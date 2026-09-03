@@ -1,0 +1,17 @@
+import fs from "node:fs";
+const css = fs.readFileSync("assets/css/www.waxueshe.com/index-CvhtvZC7-f3b0ebc293.css", "utf8");
+const i = css.lastIndexOf("@media", 108963);
+console.log("media before lg-6:", css.slice(i, i + 80));
+console.log("--- lg-6 ---");
+console.log(css.slice(108900, 109080));
+const j = css.lastIndexOf("@media", 115490);
+console.log("media before xl-6:", css.slice(j, j + 80));
+console.log("--- xl-6 ---");
+console.log(css.slice(115430, 115600));
+const k = css.indexOf(".el-col{");
+console.log("\n.el-col{", k);
+if (k>=0) console.log(css.slice(k, k+400));
+const m = css.indexOf(".el-tag--info{");
+console.log("\n.el-tag--info", css.slice(m, m+280));
+const t = css.indexOf("--el-tag-text-color");
+console.log("\ntag text", css.slice(t, t+200));

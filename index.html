@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" translate="no" style="--el-color-primary: #4162ff">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, minimum-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="google" content="notranslate" />
+    <meta name="theme-color" content="#f9fafb" />
+    <script>
+      try {
+        if (localStorage.getItem("theme") === "dark") {
+          document.documentElement.classList.add("dark");
+          document.documentElement.style.colorScheme = "dark";
+        }
+      } catch (e) {}
+    </script>
+    <title>哇学社 - 游戏化英语学习平台</title>
+    <meta
+      name="description"
+      content="哇学社是专业的游戏化英语学习平台，通过趣味游戏让英语学习变得轻松有趣。提供单词练习、语法训练、口语练习等多种学习模式，让您在游戏中提升英语水平！"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
