@@ -16,6 +16,7 @@
 import { computed } from "vue";
 import type { RankItem } from "@/api/home";
 import { formatRankTime } from "@/lib/time";
+import { localAsset } from "@/data/mall";
 
 const props = defineProps<{
   item: RankItem;
@@ -25,7 +26,7 @@ const props = defineProps<{
 const user = computed(() => props.item.user);
 const name = computed(() => user.value?.nickname || "学员");
 const avatar = computed(
-  () => user.value?.avatar || user.value?.headimg || user.value?.head_img || "/clone-assets/ico.png",
+  () => localAsset(user.value?.avatar || user.value?.headimg || user.value?.head_img || "") || "/clone-assets/ico.png",
 );
 const timeText = computed(() => props.item.total_time || formatRankTime(Number(props.item.time || props.item.duration || props.item.study_time || 0)));
 const vipSrc = computed(() => {

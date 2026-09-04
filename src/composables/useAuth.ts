@@ -2,6 +2,7 @@ import { computed, ref } from "vue";
 import { fetchMyProfile, type UserProfile } from "@/api/user";
 import { clearAuth, getToken, setAccount, setToken } from "@/api/token";
 import type { LoginResult } from "@/api/auth";
+import { localAsset } from "@/data/mall";
 
 const user = ref<UserProfile | null>(null);
 
@@ -13,9 +14,7 @@ export const displayName = computed(
 
 export const avatarUrl = computed(
   () =>
-    user.value?.avatar ||
-    user.value?.headimg ||
-    user.value?.head_img ||
+    localAsset(user.value?.avatar || user.value?.headimg || user.value?.head_img || "") ||
     "/clone-assets/ico.png",
 );
 

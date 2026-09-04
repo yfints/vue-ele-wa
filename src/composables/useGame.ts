@@ -25,6 +25,7 @@ export interface GameSentence {
   phonetic_us?: string;
   part_of_speech?: string;
   audio?: string;
+  pic?: string;
 }
 
 export interface GameSetting {
@@ -33,6 +34,7 @@ export interface GameSetting {
   success_auto_next: boolean;
   speaker_read_auto: boolean;
   typeing_show: boolean;
+  show_sentence_pic: boolean;
   answer_auto_show_error_times: number;
 }
 
@@ -82,6 +84,7 @@ export function defaultSetting(): GameSetting {
     success_auto_next: false,
     speaker_read_auto: true,
     typeing_show: true,
+    show_sentence_pic: true,
     answer_auto_show_error_times: 0,
   };
 }

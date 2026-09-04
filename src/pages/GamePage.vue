@@ -22,6 +22,7 @@
     />
 
     <div class="gameBody flex col ac jc">
+      <GamePic v-if="showPic" :pic="current?.pic" />
       <template v-if="current && answering">
         <div
           v-if="showChinese && mode === 'SentenceTranslate'"
@@ -201,6 +202,9 @@
         <el-form-item label="打字显示字母">
           <el-switch v-model="gameSetting.typeing_show" @change="persistSetting" />
         </el-form-item>
+        <el-form-item label="显示图片">
+          <el-switch v-model="gameSetting.show_sentence_pic" @change="onTogglePic" />
+        </el-form-item>
         <el-form-item label="错几次后显示答案">
           <el-input-number v-model="gameSetting.answer_auto_show_error_times" :min="0" :max="9" @change="persistSetting" />
         </el-form-item>
@@ -237,6 +241,7 @@ import { ElMessage } from "element-plus";
 import GameHeader from "@/components/GameHeader.vue";
 import GameWords from "@/components/GameWords.vue";
 import GameListen from "@/components/GameListen.vue";
+import GamePic from "@/components/GamePic.vue";
 import GameTyping from "@/components/GameTyping.vue";
 import GameSuccess from "@/components/GameSuccess.vue";
 import GameBotbar from "@/components/GameBotbar.vue";
@@ -296,9 +301,17 @@ const showChinese = computed(() => {
 });
 const phonetic = computed(() => current.value?.phonetic_uk || current.value?.phonetic_us || "");
 const successWords = computed(() => (current.value?.english || "").split(/\s+/).filter(Boolean));
+const showPic = computed(() => gameSetting.value.show_sentence_pic && Boolean(current.value?.pic));
 
 function persistSetting() {
   saveGameSetting({ ...gameSetting.value });
+}
+
+function onTogglePic() {
+  persistSetting();
+  if (gameSetting.value.show_sentence_pic && !current.value?.pic) {
+    ElMessage.info("该课程还未生成图片");
+  }
 }
 
 function toggleLetters() {

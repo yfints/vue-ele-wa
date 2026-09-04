@@ -775,7 +775,6 @@ button {
   position: relative;
   display: inline-block;
   overflow: hidden;
-  width: 100%;
 }
 .el-image__inner {
   width: 100%;
@@ -2295,6 +2294,17 @@ html.dark .loginContent {
 .gameChinese {
   max-width: 48.21429rem;
   line-height: 1.5;
+}
+.sentencePic {
+  max-width: 16.07143rem;
+}
+.sentenceCover,
+.wordCover {
+  max-width: min(14.28571rem, 42vw);
+  max-height: 10.71429rem;
+  object-fit: contain;
+  border-radius: 0.35714rem;
+  display: block;
 }
 .gameWords {
   max-width: 51.78571rem;

@@ -16,6 +16,14 @@ export default defineConfig({
         target: "https://api.waxueshe.com",
         changeOrigin: true,
       },
+      "/res-cdn": {
+        target: "https://res.waxueshe.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/res-cdn/, ""),
+        headers: {
+          Referer: "https://www.waxueshe.com/",
+        },
+      },
     },
   },
 });

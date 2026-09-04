@@ -35,13 +35,13 @@ async function loadRemote() {
     await fetchGameTime().then((data) => {
       gameTime.value = typeof data === "number" ? data : Number(data?.time || 0);
     });
-    await startGame(session.courseId, session.chapterId);
+    const started = await startGame(session.courseId, session.chapterId);
     const page = await fetchExercisePage({
       lesson_id: session.courseId,
       lesson_course_id: session.chapterId,
       limit: 10,
     });
-    const list = mapSentences(page?.sentences || []);
+    const list = mapSentences(page?.sentences?.length ? page.sentences : started?.sentences || []);
     if (list.length) {
       gameList.value = list;
       gameIndex.value = 0;

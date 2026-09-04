@@ -19,6 +19,8 @@ export interface GameSentenceItem {
   translate?: string;
   translation?: string;
   audio?: string;
+  pic?: string;
+  image?: string;
   phonetic_uk?: string;
   phonetic_us?: string;
   part_of_speech?: string;
@@ -29,6 +31,8 @@ export interface GameSentenceItem {
     content?: string;
     translate?: string;
     audio?: string;
+    pic?: string;
+    image?: string;
     phonetic_uk?: string;
     phonetic_us?: string;
     part_of_speech?: string;

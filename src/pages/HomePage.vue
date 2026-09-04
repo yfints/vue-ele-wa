@@ -318,6 +318,7 @@ import {
   shiftYearMonth,
 } from "@/lib/time";
 import HomePodium from "@/components/HomePodium.vue";
+import { localAsset } from "@/data/mall";
 
 const studyTabs = [
   { name: "总计", value: 0 },
@@ -371,7 +372,7 @@ function userName(user?: RankUser) {
 }
 
 function userAvatar(user?: RankUser) {
-  return user?.avatar || user?.headimg || user?.head_img || "/clone-assets/ico.png";
+  return localAsset(user?.avatar || user?.headimg || user?.head_img || "") || "/clone-assets/ico.png";
 }
 
 function rankTimeText(item?: RankItem | null) {

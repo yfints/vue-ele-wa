@@ -37,7 +37,12 @@ export const mallTotal = mallPayload.data.total as number;
 export const lessonCategories = categoryPayload.data as LessonCategory[];
 
 export function localAsset(url: string) {
-  return (assetMap as Record<string, string>)[url] || url;
+  if (!url) return "";
+  const mapped = (assetMap as Record<string, string>)[url];
+  if (mapped) return mapped;
+  const remote = url.match(/^https?:\/\/res\.waxueshe\.com(\/.*)$/i);
+  if (remote) return `/res-cdn${remote[1]}`;
+  return url;
 }
 
 export function getMallLesson(id: string | number) {

@@ -7,7 +7,10 @@ export function mapSentences(raw: GameSentenceItem[] | unknown[]): GameSentence[
       const row = item as GameSentenceItem;
       const practice = Array.isArray(row.practices) ? row.practices[0] : undefined;
       const english = String(row.content || row.english || practice?.content || practice?.english || "");
-      const chinese = String(row.chinese || practice?.chinese || row.translate || "");
+      const chinese = String(
+        row.chinese || practice?.chinese || row.translate || row.translation || practice?.translate || "",
+      );
+      const pic = String(row.pic || row.image || practice?.pic || practice?.image || "");
       return {
         id: Number(row.id || row.sentence_id || index + 1),
         chinese,
@@ -16,6 +19,7 @@ export function mapSentences(raw: GameSentenceItem[] | unknown[]): GameSentence[
         phonetic_us: row.phonetic_us || practice?.phonetic_us,
         part_of_speech: row.part_of_speech || practice?.part_of_speech,
         audio: row.audio || practice?.audio,
+        pic: pic || undefined,
       };
     })
     .filter((item) => item.chinese || item.english);
