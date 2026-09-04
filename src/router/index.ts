@@ -6,12 +6,16 @@ import CourseMallPage from "@/pages/CourseMallPage.vue";
 import HomePage from "@/pages/HomePage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import MyLessonDetailPage from "@/pages/MyLessonDetailPage.vue";
+import GameLoadPage from "@/pages/GameLoadPage.vue";
+import GamePage from "@/pages/GamePage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/login", redirect: "/login/index" },
     { path: "/login/index", component: LoginPage },
+    { path: "/gameLoad", component: GameLoadPage },
+    { path: "/game", component: GamePage },
     {
       path: "/",
       component: AppLayout,
@@ -44,7 +48,9 @@ router.beforeEach((to: any) => {
     return true;
   }
   if (isPublic) return true;
-  if (!loggedIn) return "/login/index";
+  if (!loggedIn) {
+    return { path: "/login/index", query: { redirect: to.fullPath } };
+  }
   return true;
 });
 

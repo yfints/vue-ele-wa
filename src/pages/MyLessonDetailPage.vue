@@ -150,6 +150,7 @@
       </div>
     </div>
     <div class="safeArea phone" />
+    <ModePop ref="modeRef" />
   </div>
 </template>
 
@@ -163,11 +164,14 @@ import { getToken } from "@/api/token";
 import { isPhone } from "@/composables/useLayout";
 import { getDemoMyLessonDetails, localAsset, type MyLessonCourse, type MyLessonDetails } from "@/data/mall";
 import { formatPracticeMinutes } from "@/lib/time";
+import ModePop from "@/components/ModePop.vue";
+import { saveGameInfo } from "@/composables/useGame";
 
 const route = useRoute();
 const router = useRouter();
 const lesson = ref<MyLessonDetails | undefined>();
 const usingDemo = ref(false);
+const modeRef = ref<{ open: () => void } | null>(null);
 
 const userLessonId = computed(() => String(route.params.id || ""));
 const cover = computed(() => (lesson.value?.image ? localAsset(lesson.value.image) : ""));
@@ -183,8 +187,18 @@ const studyTimeText = computed(() => {
   return formatPracticeMinutes(value);
 });
 
-function openPractice(_course?: MyLessonCourse) {
-  ElMessage.info("本地预览不接入练习引擎");
+function openPractice(course?: MyLessonCourse) {
+  if (!course || !lesson.value) return;
+  saveGameInfo({
+    courseId: String(lesson.value.id),
+    chapterId: String(course.id),
+    gameTitle: course.name,
+    courseName: lesson.value.name,
+    gameType: "Sentence",
+    gameMode: "SentenceTranslate",
+    userLessonId: userLessonId.value,
+  });
+  modeRef.value?.open();
 }
 
 function switchWordLesson() {

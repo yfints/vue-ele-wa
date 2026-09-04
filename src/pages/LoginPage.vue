@@ -159,7 +159,7 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { loginByPassword } from "@/api/auth";
 import { applyLogin, fetchMe } from "@/composables/useAuth";
@@ -175,6 +175,7 @@ import {
 } from "@/lib/rules";
 
 const router = useRouter();
+const route = useRoute();
 const mode = ref<"password" | "code" | "register" | "forgot" | "email">("password");
 const phone = ref("");
 const email = ref("");
@@ -292,7 +293,12 @@ async function submit() {
     applyLogin(data, phone.value.trim());
     await fetchMe();
     ElMessage.success("登录成功");
-    await router.push("/home/index");
+    const redirect = route.query.redirect;
+    const target =
+      typeof redirect === "string" && redirect.startsWith("/") && !redirect.startsWith("//")
+        ? redirect
+        : "/home/index";
+    await router.push(target);
   } catch {
     /* unwrap 已提示 */
   } finally {
