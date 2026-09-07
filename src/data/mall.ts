@@ -41,7 +41,9 @@ export function localAsset(url: string) {
   const mapped = (assetMap as Record<string, string>)[url];
   if (mapped) return mapped;
   const remote = url.match(/^https?:\/\/res\.waxueshe\.com(\/.*)$/i);
-  if (remote) return `/res-cdn${remote[1]}`;
+  if (remote) {
+    return import.meta.env.DEV ? `/res-cdn${remote[1]}` : url;
+  }
   return url;
 }
 

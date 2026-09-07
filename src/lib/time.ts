@@ -1,4 +1,4 @@
-export function formatPracticeMinutes(total = 0) {
+export function formatPracticeMinutes(total: string | number | null | undefined = 0) {
   const t = Math.max(0, Number(total) || 0);
   return `${Math.floor(t / 60)}分钟`;
 }
