@@ -22,13 +22,17 @@
       <div class="opc5 size24 mt10">口语评测 (Enter)</div>
     </div>
     <div v-if="transcript" class="oralHeard mt30 tc size24">{{ transcript }}</div>
+    <div v-if="audioUrl" class="flex ac jc mt20 hand" @click="playAudio">
+      <el-icon :size="22" class="mainColor"><VideoPlay /></el-icon>
+      <div class="size20 ml10">试听录音</div>
+    </div>
     <div v-if="hint" class="oralHint opc6 mt20 tc size20">{{ hint }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Microphone } from "@element-plus/icons-vue";
+import { Microphone, VideoPlay } from "@element-plus/icons-vue";
 
 const props = defineProps<{
   english: string;
@@ -38,6 +42,7 @@ const props = defineProps<{
   evaluating: boolean;
   hint: string;
   transcript: string;
+  audioUrl: string;
 }>();
 
 const emit = defineEmits<{
@@ -46,4 +51,9 @@ const emit = defineEmits<{
 }>();
 
 const words = computed(() => String(props.english || "").split(/\s+/).filter(Boolean));
+
+const playAudio = () => {
+  const audio = new Audio(props.audioUrl);
+  audio.play();
+};
 </script>

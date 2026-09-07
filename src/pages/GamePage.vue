@@ -69,6 +69,7 @@
           :show-chinese="gameSetting.show_translate"
           :recording="recording"
           :evaluating="evaluating"
+          :audio-url="oralAudioUrl"
           :hint="oralHint"
           :transcript="oralTranscript"
           @record="toggleRecord"
@@ -285,6 +286,8 @@ const evaluating = ref(false);
 const oralCompleted = ref(false);
 const oralTranscript = ref("");
 const oralHint = ref("");
+const oralAudioBlob = ref<Blob | null>(null);
+const oralAudioUrl = ref("");
 const nextKey = ref("");
 const errorKey = ref("");
 const activeKey = ref("");
@@ -293,6 +296,11 @@ let autoNextTimer: number | undefined;
 let audioEl: HTMLAudioElement | null = null;
 let stopViewport: (() => void) | undefined;
 let recognition: SpeechRecognition | null = null;
+let mediaStream: MediaStream | null = null;
+let mediaRecorder: MediaRecorder | null = null;
+let audioChunks: BlobPart[] = [];
+let captureToken = 0;
+let captureCancelled = false;
 
 const isDesktop = computed(() => !isPhone.value);
 const clock = computed(() => formatClock(elapsed.value));
@@ -425,6 +433,8 @@ function startRecord() {
   stopSpeak();
   oralTranscript.value = "";
   oralHint.value = "";
+  releaseOralAudio();
+  void startAudioCapture();
   const rec = getRecognizer();
   if (!rec) {
     recording.value = true;
@@ -450,6 +460,7 @@ function startRecord() {
   };
   rec.onend = () => {
     recording.value = false;
+    stopAudioCapture();
     if (oralTranscript.value && answering.value) {
       checkOral(oralTranscript.value);
     }
@@ -462,6 +473,76 @@ function stopRecord() {
   recognition?.stop();
   recognition = null;
   recording.value = false;
+  stopAudioCapture();
+}
+
+async function startAudioCapture() {
+  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") return;
+  const token = ++captureToken;
+  captureCancelled = false;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    if (token !== captureToken) {
+      stream.getTracks().forEach((track) => track.stop());
+      return;
+    }
+    mediaStream = stream;
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
+    const recorder = mimeType
+      ? new MediaRecorder(stream, { mimeType })
+      : new MediaRecorder(stream);
+    mediaRecorder = recorder;
+    audioChunks = [];
+    recorder.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) audioChunks.push(event.data);
+    };
+
+    recorder.onstop = () => {
+      if (captureCancelled || !audioChunks.length) return;
+      if (oralAudioUrl.value) URL.revokeObjectURL(oralAudioUrl.value);
+      const blob = new Blob(audioChunks, { type: recorder.mimeType || "audio/webm" });
+
+      oralAudioBlob.value = blob;
+      oralAudioUrl.value = URL.createObjectURL(blob);
+
+
+
+// 下载到本地
+   /*   const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+
+      a.href = downloadUrl;
+      a.download = 'oral-audio.wav'; // 根据实际音频格式修改
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(downloadUrl);*/
+    };
+    recorder.start();
+  } catch {
+    /* 未授权麦克风时退化为仅语音识别转写 */
+  }
+}
+
+function stopAudioCapture() {
+  captureToken += 1;
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    try {
+      mediaRecorder.stop();
+    } catch {
+      /* ignore */
+    }
+  }
+  mediaStream?.getTracks().forEach((track) => track.stop());
+  mediaStream = null;
+  mediaRecorder = null;
+}
+
+function releaseOralAudio() {
+  if (oralAudioUrl.value) URL.revokeObjectURL(oralAudioUrl.value);
+  oralAudioUrl.value = "";
+  oralAudioBlob.value = null;
 }
 
 function checkOral(text: string) {
@@ -495,11 +576,14 @@ function resetItem() {
   activeKey.value = "";
   recognition?.abort();
   recognition = null;
+  stopAudioCapture();
+  releaseOralAudio();
   recording.value = false;
 }
 
 function cancelRecording() {
   if (!recording.value) return false;
+  captureCancelled = true;
   stopRecord();
   ElMessage.info("录音已取消");
   return true;
@@ -682,5 +766,6 @@ onUnmounted(() => {
   if (autoNextTimer) clearTimeout(autoNextTimer);
   stopRecord();
   stopSpeak();
+  releaseOralAudio();
 });
 </script>
