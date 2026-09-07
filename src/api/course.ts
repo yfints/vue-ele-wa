@@ -46,6 +46,15 @@ export async function fetchMyLessonDetails(id: string | number) {
   return unwrapLesson(data);
 }
 
+export async function fetchLessonDetails(id: string | number) {
+  const data = await get<unknown>(
+    "/api/v2/lesson_details",
+    { id },
+    { skipAuthRedirect: true },
+  );
+  return unwrapLesson(data);
+}
+
 export function toggleCollect(lessonId: string | number) {
   return post("/api/v2/collect/toggle", { lesson_id: lessonId, type: 0 }, { skipAuthRedirect: true });
 }

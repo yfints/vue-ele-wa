@@ -33,7 +33,7 @@
             :xl="6"
             class="mb30"
           >
-            <div class="card hand" title="练习未接入">
+            <div class="card hand" @click="openPractice(course)">
               <div class="flex ac">
                 <div class="size26 line1 flex1 mr20 bold6">{{ course.name }}</div>
                 <el-tag type="info" size="small" effect="plain" round>暂未练习</el-tag>
@@ -42,20 +42,7 @@
                 <div class="flex ac size-18">
                   <div class="flex ac mr20">
                     <div class="img20 mr5">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                        <path
-                          fill="currentColor"
-                          d="M512 896a384 384 0 1 0 0-768 384 384 0 0 0 0 768m0 64a448 448 0 1 1 0-896 448 448 0 0 1 0 896"
-                        />
-                        <path
-                          fill="currentColor"
-                          d="M480 256a32 32 0 0 1 32 32v256a32 32 0 0 1-64 0V288a32 32 0 0 1 32-32"
-                        />
-                        <path
-                          fill="currentColor"
-                          d="M480 512h256q32 0 32 32t-32 32H480q-32 0-32-32t32-32"
-                        />
-                      </svg>
+                      <el-icon><Clock /></el-icon>
                     </div>
                     <div>练习时长：0分钟</div>
                   </div>
@@ -67,25 +54,145 @@
         </el-row>
       </div>
     </div>
+    <ModePop ref="modeRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getLessonDetails, getMallLesson, localAsset } from "@/data/mall";
+import { ElMessageBox } from "element-plus";
+import { Clock } from "@element-plus/icons-vue";
+import { fetchLessonDetails } from "@/api/course";
+import { getToken } from "@/api/token";
+import ModePop from "@/components/ModePop.vue";
+import { saveGameInfo } from "@/composables/useGame";
+import {
+  getLessonDetails,
+  getMallLesson,
+  localAsset,
+  type LessonCourse,
+  type LessonDetails,
+} from "@/data/mall";
 
 const route = useRoute();
 const router = useRouter();
+const modeRef = ref<{ open: () => void } | null>(null);
+const lesson = ref<LessonDetails | undefined>();
 const courseId = computed(() => String(route.params.courseId || ""));
+const courses = computed(() => lesson.value?.lesson_courses ?? []);
+const courseCount = computed(
+  () => lesson.value?.course_published_count ?? courses.value.length,
+);
+
 function goMall() {
   void router.push("/courseMall/index");
 }
-const details = computed(() => (courseId.value ? getLessonDetails(courseId.value) : undefined));
-const mallLesson = computed(() => (courseId.value ? getMallLesson(courseId.value) : undefined));
-const lesson = computed(() => details.value ?? mallLesson.value);
-const courses = computed(() => details.value?.lesson_courses ?? []);
-const courseCount = computed(
-  () => details.value?.course_published_count ?? lesson.value?.course_published_count ?? 0,
+
+function toLessonDetails(source?: {
+  id?: number | string;
+  name?: string;
+  describe?: string;
+  image?: string;
+  course_published_count?: number;
+  user_lesson_id?: number;
+  lesson_courses?: Array<{ id: number; name: string; describe?: string }>;
+  lesson_course?: Array<{ id: number; name: string; describe?: string }>;
+}): LessonDetails | undefined {
+  if (!source) return undefined;
+  const list = (source.lesson_courses || source.lesson_course || []).map((item) => ({
+    id: item.id,
+    name: item.name,
+    describe: item.describe || item.name,
+  }));
+  if (!source.id && !source.name && !list.length) return undefined;
+  const base = getMallLesson(source.id || courseId.value);
+  return {
+    ...(base || ({} as LessonDetails)),
+    ...source,
+    id: Number(source.id || courseId.value),
+    lesson_courses: list,
+  } as LessonDetails;
+}
+
+async function load() {
+  const local =
+    getLessonDetails(courseId.value) || toLessonDetails(getMallLesson(courseId.value));
+  try {
+    const remote = await fetchLessonDetails(courseId.value);
+    const mapped = toLessonDetails(remote);
+    if (mapped?.id) {
+      lesson.value = {
+        ...local,
+        ...mapped,
+        lesson_courses: mapped.lesson_courses.length
+          ? mapped.lesson_courses
+          : local?.lesson_courses || [],
+      };
+      return;
+    }
+  } catch {
+    /* 走本地课纲 */
+  }
+  lesson.value = local;
+}
+
+function startPractice(course: LessonCourse) {
+  if (!lesson.value) return;
+  const userLessonId = lesson.value.user_lesson_id;
+  saveGameInfo({
+    courseId: String(lesson.value.id),
+    chapterId: String(course.id),
+    gameTitle: course.name,
+    courseName: lesson.value.name,
+    gameType: "Sentence",
+    gameMode: "SentenceTranslate",
+    userLessonId: userLessonId && userLessonId !== 0 ? String(userLessonId) : "",
+  });
+  modeRef.value?.open();
+}
+
+async function askLogin(chapterId: number) {
+  try {
+    await ElMessageBox.confirm("您还未登录或登录失效，是否前往登录？", "提示", {
+      confirmButtonText: "确认",
+      cancelButtonText: "先不登录",
+      type: "warning",
+      closeOnClickModal: false,
+    });
+    await router.push({
+      path: "/login/index",
+      query: { redirect: `${route.path}?start=${chapterId}` },
+    });
+  } catch {
+    /* 先不登录 */
+  }
+}
+
+function openPractice(course: LessonCourse) {
+  if (!getToken()) {
+    void askLogin(course.id);
+    return;
+  }
+  startPractice(course);
+}
+
+async function maybeResumeStart() {
+  const startId = String(route.query.start || "");
+  if (!startId || !getToken()) return;
+  const course = courses.value.find((item) => String(item.id) === startId);
+  if (course) startPractice(course);
+  const query = { ...route.query };
+  delete query.start;
+  await router.replace({ path: route.path, query });
+}
+
+watch(
+  courseId,
+  async () => {
+    await load();
+    await maybeResumeStart();
+  },
+  { immediate: true },
 );
 </script>

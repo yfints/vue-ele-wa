@@ -249,6 +249,7 @@ import GameOral from "@/components/GameOral.vue";
 import ModePop from "@/components/ModePop.vue";
 import {
   currentSentence,
+  gameBackPath,
   gameIndex,
   gameList,
   gameSession,
@@ -557,8 +558,7 @@ function resume() {
 async function leave() {
   pauseOpen.value = false;
   leaveOpen.value = false;
-  const id = session.value?.userLessonId;
-  await router.replace(id ? `/courseMall/detail/${id}` : "/courseMall/index");
+  await router.replace(gameBackPath(session.value));
 }
 
 function toggleFullscreen() {
@@ -656,7 +656,7 @@ onMounted(() => {
   window.addEventListener("keydown", onShortcut);
   if (!session.value?.chapterId || !gameList.value.length) {
     ElMessage.warning("请先选择课程");
-    void router.replace("/courseMall/index");
+    void router.replace(gameBackPath(session.value));
     return;
   }
   elapsed.value = gameTime.value || 0;

@@ -20,7 +20,7 @@ const router = createRouter({
       path: "/",
       component: AppLayout,
       children: [
-        { path: "", redirect: "/home/index" },
+        { path: "", redirect: "/courseMall" },
         { path: "home", redirect: "/home/index" },
         { path: "home/index", component: HomePage },
         { path: "courseMall", component: CourseMallPage, meta: { public: true } },
@@ -39,12 +39,16 @@ const router = createRouter({
   ],
 });
 
+function safeRedirect(value: unknown) {
+  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : "";
+}
+
 router.beforeEach((to: any) => {
   const loggedIn = Boolean(getToken());
   const isLogin = to.path.startsWith("/login");
   const isPublic = to.matched.some((record: any) => record.meta.public === true);
   if (isLogin) {
-    if (loggedIn) return "/home/index";
+    if (loggedIn) return safeRedirect(to.query.redirect) || "/home/index";
     return true;
   }
   if (isPublic) return true;

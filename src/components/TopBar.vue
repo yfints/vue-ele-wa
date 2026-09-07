@@ -50,7 +50,7 @@
         <div class="img30 opc6 phone" v-html="item.icon" />
       </div>
       <ThemeToggle />
-      <RouterLink :to="isLoggedIn ? '/home/index' : '/login/index'">
+      <RouterLink :to="profileTo">
         <el-image :src="avatarUrl" class="img48 hand circle" fit="cover" />
       </RouterLink>
     </div>
@@ -68,6 +68,11 @@ const route = useRoute();
 const isHome = computed(() => route.path.startsWith("/home"));
 const isDetail = computed(
   () => /^\/courseMall\/(?!index$)/.test(route.path) || route.path.startsWith("/courses/"),
+);
+const profileTo = computed(() =>
+  isLoggedIn.value
+    ? "/home/index"
+    : { path: "/login/index", query: { redirect: route.fullPath } },
 );
 
 const searchIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><path fill="currentColor" d="m795.904 750.72 124.992 124.928a32 32 0 0 1-45.248 45.248L750.656 795.904a416 416 0 1 1 45.248-45.248zM480 832a352 352 0 1 0 0-704 352 352 0 0 0 0 704"/></svg>`;

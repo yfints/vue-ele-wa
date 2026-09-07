@@ -263,7 +263,7 @@ async function askLogin() {
       type: "warning",
       closeOnClickModal: false,
     });
-    await router.push("/login/index");
+    await router.push({ path: "/login/index", query: { redirect: route.fullPath } });
   } catch {
     /* 先不登录 */
   }

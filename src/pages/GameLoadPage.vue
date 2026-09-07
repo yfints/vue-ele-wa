@@ -18,7 +18,7 @@ import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { fetchExercisePage, fetchGameTime, startGame } from "@/api/game";
 import { getToken } from "@/api/token";
-import { gameIndex, gameList, gameSession, gameTime, resetGameData, saveGameInfo } from "@/composables/useGame";
+import { gameIndex, gameList, gameSession, gameTime, gameBackPath, resetGameData, saveGameInfo } from "@/composables/useGame";
 import { demoSentences } from "@/data/game-demo";
 import { mapSentences } from "@/lib/mapSentences";
 
@@ -56,7 +56,7 @@ async function loadRemote() {
 onMounted(async () => {
   if (!gameSession.value?.chapterId) {
     ElMessage.warning("请先选择课程");
-    await router.replace("/courseMall/index");
+    await router.replace(gameBackPath());
     return;
   }
   resetGameData();
