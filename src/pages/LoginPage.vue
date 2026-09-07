@@ -94,12 +94,12 @@
         {{ errors.sms }}
       </p>
 
-      <div v-if="mode === 'password' || mode === 'code'" class="flex jb size18 mt20">
+<!--      <div v-if="mode === 'password' || mode === 'code'" class="flex jb size18 mt20">
         <div class="mainColor hand" @click="mode = mode === 'password' ? 'code' : 'password'">
           {{ mode === 'password' ? "用验证码登录" : "用密码登录" }}
         </div>
         <div class="hand forget" @click="mode = 'forgot'">忘记密码？</div>
-      </div>
+      </div>-->
       <div v-else-if="mode === 'forgot'" class="flex jb size18 mt20">
         <div class="mainColor hand" @click="mode = 'password'">返回登录</div>
         <div />
@@ -129,7 +129,7 @@
         </div>
         <p v-if="errors.agreed" class="fieldError">{{ errors.agreed }}</p>
       </template>
-      <template v-else>
+<!--      <template v-else>
         <div class="flex jc ac mt30">
           <img :src="icons.line" class="pic6" alt="" />
           <div class="size12 txt">或使用以下方式继续</div>
@@ -152,7 +152,7 @@
             <div class="size-20">国外邮箱</div>
           </div>
         </div>
-      </template>
+      </template>-->
     </div>
   </div>
 </template>
@@ -176,7 +176,7 @@ import {
 
 const router = useRouter();
 const route = useRoute();
-const mode = ref<"password" | "code" | "register" | "forgot" | "email">("password");
+const mode = ref<"password" | "code" | "register" | "forgot" | "email">("code");
 const phone = ref("");
 const email = ref("");
 const password = ref("");
