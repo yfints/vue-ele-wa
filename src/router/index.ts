@@ -22,11 +22,17 @@ const router = createRouter({
       children: [
         { path: "", redirect: "/courseMall" },
         { path: "home", redirect: "/home/index" },
-        { path: "home/index", component: HomePage },
-        { path: "courseMall", component: CourseMallPage, meta: { public: true } },
-        { path: "courseMall/index", component: CourseMallPage, meta: { public: true } },
-        { path: "courseMall/detail/:id", component: MyLessonDetailPage, meta: { public: true } },
-        { path: "courseMall/:courseId", component: CourseDetailPage, meta: { public: true } },
+        { path: "home/index", component: HomePage, meta: { title: "首页" } },
+        {
+          path: "courseMall",
+          meta: { public: true, title: "课程广场" },
+          children: [
+            { path: "", component: CourseMallPage },
+            { path: "index", component: CourseMallPage },
+            { path: "detail/:id", component: MyLessonDetailPage, meta: { title: "课程详情" } },
+            { path: ":courseId", component: CourseDetailPage, meta: { title: "课程详情" } },
+          ],
+        },
         { path: "courses", redirect: "/courseMall/index", meta: { public: true } },
         {
           path: "courses/:courseId",

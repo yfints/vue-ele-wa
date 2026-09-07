@@ -6,12 +6,13 @@
       </button>
       <div class="pc flex ac flex1">
         <el-breadcrumb separator="/" aria-label="面包屑">
-          <el-breadcrumb-item v-if="isHome">首页</el-breadcrumb-item>
-          <template v-else>
-            <el-breadcrumb-item v-if="isDetail" to="/courseMall/index">课程广场</el-breadcrumb-item>
-            <el-breadcrumb-item v-else>课程广场</el-breadcrumb-item>
-            <el-breadcrumb-item v-if="isDetail">课程详情</el-breadcrumb-item>
-          </template>
+          <el-breadcrumb-item
+            v-for="(crumb, index) in breadcrumbs"
+            :key="`${crumb.label}-${index}`"
+            :to="index < breadcrumbs.length - 1 ? crumb.to : undefined"
+          >
+            {{ crumb.label }}
+          </el-breadcrumb-item>
         </el-breadcrumb>
         <div class="search ml30 flex ac hand bigElement" @click="openSearch">
           <div class="img26 opc6">
@@ -65,10 +66,20 @@ import { avatarUrl, isLoggedIn } from "@/composables/useAuth";
 import ThemeToggle from "./ThemeToggle.vue";
 
 const route = useRoute();
-const isHome = computed(() => route.path.startsWith("/home"));
-const isDetail = computed(
-  () => /^\/courseMall\/(?!index$)/.test(route.path) || route.path.startsWith("/courses/"),
-);
+
+interface Crumb {
+  label: string;
+  to?: string;
+}
+
+const breadcrumbs = computed<Crumb[]>(() => {
+  const titled = route.matched.filter((record) => typeof record.meta.title === "string");
+  return titled.map((record, index) => ({
+    label: String(record.meta.title),
+    to: index < titled.length - 1 ? record.path : undefined,
+  }));
+});
+
 const profileTo = computed(() =>
   isLoggedIn.value
     ? "/home/index"
