@@ -17,5 +17,5 @@ export function loginByPassword(phone: string, code: string) {
 }
 
 export function sendSms(phone: string) {
-  return post("/api/v2/auth/sms/send", { phone, scene: "login" });
+  return post("/api/v1/auth/sms/send", { phone, scene: "login" });
 }
