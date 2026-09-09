@@ -10,9 +10,17 @@ export const BASE_URL = import.meta.env.DEV
 
 export interface ApiResult<T = unknown> {
   code: number;
-  msg: string;
   message?: string;
+  msg?: string;
   data: T;
+}
+
+function apiMessage(payload: unknown, fallback = "请求失败") {
+  if (payload && typeof payload === "object") {
+    const data = payload as { message?: string; msg?: string };
+    return data.message || data.msg || fallback;
+  }
+  return fallback;
 }
 
 export const http: AxiosInstance = axios.create({
@@ -34,20 +42,23 @@ http.interceptors.response.use(
   (error: unknown) => {
     const config = axios.isAxiosError(error) ? error.config : undefined;
     const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+    const payload = axios.isAxiosError(error) ? error.response?.data : undefined;
+    const code =
+      payload && typeof payload === "object" && "code" in payload
+        ? (payload as ApiResult).code
+        : undefined;
+
+    if (code != null && code !== 200) {
+      ElMessage.error(apiMessage(payload));
+    } else if (axios.isAxiosError(error) && !config?.skipAuthRedirect) {
+      ElMessage.error(apiMessage(payload, error.message || "网络异常，请稍后重试"));
+    }
+
     if (status === 401) {
       clearAuth();
-      if (!config?.skipAuthRedirect) {
-        ElMessage.error("登录已过期，请重新登录");
-        if (!router.currentRoute.value.path.startsWith("/login")) {
-          void router.push("/login/index");
-        }
+      if (!config?.skipAuthRedirect && !router.currentRoute.value.path.startsWith("/login")) {
+        void router.push("/login/index");
       }
-    } else if (axios.isAxiosError(error) && !config?.skipAuthRedirect) {
-      const message =
-        (error.response?.data as { msg?: string } | undefined)?.msg ||
-        error.message ||
-        "网络异常，请稍后重试";
-      ElMessage.error(message);
     }
     return Promise.reject(error);
   },
@@ -57,8 +68,9 @@ function unwrap<T>(payload: ApiResult<T> | T): T {
   if (payload && typeof payload === "object" && "code" in payload) {
     const result = payload as ApiResult<T>;
     if (result.code !== 200) {
-      ElMessage.error(result.msg || result.message || "请求失败");
-      throw new Error(result.msg || result.message ||  "请求失败");
+      const message = apiMessage(result);
+      ElMessage.error(message);
+      throw new Error(message);
     }
     return result.data;
   }
