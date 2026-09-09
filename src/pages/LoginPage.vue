@@ -293,7 +293,6 @@ async function submit() {
     return;
   }
   if (mode.value !== "password") {
-    ElMessage.info("当前仅接入手机号密码登录");
     if(mode.value === "code"){
       const data = await loginByPassword(phone.value.trim(), sms.value);
       applyLogin(data, phone.value.trim());
