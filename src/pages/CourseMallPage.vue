@@ -42,8 +42,9 @@
           </div>
         </div>
       </div>
-      <div class="pageScroll listScroll">
-        <div class="gridContainer">
+      <div v-loading="loading" class="pageScroll listScroll">
+        <el-empty v-if="!loading && !filtered.length" description="暂无课程" />
+        <div v-else class="gridContainer">
           <MallCard v-for="lesson in filtered" :key="lesson.id" :lesson="lesson" />
         </div>
         <div class="opc6 size20 mt30 pb20">共 {{ mallTotal }} 门课，当前展示 {{ filtered.length }} 门</div>
@@ -53,16 +54,56 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import MallCard from "@/components/MallCard.vue";
-import { lessonCategories, mallLessons, mallTotal } from "@/data/mall";
+import { toMallLesson, type MallLesson } from "@/data/mall";
+import {
+  fetchCourseCategories,
+  fetchCourses,
+  type CourseCategory,
+} from "@/api/course";
 
 const moreCoursesUrl = "https://hcn2xg5ch01u.feishu.cn/share/base/form/shrcnxt6O7BuVRjxTvMYoOJHyEh";
 const categoryId = ref(0);
+const lessonCategories = ref<CourseCategory[]>([]);
+const filtered = ref<MallLesson[]>([]);
+const mallTotal = ref(0);
+const loading = ref(false);
 
-const filtered = computed(() =>
-  mallLessons.filter(
-    (lesson) => categoryId.value === 0 || lesson.lesson_category_id === categoryId.value,
-  ),
-);
+async function loadCategories() {
+  try {
+    const list = await fetchCourseCategories();
+    lessonCategories.value = Array.isArray(list) ? list : [];
+  } catch {
+    lessonCategories.value = [];
+  }
+}
+
+async function loadCourses() {
+  loading.value = true;
+  try {
+    const page = await fetchCourses({
+      categoryId: categoryId.value || undefined,
+      current: 1,
+      size: 50,
+    });
+    const records = page?.records || [];
+    filtered.value = records.map(toMallLesson);
+    mallTotal.value = Number(page?.total ?? records.length);
+  } catch {
+    filtered.value = [];
+    mallTotal.value = 0;
+  } finally {
+    loading.value = false;
+  }
+}
+
+watch(categoryId, () => {
+  void loadCourses();
+});
+
+onMounted(() => {
+  void loadCategories();
+  void loadCourses();
+});
 </script>

@@ -48,7 +48,7 @@ export async function fetchMyLessonDetails(id: string | number) {
 
 export async function fetchLessonDetails(id: string | number) {
   const data = await get<unknown>(
-    "/api/v2/lesson_details",
+    "/api/v1/courses/"+id,
     { id },
     { skipAuthRedirect: true },
   );
@@ -61,4 +61,44 @@ export function toggleCollect(lessonId: string | number) {
 
 export function deleteMyLesson(userLessonId: string | number) {
   return post("/api/v2/lessons/my/delete", { user_lesson_id: userLessonId });
+}
+
+export interface CourseCategory {
+  id: number;
+  name: string;
+  sortOrder?: number;
+}
+
+export interface CourseVo {
+  id: number;
+  categoryId?: number;
+  name?: string;
+  cover?: string;
+  description?: string;
+  courseType?: number;
+  sortOrder?: number;
+  access?: { allowed?: boolean; reason?: string };
+}
+
+export interface CoursePage {
+  records?: CourseVo[];
+  total?: number;
+  current?: number;
+  size?: number;
+}
+
+export function fetchCourseCategories() {
+  return get<CourseCategory[]>("/api/v1/course/categories", undefined, {
+    skipAuthRedirect: true,
+  });
+}
+
+export function fetchCourses(params?: {
+  categoryId?: number;
+  courseType?: number;
+  keyword?: string;
+  current?: number;
+  size?: number;
+}) {
+  return get<CoursePage>("/api/v1/courses", params, { skipAuthRedirect: true });
 }

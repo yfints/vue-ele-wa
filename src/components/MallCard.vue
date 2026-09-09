@@ -7,10 +7,14 @@
     <div class="line2 size20 mt10 courseName">{{ lesson.name }}</div>
     <div class="flex jb ac mt10 size14">
       <div class="flex ac flex1">
-        <img :src="localAsset(lesson.founder.head_img)" class="img25 avatar circle" alt="" />
-        <div class="ml5 line1 name opc6">{{ lesson.founder.name }}</div>
+        <img
+          :src="localAsset(lesson.founder?.head_img || '') || '/clone-assets/ico.png'"
+          class="img25 avatar circle"
+          alt=""
+        />
+        <div class="ml5 line1 name opc6">{{ lesson.founder?.name || "官方" }}</div>
       </div>
-      <div class="flex ac opc6">
+      <div v-if="lesson.heat" class="flex ac opc6">
         <strong>
           <i class="van-badge__wrapper van-icon van-icon-fire-o" />
         </strong>
