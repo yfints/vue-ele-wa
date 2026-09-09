@@ -23,6 +23,16 @@ function apiMessage(payload: unknown, fallback = "请求失败") {
   return fallback;
 }
 
+let unauthorizedNotified = false;
+
+function notifyApiError(payload: unknown, code?: number, fallback = "请求失败") {
+  if (code === 401) {
+    if (unauthorizedNotified) return;
+    unauthorizedNotified = true;
+  }
+  ElMessage.error(apiMessage(payload, fallback));
+}
+
 export const http: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
@@ -38,7 +48,10 @@ http.interceptors.request.use((config) => {
 });
 
 http.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    unauthorizedNotified = false;
+    return response;
+  },
   (error: unknown) => {
     const config = axios.isAxiosError(error) ? error.config : undefined;
     const status = axios.isAxiosError(error) ? error.response?.status : undefined;
@@ -46,15 +59,17 @@ http.interceptors.response.use(
     const code =
       payload && typeof payload === "object" && "code" in payload
         ? (payload as ApiResult).code
-        : undefined;
+        : status === 401
+          ? 401
+          : undefined;
 
     if (code != null && code !== 200) {
-      ElMessage.error(apiMessage(payload));
+      notifyApiError(payload, code);
     } else if (axios.isAxiosError(error) && !config?.skipAuthRedirect) {
-      ElMessage.error(apiMessage(payload, error.message || "网络异常，请稍后重试"));
+      notifyApiError(payload, undefined, error.message || "网络异常，请稍后重试");
     }
 
-    if (status === 401) {
+    if (status === 401 || code === 401) {
       clearAuth();
       if (!config?.skipAuthRedirect && !router.currentRoute.value.path.startsWith("/login")) {
         void router.push("/login/index");
@@ -68,10 +83,10 @@ function unwrap<T>(payload: ApiResult<T> | T): T {
   if (payload && typeof payload === "object" && "code" in payload) {
     const result = payload as ApiResult<T>;
     if (result.code !== 200) {
-      const message = apiMessage(result);
-      ElMessage.error(message);
-      throw new Error(message);
+      notifyApiError(result, result.code);
+      throw new Error(apiMessage(result));
     }
+    unauthorizedNotified = false;
     return result.data;
   }
   return payload as T;
