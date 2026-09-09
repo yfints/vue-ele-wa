@@ -94,12 +94,12 @@
         {{ errors.sms }}
       </p>
 
-      <div v-if="mode === 'password' || mode === 'code'" class="flex jb size18 mt20">
+<!--      <div v-if="mode === 'password' || mode === 'code'" class="flex jb size18 mt20">
         <div class="mainColor hand" @click="mode = mode === 'password' ? 'code' : 'password'">
           {{ mode === 'password' ? "用验证码登录" : "用密码登录" }}
         </div>
         <div class="hand forget" @click="mode = 'forgot'">忘记密码？</div>
-      </div>
+      </div>-->
       <div v-else-if="mode === 'forgot'" class="flex jb size18 mt20">
         <div class="mainColor hand" @click="mode = 'password'">返回登录</div>
         <div />
@@ -117,10 +117,12 @@
         <span>已有账号？</span>
         <span class="mainColor hand" @click="mode = 'password'">立即登录</span>
       </div>
+<!--
       <div v-else class="tc size20 mt30">
         <span>还没有账号？</span>
         <span class="mainColor hand" @click="mode = 'register'">立即注册</span>
       </div>
+-->
 
       <template v-if="mode === 'register'">
         <div class="agree flex ac mt30 size20">
@@ -129,7 +131,7 @@
         </div>
         <p v-if="errors.agreed" class="fieldError">{{ errors.agreed }}</p>
       </template>
-      <template v-else>
+<!--      <template v-else>
         <div class="flex jc ac mt30">
           <img :src="icons.line" class="pic6" alt="" />
           <div class="size12 txt">或使用以下方式继续</div>
@@ -152,7 +154,7 @@
             <div class="size-20">国外邮箱</div>
           </div>
         </div>
-      </template>
+      </template>-->
     </div>
   </div>
 </template>
@@ -161,7 +163,7 @@
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import { loginByPassword } from "@/api/auth";
+import {loginByPassword, sendSms} from "@/api/auth";
 import { applyLogin, fetchMe } from "@/composables/useAuth";
 import {
   agreeRules,
@@ -176,7 +178,7 @@ import {
 
 const router = useRouter();
 const route = useRoute();
-const mode = ref<"password" | "code" | "register" | "forgot" | "email">("password");
+const mode = ref<"password" | "code" | "register" | "forgot" | "email">("code");
 const phone = ref("");
 const email = ref("");
 const password = ref("");
@@ -259,15 +261,22 @@ function sendCode() {
     ElMessage.warning(message);
     return;
   }
-  ElMessage.success("验证码已发送（本地预览）");
-  cooldown.value = 60;
-  timer = window.setInterval(() => {
-    cooldown.value -= 1;
-    if (cooldown.value <= 0 && timer) {
-      clearInterval(timer);
-      timer = undefined;
-    }
-  }, 1000);
+  sendSms(phone.value)
+    .then(() => {
+      ElMessage.success("验证码已发送");
+      cooldown.value = 60;
+      timer = window.setInterval(() => {
+        cooldown.value -= 1;
+        if (cooldown.value <= 0 && timer) {
+          clearInterval(timer);
+          timer = undefined;
+        }
+      }, 1000);
+    })
+    .catch(() => {
+      /* http 拦截器已提示 */
+    });
+
 }
 
 function thirdParty(name: string) {
@@ -285,6 +294,20 @@ async function submit() {
   }
   if (mode.value !== "password") {
     ElMessage.info("当前仅接入手机号密码登录");
+    if(mode.value === "code"){
+      const data = await loginByPassword(phone.value.trim(), sms.value);
+      applyLogin(data, phone.value.trim());
+      await fetchMe();
+      ElMessage.success("登录成功");
+      const redirect = route.query.redirect;
+      const target =
+          typeof redirect === "string" && redirect.startsWith("/") && !redirect.startsWith("//")
+              ? redirect
+              : "/home/index";
+      await router.push(target);
+      return
+    }
+
     return;
   }
   submitting.value = true;

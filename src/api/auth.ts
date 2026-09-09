@@ -8,10 +8,14 @@ export interface LoginResult {
   expires_in?: number;
 }
 
-export function loginByPassword(phone: string, password: string) {
-  return post<LoginResult>("/api/v2/auth/login", {
+export function loginByPassword(phone: string, code: string) {
+  return post<LoginResult>("/api/v1/auth/login", {
     phone,
-    password,
+    code,
     client: "pc",
   });
+}
+
+export function sendSms(phone: string) {
+  return post("/api/v2/auth/sms/send", { phone, scene: "login" });
 }

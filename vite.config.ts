@@ -13,7 +13,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://api.waxueshe.com",
+        target: "http://test-jiaopei.zrgy-bbg.com",
+       // target: "https://api.waxueshe.com",
         changeOrigin: true,
       },
       "/res-cdn": {
