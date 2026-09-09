@@ -11,6 +11,7 @@ export const BASE_URL = import.meta.env.DEV
 export interface ApiResult<T = unknown> {
   code: number;
   msg: string;
+  message?: string;
   data: T;
 }
 
@@ -56,8 +57,8 @@ function unwrap<T>(payload: ApiResult<T> | T): T {
   if (payload && typeof payload === "object" && "code" in payload) {
     const result = payload as ApiResult<T>;
     if (result.code !== 200) {
-      ElMessage.error(result.msg || "请求失败");
-      throw new Error(result.msg || "请求失败");
+      ElMessage.error(result.msg || result.message || "请求失败");
+      throw new Error(result.msg || result.message ||  "请求失败");
     }
     return result.data;
   }
