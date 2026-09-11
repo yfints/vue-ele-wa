@@ -22,6 +22,7 @@ export interface MyLessonDetails {
   is_collect?: number;
   course_done_count?: number;
   course_count?: number;
+  course_published_count?: number;
   time_seconds?: number | string;
   recent_study_time?: string;
   percentage?: number;

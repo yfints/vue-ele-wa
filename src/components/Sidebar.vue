@@ -67,6 +67,7 @@ const primary = [
     { label: "PK竞技场", icon: "PK竞技场" },*/
 ];
 
+/* 暂未在模板中使用，保留待启用
 const study = [
   {label: "学习计划", icon: "学习计划"},
   {label: "学习手账", icon: "学习手账"},
@@ -84,6 +85,7 @@ const promo = [
   {label: "开通学习卡", icon: "开通学习卡", tone: "highMenu2"},
   {label: "推广奖励", icon: "推广奖励"},
 ];
+*/
 
 const vipIcon = computed(() => {
   if (vipId.value === 1) return "/clone-assets/home/tag-p2.png";

@@ -97,6 +97,9 @@ export interface LessonCourse {
   id: number | string;
   name: string;
   describe: string;
+  last_time?: number;
+  time_seconds?: number | string;
+  done_num?: number;
 }
 
 export interface LessonDetails extends MallLesson {

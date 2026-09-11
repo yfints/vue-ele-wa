@@ -279,9 +279,11 @@ function sendCode() {
 
 }
 
+/* 暂未在模板中使用，保留待启用
 function thirdParty(name: string) {
   ElMessage.info(`本地预览不接入${name}登录`);
 }
+*/
 
 async function submit() {
   if (submitting.value) return;

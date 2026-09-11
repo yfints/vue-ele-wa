@@ -5,7 +5,6 @@ import CourseDetailPage from "@/pages/CourseDetailPage.vue";
 import CourseMallPage from "@/pages/CourseMallPage.vue";
 import HomePage from "@/pages/HomePage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
-import MyLessonDetailPage from "@/pages/MyLessonDetailPage.vue";
 import GameLoadPage from "@/pages/GameLoadPage.vue";
 import GamePage from "@/pages/GamePage.vue";
 
@@ -29,7 +28,7 @@ const router = createRouter({
           children: [
             { path: "", component: CourseMallPage },
             { path: "index", component: CourseMallPage },
-            { path: "detail/:id", component: MyLessonDetailPage, meta: { title: "课程详情" } },
+            { path: "detail/:id", component: CourseDetailPage, meta: { title: "课程详情" } },
             { path: ":courseId", component: CourseDetailPage, meta: { title: "课程详情" } },
           ],
         },

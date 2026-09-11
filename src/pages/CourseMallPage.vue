@@ -69,7 +69,6 @@ import {
   type CourseCategory,
 } from "@/api/course";
 
-const moreCoursesUrl = "https://hcn2xg5ch01u.feishu.cn/share/base/form/shrcnxt6O7BuVRjxTvMYoOJHyEh";
 const listRef = ref<HTMLElement>();
 const categoryId = ref<number | string>(0);
 const lessonCategories = ref<CourseCategory[]>([]);
