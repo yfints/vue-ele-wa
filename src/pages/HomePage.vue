@@ -122,19 +122,19 @@
                 <div class="box flex1 flex col jc ac">
                   <div class="opc6">当前连续</div>
                   <div class="size28 mt10">
-                    <el-statistic :value="Number(stats.current_streak || 0)" />
+                    <el-statistic :value="Number(checkInStat.currentStreak || 0)" />
                   </div>
                 </div>
                 <div class="box flex1 flex col jc ac ml20 mr20">
                   <div class="opc6">最高连续</div>
                   <div class="size28 mt10">
-                    <el-statistic :value="Number(stats.max_streak || 0)" />
+                    <el-statistic :value="Number(checkInStat.maxStreak || 0)" />
                   </div>
                 </div>
                 <div class="box flex1 flex col jc ac">
                   <div class="opc6">累计打卡</div>
                   <div class="size28 mt10">
-                    <el-statistic :value="Number(stats.total_check_in || 0)" />
+                    <el-statistic :value="Number(checkInStat.totalCheckIn || 0)" />
                   </div>
                 </div>
               </div>
@@ -152,11 +152,11 @@
             <div>
               <div class="pl20 pr20 flex size24 mb40">
                 <div class="flex1 mr10 leftStat">
-                  <div>累计{{ Number(stats.total_check_in || 0) }}天</div>
+                  <div>累计{{ Number(checkInStat.totalCheckIn || 0) }}天</div>
                 </div>
                 <div class="flex2 rightStat flex ja">
-                  <div>累计{{ Number(stats.total_check_in || 0) + 1 }}天</div>
-                  <div>累计{{ Number(stats.total_check_in || 0) + 2 }}天</div>
+                  <div>累计{{ Number(checkInStat.totalCheckIn || 0) + 1 }}天</div>
+                  <div>累计{{ Number(checkInStat.totalCheckIn || 0) + 2 }}天</div>
                 </div>
               </div>
               <div
@@ -308,7 +308,7 @@ import {
   type RankItem,
   type RankUser,
   type StudyCount,
-  type StudyNum,
+  type StudyNum, fetchCheckInStatInfo,
 } from "@/api/home";
 import {
   currentYearMonth,
@@ -341,6 +341,7 @@ const studyNum = ref<StudyNum>({});
 const studyCount = ref<StudyCount>({});
 const stats = ref<HomeStats>({});
 const homeIndex = ref<HomeIndex>({});
+const checkInStat = ref<{ currentStreak?: number; maxStreak?: number; totalCheckIn?: number }>({});
 const chartMonth = ref(currentYearMonth());
 const chartDays = ref<{ date: string; time: number; percentage: number }[]>([]);
 const rankFirst = ref<RankItem | null>(null);
@@ -433,13 +434,14 @@ async function doClockIn() {
 }
 
 onMounted(async () => {
-  const [noticeRes, numRes, countRes, indexRes, statsRes, rankRes] = await Promise.allSettled([
+  const [noticeRes, numRes, countRes, indexRes, statsRes, rankRes, checkinRes] = await Promise.allSettled([
     fetchNotices(),
     fetchStudyNum(0),
     fetchStudyCount(),
     fetchHomeIndex(),
     fetchHomeStats(),
     fetchRankList(),
+    fetchCheckInStatInfo()
   ]);
   if (noticeRes.status === "fulfilled") {
     notices.value = (noticeRes.value.list || []).map(
@@ -450,6 +452,7 @@ onMounted(async () => {
   if (countRes.status === "fulfilled") studyCount.value = countRes.value || {};
   if (indexRes.status === "fulfilled") homeIndex.value = indexRes.value || {};
   if (statsRes.status === "fulfilled") stats.value = statsRes.value || {};
+  if (checkinRes.status === "fulfilled") checkInStat.value = checkinRes.value || {};
   if (rankRes.status === "fulfilled") {
     const sort = rankRes.value.sort || [];
     rankFirst.value = sort[0] || null;
