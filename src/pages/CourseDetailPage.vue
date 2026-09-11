@@ -95,9 +95,9 @@ function toLessonDetails(source?: {
   describe?: string;
   image?: string;
   course_published_count?: number;
-  user_lesson_id?: number;
-  lesson_courses?: Array<{ id: number; name: string; describe?: string }>;
-  lesson_course?: Array<{ id: number; name: string; describe?: string }>;
+  user_lesson_id?: number | string;
+  lesson_courses?: Array<{ id: number | string; name: string; describe?: string }>;
+  lesson_course?: Array<{ id: number | string; name: string; describe?: string }>;
 }): LessonDetails | undefined {
   if (!source) return undefined;
   const list = (source.lesson_courses || source.lesson_course || []).map((item) => ({
@@ -110,7 +110,7 @@ function toLessonDetails(source?: {
   return {
     ...(base || ({} as LessonDetails)),
     ...source,
-    id: Number(source.id || courseId.value),
+    id: String(source.id || courseId.value),
     lesson_courses: list,
   } as LessonDetails;
 }
@@ -152,7 +152,7 @@ function startPractice(course: LessonCourse) {
   modeRef.value?.open();
 }
 
-async function askLogin(chapterId: number) {
+async function askLogin(chapterId: number | string) {
   try {
     await ElMessageBox.confirm("您还未登录或登录失效，是否前往登录？", "提示", {
       confirmButtonText: "确认",
