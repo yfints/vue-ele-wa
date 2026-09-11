@@ -1,7 +1,7 @@
 import { get, post } from "./http";
 
 export interface MyLessonCourse {
-  id: number;
+  id: number | string;
   name: string;
   describe?: string;
   last_time?: number;
@@ -10,12 +10,12 @@ export interface MyLessonCourse {
 }
 
 export interface RelatedWordLesson {
-  id: number;
+  id: number | string;
   name?: string;
 }
 
 export interface MyLessonDetails {
-  id: number;
+  id: number | string;
   name?: string;
   describe?: string;
   image?: string;
@@ -46,13 +46,45 @@ export async function fetchMyLessonDetails(id: string | number) {
   return unwrapLesson(data);
 }
 
+/** `/courses/:id` 返回 `{ course, lessons }` 结构 */
+interface CourseDetailPayload {
+  course?: {
+    id?: number | string;
+    name?: string;
+    cover?: string | null;
+    description?: string | null;
+  };
+  lessons?: Array<{
+    id?: number | string;
+    name?: string;
+  }>;
+}
+
+function unwrapCourseDetail(data: unknown): MyLessonDetails | undefined {
+  if (!data || typeof data !== "object") return undefined;
+  const { course, lessons } = data as CourseDetailPayload;
+  if (!course) return undefined;
+  return {
+    id: course.id ?? "",
+    name: course.name,
+    describe: course.description || undefined,
+    image: course.cover || undefined,
+    course_published_count: lessons?.length ?? 0,
+    lesson_courses: (lessons || []).map((item) => ({
+      id: item.id ?? "",
+      name: item.name || "",
+      describe: item.name || "",
+    })),
+  };
+}
+
 export async function fetchLessonDetails(id: string | number) {
   const data = await get<unknown>(
     "/courses/"+id,
     { id },
     { skipAuthRedirect: true },
   );
-  return unwrapLesson(data);
+  return unwrapCourseDetail(data);
 }
 
 export function toggleCollect(lessonId: string | number) {
@@ -64,14 +96,14 @@ export function deleteMyLesson(userLessonId: string | number) {
 }
 
 export interface CourseCategory {
-  id: number;
+  id: number | string;
   name: string;
   sortOrder?: number;
 }
 
 export interface CourseVo {
-  id: number;
-  categoryId?: number;
+  id: number | string;
+  categoryId?: number | string;
   name?: string;
   cover?: string;
   description?: string;
@@ -94,7 +126,7 @@ export function fetchCourseCategories() {
 }
 
 export function fetchCourses(params?: {
-  categoryId?: number;
+  categoryId?: number | string;
   courseType?: number;
   keyword?: string;
   current?: number;

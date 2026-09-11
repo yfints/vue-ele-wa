@@ -71,7 +71,7 @@ import {
 
 const moreCoursesUrl = "https://hcn2xg5ch01u.feishu.cn/share/base/form/shrcnxt6O7BuVRjxTvMYoOJHyEh";
 const listRef = ref<HTMLElement>();
-const categoryId = ref(0);
+const categoryId = ref<number | string>(0);
 const lessonCategories = ref<CourseCategory[]>([]);
 const filtered = ref<MallLesson[]>([]);
 const mallTotal = ref(0);

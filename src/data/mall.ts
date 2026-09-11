@@ -9,11 +9,11 @@ export interface Founder {
 }
 
 export interface MallLesson {
-  id: number;
+  id: number | string;
   name: string;
   describe: string;
   image: string;
-  lesson_category_id: number;
+  lesson_category_id: number | string;
   status: number;
   heat: number;
   created_at: number;
@@ -22,7 +22,7 @@ export interface MallLesson {
   human_num: number;
   is_have: number;
   is_collect: number;
-  user_lesson_id: number;
+  user_lesson_id: number | string;
   founder?: Founder;
 }
 
@@ -61,21 +61,21 @@ export function localAsset(url: string) {
 }
 
 export function toMallLesson(course: {
-  id: number;
+  id: number | string;
   name?: string;
   cover?: string;
   image?: string;
   description?: string;
   describe?: string;
-  categoryId?: number;
-  lesson_category_id?: number;
+  categoryId?: number | string;
+  lesson_category_id?: number | string;
 }): MallLesson {
   return {
-    id: Number(course.id),
+    id: String(course.id),
     name: course.name || "",
     describe: course.description || course.describe || "",
     image: course.cover || course.image || "",
-    lesson_category_id: Number(course.categoryId ?? course.lesson_category_id ?? 0),
+    lesson_category_id: String(course.categoryId ?? course.lesson_category_id ?? 0),
     status: 1,
     heat: 0,
     created_at: 0,
@@ -94,7 +94,7 @@ export function getMallLesson(id: string | number) {
 }
 
 export interface LessonCourse {
-  id: number;
+  id: number | string;
   name: string;
   describe: string;
 }
@@ -112,7 +112,7 @@ export function getLessonDetails(id: string | number) {
 }
 
 export interface MyLessonCourse {
-  id: number;
+  id: number | string;
   name: string;
   describe?: string;
   last_time?: number;
@@ -121,7 +121,7 @@ export interface MyLessonCourse {
 }
 
 export interface MyLessonDetails {
-  id: number;
+  id: number | string;
   name?: string;
   describe?: string;
   image?: string;
@@ -131,7 +131,7 @@ export interface MyLessonDetails {
   time_seconds?: number | string;
   recent_study_time?: string;
   percentage?: number;
-  related_word_lessons?: { id: number; name?: string }[];
+  related_word_lessons?: { id: number | string; name?: string }[];
   lesson_course?: MyLessonCourse[];
   lesson_courses?: MyLessonCourse[];
 }

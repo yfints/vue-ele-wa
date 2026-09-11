@@ -39,12 +39,12 @@ export interface GameSentenceItem {
   }>;
 }
 
-function toLessonId(value: string | number) {
-  const id = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(id)) {
+function toLessonId(value: string | number): number | string {
+  const num = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(num)) {
     throw new Error("invalid lesson id");
   }
-  return id;
+  return Number.isSafeInteger(num) ? num : String(value);
 }
 
 export function startGame(lessonId: string | number, lessonCourseId: string | number) {

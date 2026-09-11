@@ -33,12 +33,37 @@ function notifyApiError(payload: unknown, code?: number, fallback = "请求失�
   ElMessage.error(apiMessage(payload, fallback));
 }
 
+const BIG_INT_RE = /(?<![\d."])[+-]?\d{16,}(?![\d.eE])/g;
+const PLACEHOLDER_RE = /"\u0001(\d+)\u0001"/g;
+
+/** 解析 JSON 时把超长整数转成字符串，避免超出 Number.MAX_SAFE_INTEGER 精度丢失 */
+function parseLosslessJson(text: string): unknown {
+  const strings: string[] = [];
+  const shielded = text.replace(/"(?:[^"\\]|\\.)*"/g, (match) => {
+    strings.push(match);
+    return `"\u0001${strings.length - 1}\u0001"`;
+  });
+  const bigified = shielded.replace(BIG_INT_RE, (match) => `"${match}"`);
+  const restored = bigified.replace(PLACEHOLDER_RE, (_match, index: string) => strings[Number(index)]);
+  return JSON.parse(restored);
+}
+
 export const http: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
+  transformResponse: [
+    (data: unknown) => {
+      if (typeof data !== "string") return data;
+      try {
+        return parseLosslessJson(data);
+      } catch {
+        return data;
+      }
+    },
+  ],
 });
 
 http.interceptors.request.use((config) => {
