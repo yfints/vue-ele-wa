@@ -930,33 +930,33 @@ html.dark .myLessonDetail .top {
   background: linear-gradient(to right, #604bff, #74eaff) !important;
   color: #fff;
 }
-.myLessonDetail .act .desc {
+.contentBox .act .desc {
   color: #fff !important;
   opacity: 0.5;
 }
 @media (min-width: 575px) {
-  .myLessonDetail .box {
+  .contentBox .box {
     width: calc(100% - 2.14286rem);
     left: 1.07143rem;
   }
-  .myLessonDetail .box .progress {
+  .contentBox .box .progress {
     flex: 1;
     margin-left: 0.71429rem;
     margin-right: 0.71429rem;
   }
-  .myLessonDetail .name {
+  .contentBox .name {
     max-width: 8.92857rem;
   }
 }
 @media (max-width: 575px) {
-  .myLessonDetail .box {
+  .contentBox .box {
     width: 100%;
   }
-  .myLessonDetail .box .progress {
+  .contentBox .box .progress {
     width: 100%;
     margin: 0.71429rem 0;
   }
-  .myLessonDetail .name {
+  .contentBox .name {
     max-width: 1.78571rem;
   }
 }
@@ -1943,7 +1943,7 @@ html.dark .headBar .menuBox img {
 
 html.dark .mallCard,
 html.dark .lessonDetail .card,
-html.dark .myLessonDetail .card {
+html.dark .contentBox .card {
   background-color: var(--bg-card);
 }
 
