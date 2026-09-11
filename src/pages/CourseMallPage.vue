@@ -23,7 +23,7 @@
               {{ category.name }}
             </button>
           </div>
-          <div class="flex0">
+<!--          <div class="flex0">
             <el-link type="info" :underline="'hover'" :href="moreCoursesUrl">
               <el-icon>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
@@ -39,14 +39,20 @@
               </el-icon>
               想要更多课程？
             </el-link>
-          </div>
+          </div>-->
         </div>
       </div>
-      <div v-loading="loading" class="pageScroll listScroll">
+      <div
+        ref="listRef"
+        v-loading="loading"
+        class="pageScroll listScroll"
+        @scroll="onListScroll"
+      >
         <el-empty v-if="!loading && !filtered.length" description="暂无课程" />
         <div v-else class="gridContainer">
           <MallCard v-for="lesson in filtered" :key="lesson.id" :lesson="lesson" />
         </div>
+        <div v-if="loadingMore" class="tc opc6 size20 pt20 pb10">加载中…</div>
         <div class="opc6 size20 mt30 pb20">共 {{ mallTotal }} 门课，当前展示 {{ filtered.length }} 门</div>
       </div>
     </div>
@@ -64,11 +70,17 @@ import {
 } from "@/api/course";
 
 const moreCoursesUrl = "https://hcn2xg5ch01u.feishu.cn/share/base/form/shrcnxt6O7BuVRjxTvMYoOJHyEh";
+const listRef = ref<HTMLElement>();
 const categoryId = ref(0);
 const lessonCategories = ref<CourseCategory[]>([]);
 const filtered = ref<MallLesson[]>([]);
 const mallTotal = ref(0);
 const loading = ref(false);
+const loadingMore = ref(false);
+const pageSize = 20;
+const current = ref(1);
+const finished = ref(false);
+let requestSeq = 0;
 
 async function loadCategories() {
   try {
@@ -79,31 +91,71 @@ async function loadCategories() {
   }
 }
 
-async function loadCourses() {
-  loading.value = true;
-  try {
-    const page = await fetchCourses({
-      categoryId: categoryId.value || undefined,
-      current: 1,
-      size: 50,
-    });
-    const records = page?.records || [];
-    filtered.value = records.map(toMallLesson);
-    mallTotal.value = Number(page?.total ?? records.length);
-  } catch {
+async function loadCourses(reset = false) {
+  if (!reset && (loading.value || loadingMore.value || finished.value)) return;
+  const seq = ++requestSeq;
+  if (reset) {
+    current.value = 1;
+    finished.value = false;
     filtered.value = [];
     mallTotal.value = 0;
+    loading.value = true;
+  } else {
+    loadingMore.value = true;
+  }
+  try {
+    const result = await fetchCourses({
+      categoryId: categoryId.value || undefined,
+      current: current.value,
+      size: pageSize,
+    });
+    if (seq !== requestSeq) return;
+    const records = result?.records || [];
+    const items = records.map(toMallLesson);
+    if (reset) filtered.value = items;
+    else filtered.value.push(...items);
+    mallTotal.value = Number(result?.total ?? mallTotal.value);
+    if (items.length < pageSize || filtered.value.length >= mallTotal.value) {
+      finished.value = true;
+    }
+    current.value += 1;
+  } catch {
+    if (reset) {
+      filtered.value = [];
+      mallTotal.value = 0;
+    }
   } finally {
-    loading.value = false;
+    if (seq === requestSeq) {
+      loading.value = false;
+      loadingMore.value = false;
+      ensureFill();
+    }
+  }
+}
+
+function onListScroll() {
+  const el = listRef.value;
+  if (!el || loading.value || loadingMore.value || finished.value) return;
+  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 60) {
+    void loadCourses();
+  }
+}
+
+function ensureFill() {
+  const el = listRef.value;
+  if (!el || loading.value || loadingMore.value || finished.value) return;
+  if (el.scrollHeight <= el.clientHeight) {
+    void loadCourses();
   }
 }
 
 watch(categoryId, () => {
-  void loadCourses();
+  listRef.value?.scrollTo({ top: 0 });
+  void loadCourses(true);
 });
 
 onMounted(() => {
   void loadCategories();
-  void loadCourses();
+  void loadCourses(true);
 });
 </script>
