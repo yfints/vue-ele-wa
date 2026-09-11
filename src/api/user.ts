@@ -16,6 +16,6 @@ export interface UserProfile {
 }
 
 export async function fetchMyProfile() {
-  const data = await get<UserProfile>("/api/v1/user/my");
+  const data = await get<UserProfile>("/user/my");
   return data?.user ?? data;
 }

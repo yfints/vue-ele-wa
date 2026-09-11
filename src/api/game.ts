@@ -49,7 +49,7 @@ function toLessonId(value: string | number) {
 
 export function startGame(lessonId: string | number, lessonCourseId: string | number) {
   return post<GameStartResult>(
-    "/api/v2/game/start",
+    "/game/start",
     {
       lesson_id: toLessonId(lessonId),
       lesson_course_id: toLessonId(lessonCourseId),
@@ -65,7 +65,7 @@ export function fetchExercisePage(params: {
   cursor?: string;
 }) {
   return get<{ sentences?: GameSentenceItem[]; meta?: { nextCursor?: string } }>(
-    "/api/v2/game/exercise_page",
+    "/game/exercise_page",
     {
       ...params,
       lesson_id: toLessonId(params.lesson_id),
@@ -76,5 +76,5 @@ export function fetchExercisePage(params: {
 }
 
 export function fetchGameTime() {
-  return get<number | { time?: number }>("/api/v2/game/time", undefined, { skipAuthRedirect: true });
+  return get<number | { time?: number }>("/game/time", undefined, { skipAuthRedirect: true });
 }

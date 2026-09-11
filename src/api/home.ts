@@ -66,7 +66,7 @@ export interface RankList {
 }
 
 export function fetchNotices() {
-  return get<NoticeResult>("/api/v1/index/notice", { page: 1, limit: 5 });
+  return get<NoticeResult>("/index/notice", { page: 1, limit: 5 });
 }
 
 export function fetchStudyNum(type: number) {
@@ -74,15 +74,15 @@ export function fetchStudyNum(type: number) {
 }
 
 export function fetchStudyCount() {
-  return get<StudyCount>("/api/v1/index/count");
+  return get<StudyCount>("/index/count");
 }
 
 export function fetchHomeIndex() {
-  return get<HomeIndex>("/api/v1/index/index");
+  return get<HomeIndex>("/index/index");
 }
 
 export async function fetchHomeStats() {
-  const raw = (await get<HomeStats>("/api/v1/index/user_count")) || {};
+  const raw = (await get<HomeStats>("/index/user_count")) || {};
   return {
     current_streak: Number(raw.current_streak || 0),
     max_streak: Number(raw.max_streak || 0),
@@ -94,13 +94,13 @@ export async function fetchHomeStats() {
 }
 
 export function fetchDateHot(date: string) {
-  return get<DateHotItem[]>("/api/v1/index/date_hot", { date });
+  return get<DateHotItem[]>("/index/date_hot", { date });
 }
 
 export function fetchRankList() {
-  return get<RankList>("/api/v1/rank/list", { type: 4, limit: 50 });
+  return get<RankList>("/rank/list", { type: 4, limit: 50 });
 }
 
 export function clockIn() {
-  return post("/api/v1/game/clock_in");
+  return post("/game/clock_in");
 }

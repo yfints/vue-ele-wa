@@ -9,7 +9,7 @@ export interface LoginResult {
 }
 
 export function loginByPassword(phone: string, code: string) {
-  return post<LoginResult>("/api/v1/auth/login", {
+  return post<LoginResult>("/auth/login", {
     phone,
     code,
     client: "pc",
@@ -17,5 +17,5 @@ export function loginByPassword(phone: string, code: string) {
 }
 
 export function sendSms(phone: string) {
-  return post("/api/v1/auth/sms/send", { phone, scene: "login" });
+  return post("/auth/sms/send", { phone, scene: "login" });
 }

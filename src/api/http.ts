@@ -5,8 +5,8 @@ import { clearAuth, getToken } from "./token";
 
 /** 开发走 Vite 代理；打包后用 `.env` 的 `VITE_API_BASE_URL` */
 export const BASE_URL = import.meta.env.DEV
-  ? ""
-  : import.meta.env.VITE_API_BASE_URL || "https://api.waxueshe.com";
+  ? "/api/v1"
+  : (import.meta.env.VITE_API_BASE_URL || "https://api.waxueshe.com") + "/api/v1";
 
 export interface ApiResult<T = unknown> {
   code: number;

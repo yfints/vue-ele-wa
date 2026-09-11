@@ -48,7 +48,7 @@ export async function fetchMyLessonDetails(id: string | number) {
 
 export async function fetchLessonDetails(id: string | number) {
   const data = await get<unknown>(
-    "/api/v1/courses/"+id,
+    "/courses/"+id,
     { id },
     { skipAuthRedirect: true },
   );
@@ -88,7 +88,7 @@ export interface CoursePage {
 }
 
 export function fetchCourseCategories() {
-  return get<CourseCategory[]>("/api/v1/course/categories", undefined, {
+  return get<CourseCategory[]>("/course/categories", undefined, {
     skipAuthRedirect: true,
   });
 }
@@ -100,5 +100,5 @@ export function fetchCourses(params?: {
   current?: number;
   size?: number;
 }) {
-  return get<CoursePage>("/api/v1/courses", params, { skipAuthRedirect: true });
+  return get<CoursePage>("/courses", params, { skipAuthRedirect: true });
 }
