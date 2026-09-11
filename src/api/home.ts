@@ -70,7 +70,7 @@ export function fetchNotices() {
 }
 
 export function fetchStudyNum(type: number) {
-  return get<StudyNum>("/api/index/study_num", { type });
+  return get<StudyNum>("/index/study_num", { type });
 }
 
 export function fetchStudyCount() {

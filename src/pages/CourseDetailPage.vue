@@ -20,7 +20,7 @@
                 <div class="size20 gray">{{ detail.description }}</div>
               </div>
               <div class="flex ac wrap">
-                <el-tag v-if="accessText" type="warning" round class="mr20">{{ accessText }}</el-tag>
+                <el-tag v-if="access.text" type="warning" round class="mr20">{{ access.text }}</el-tag>
                 <el-tooltip
                   v-if="!isPhone"
                   effect="light"
@@ -162,11 +162,18 @@ import { saveGameInfo } from "@/composables/useGame";
 import { localAsset } from "@/data/mall";
 import { formatPracticeMinutes } from "@/lib/time";
 
+const ACCESS_LABELS: Record<string, string> = {
+  NEED_MEMBER: "会员课程",
+  NEED_LOGIN: "需登录后学习",
+  NEED_BUY: "需购买后学习",
+};
+
 const route = useRoute();
 const router = useRouter();
 const modeRef = ref<{ open: () => void } | null>(null);
 const detail = ref<CourseDetailVo | undefined>();
 const loading = ref(false);
+let requestSeq = 0;
 
 const courseId = computed(() => String(route.params.courseId || route.params.id || ""));
 const isMine = computed(() => Boolean(detail.value?.isHave || detail.value?.userLessonId));
@@ -178,24 +185,19 @@ const progress = computed(() => ({
   percentage: 0,
   ...(detail.value?.progress || {}),
 }));
-const accessAllowed = computed(() => detail.value?.access?.allowed !== false);
-const accessText = computed(() => {
-  const reason = detail.value?.access?.reason;
-  if (!reason) return "";
-  const labels: Record<string, string> = {
-    NEED_MEMBER: "会员课程",
-    NEED_LOGIN: "需登录后学习",
-    NEED_BUY: "需购买后学习",
+const access = computed(() => {
+  const info = detail.value?.access;
+  return {
+    allowed: info?.allowed !== false,
+    text: info?.reason ? ACCESS_LABELS[info.reason] || info.reason : "",
   };
-  return labels[reason] || reason;
 });
 const continueLesson = computed<CourseLessonVo | undefined>(() => {
   const list = lessons.value;
+  const lastId = detail.value?.lastLessonId;
   return (
     list.find((item) => item.lastTime) ||
-    (detail.value?.lastLessonId
-      ? list.find((item) => String(item.id) === String(detail.value?.lastLessonId))
-      : undefined) ||
+    (lastId ? list.find((item) => String(item.id) === String(lastId)) : undefined) ||
     list[0]
   );
 });
@@ -205,104 +207,102 @@ function goMall() {
   void router.push("/courseMall/index");
 }
 
+function isValidDetail(data?: CourseDetailVo): data is CourseDetailVo {
+  return Boolean(data && (data.id || data.name || data.lessons?.length));
+}
+
 async function load() {
+  const seq = ++requestSeq;
   detail.value = undefined;
   loading.value = true;
   try {
     const data = await fetchLessonDetails(courseId.value);
-    if (data?.id || data?.name || data?.lessons?.length) detail.value = data;
+    if (seq === requestSeq) detail.value = isValidDetail(data) ? data : undefined;
   } catch {
-    detail.value = undefined;
+    if (seq === requestSeq) detail.value = undefined;
   } finally {
-    loading.value = false;
+    if (seq === requestSeq) {
+      loading.value = false;
+      await maybeResumeStart();
+    }
   }
-  await maybeResumeStart();
+}
+
+async function confirmBox(message: string, title = "提示") {
+  try {
+    await ElMessageBox.confirm(message, title, {
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      type: "warning",
+      closeOnClickModal: false,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function askLogin(chapterId?: number | string) {
+  if (!(await confirmBox("您还未登录或登录失效，是否前往登录？"))) return;
+  await router.push({
+    path: "/login/index",
+    query: {
+      redirect: chapterId != null ? `${route.path}?start=${chapterId}` : route.fullPath,
+    },
+  });
 }
 
 function startPractice(course?: CourseLessonVo) {
-  if (!course || !detail.value) return;
-  if (!accessAllowed.value) {
-    if (!getToken()) {
-      void askLogin(course.id);
-      return;
-    }
-    ElMessage.info(accessText.value ? `该课程为${accessText.value}，暂无法学习` : "暂无法学习该课程");
-    return;
-  }
-  const userLessonId = detail.value.userLessonId;
+  const current = detail.value;
+  if (!course || !current) return;
   saveGameInfo({
-    courseId: String(detail.value.id),
+    courseId: String(current.id),
     chapterId: String(course.id),
     gameTitle: course.name,
-    courseName: detail.value.name || "",
+    courseName: current.name || "",
     gameType: "Sentence",
     gameMode: "SentenceTranslate",
-    userLessonId: userLessonId ? String(userLessonId) : "",
+    userLessonId: current.userLessonId ? String(current.userLessonId) : "",
   });
   modeRef.value?.open();
 }
 
-async function askLogin(chapterId?: number | string) {
-  try {
-    await ElMessageBox.confirm("您还未登录或登录失效，是否前往登录？", "提示", {
-      confirmButtonText: "确认",
-      cancelButtonText: "先不登录",
-      type: "warning",
-      closeOnClickModal: false,
-    });
-    await router.push({
-      path: "/login/index",
-      query: {
-        redirect: chapterId != null ? `${route.path}?start=${chapterId}` : route.fullPath,
-      },
-    });
-  } catch {
-    /* 先不登录 */
-  }
-}
-
-function openPractice(course?: CourseLessonVo) {
+async function openPractice(course?: CourseLessonVo) {
   if (!course) return;
   if (!getToken()) {
-    void askLogin(course.id);
+    await askLogin(course.id);
+    return;
+  }
+  if (!access.value.allowed) {
+    ElMessage.info(access.value.text ? `该课程为${access.value.text}，暂无法学习` : "暂无法学习该课程");
     return;
   }
   startPractice(course);
 }
 
-async function collect() {
-  if (!detail.value) return;
+async function setCollect(next: boolean) {
+  const current = detail.value;
+  if (!current || (next && current.isCollect)) return;
   if (!getToken()) {
     await askLogin();
     return;
   }
+  if (!next && !(await confirmBox("确定要取消收藏吗？"))) return;
   try {
-    await toggleCollect(detail.value.id);
-    detail.value.isCollect = true;
-    ElMessage.success("已添加到我的收藏");
+    await toggleCollect(current.id);
+    current.isCollect = next;
+    ElMessage.success(next ? "已添加到我的收藏" : "已取消收藏");
   } catch {
     /* unwrap 已提示 */
   }
 }
 
-async function askUncollect() {
-  try {
-    await ElMessageBox.confirm("确定要取消收藏吗？", "提示", {
-      confirmButtonText: "确认",
-      cancelButtonText: "取消",
-      type: "warning",
-    });
-  } catch {
-    return;
-  }
-  if (!detail.value) return;
-  try {
-    await toggleCollect(detail.value.id);
-    detail.value.isCollect = false;
-    ElMessage.success("已取消收藏");
-  } catch {
-    /* unwrap 已提示 */
-  }
+function collect() {
+  void setCollect(true);
+}
+
+function askUncollect() {
+  void setCollect(false);
 }
 
 async function maybeResumeStart() {
