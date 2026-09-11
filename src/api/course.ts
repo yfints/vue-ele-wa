@@ -39,7 +39,7 @@ function unwrapLesson(data: unknown): MyLessonDetails | undefined {
 
 export async function fetchMyLessonDetails(id: string | number) {
   const data = await get<unknown>(
-    "/api/v2/game/my_lesson_details",
+    "/api/v1/game/my_lesson_details",
     { id },
     { skipAuthRedirect: true },
   );
@@ -88,11 +88,11 @@ export async function fetchLessonDetails(id: string | number) {
 }
 
 export function toggleCollect(lessonId: string | number) {
-  return post("/api/v2/collect/toggle", { lesson_id: lessonId, type: 0 }, { skipAuthRedirect: true });
+  return post("/api/v1/collect/toggle", { lesson_id: lessonId, type: 0 }, { skipAuthRedirect: true });
 }
 
 export function deleteMyLesson(userLessonId: string | number) {
-  return post("/api/v2/lessons/my/delete", { user_lesson_id: userLessonId });
+  return post("/api/v1/lessons/my/delete", { user_lesson_id: userLessonId });
 }
 
 export interface CourseCategory {
