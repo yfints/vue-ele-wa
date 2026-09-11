@@ -40,11 +40,58 @@ function unwrapLesson(data: unknown): MyLessonDetails | undefined {
 
 export async function fetchMyLessonDetails(id: string | number) {
   const data = await get<unknown>(
-    "/api/v1/game/my_lesson_details",
+    "/game/my_lesson_details",
     { id },
     { skipAuthRedirect: true },
   );
   return unwrapLesson(data);
+}
+
+/** `/courses/:id` 返回的课程课时 */
+export interface CourseLessonVo {
+  id: number | string;
+  name: string;
+  lessonType?: number | string | null;
+  duration?: number;
+  sortOrder?: number;
+  wordCount?: number;
+  timeSeconds?: number;
+  doneNum?: number;
+  status?: number;
+  lastStudyTime?: string | null;
+  lastTime?: boolean;
+}
+
+export interface CourseProgressVo {
+  doneCount?: number;
+  total?: number;
+  percentage?: number;
+}
+
+/** 课程详情接口数据（驼峰结构，直接渲染，不做二次转换） */
+export interface CourseDetailVo {
+  id: number | string;
+  categoryId?: number | string;
+  name?: string;
+  cover?: string | null;
+  description?: string | null;
+  courseType?: number;
+  heat?: number;
+  humanNum?: number;
+  courseNum?: number;
+  isHave?: boolean;
+  userLessonId?: number | string | null;
+  isCollect?: boolean;
+  access?: { allowed?: boolean; reason?: string };
+  lessons?: CourseLessonVo[];
+  progress?: CourseProgressVo;
+  timeSeconds?: number;
+  lastLessonId?: number | string | null;
+  lastStudyTime?: string | null;
+}
+
+export async function fetchLessonDetails(id: string | number) {
+  return get<CourseDetailVo>(`/courses/${id}`, undefined, { skipAuthRedirect: true });
 }
 
 /** `/courses/:id` 返回 `{ course, lessons }` 结构 */
@@ -79,21 +126,12 @@ function unwrapCourseDetail(data: unknown): MyLessonDetails | undefined {
   };
 }
 
-export async function fetchLessonDetails(id: string | number) {
-  const data = await get<unknown>(
-    "/courses/"+id,
-    { id },
-    { skipAuthRedirect: true },
-  );
-  return unwrapCourseDetail(data);
-}
-
-export function toggleCollect(lessonId: string | number) {
-  return post("/api/v1/collect/toggle", { lesson_id: lessonId, type: 0 }, { skipAuthRedirect: true });
+export function toggleCollect(courseId: string | number) {
+  return post("/collect/toggle", { courseId: courseId, type: 0 }, { skipAuthRedirect: true });
 }
 
 export function deleteMyLesson(userLessonId: string | number) {
-  return post("/api/v1/lessons/my/delete", { user_lesson_id: userLessonId });
+  return post("/lessons/my/delete", { user_lesson_id: userLessonId });
 }
 
 export interface CourseCategory {
