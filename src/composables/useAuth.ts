@@ -1,4 +1,6 @@
 import { computed, ref } from "vue";
+import { ElMessageBox } from "element-plus";
+import router from "@/router";
 import { fetchMyProfile, type UserProfile } from "@/api/user";
 import { clearAuth, getToken, setAccount, setToken } from "@/api/token";
 import type { LoginResult } from "@/api/auth";
@@ -42,6 +44,36 @@ export function logout() {
   user.value = null;
 }
 
+/** 未登录引导：弹确认框，确认后跳转登录页并携带回跳地址 */
+export async function ensureLogin(options?: {
+  chapterId?: number | string;
+  message?: string;
+}) {
+  const route = router.currentRoute.value;
+  try {
+    await ElMessageBox.confirm(
+      options?.message || "您还未登录或登录失效，是否前往登录？",
+      "提示",
+      {
+        confirmButtonText: "确认",
+        cancelButtonText: "先不登录",
+        type: "warning",
+        closeOnClickModal: false,
+      },
+    );
+  } catch {
+    return false;
+  }
+  const chapterId = options?.chapterId;
+  await router.push({
+    path: "/login/index",
+    query: {
+      redirect: chapterId != null ? `${route.path}?start=${chapterId}` : route.fullPath,
+    },
+  });
+  return true;
+}
+
 export function useAuth() {
   return {
     user,
@@ -52,5 +84,6 @@ export function useAuth() {
     fetchMe,
     applyLogin,
     logout,
+    ensureLogin,
   };
 }

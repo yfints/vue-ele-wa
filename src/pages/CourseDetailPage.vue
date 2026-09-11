@@ -158,6 +158,7 @@ import {
 import { getToken } from "@/api/token";
 import ModePop from "@/components/ModePop.vue";
 import { isPhone } from "@/composables/useLayout";
+import { ensureLogin } from "@/composables/useAuth";
 import { saveGameInfo } from "@/composables/useGame";
 import { localAsset } from "@/data/mall";
 import { formatPracticeMinutes } from "@/lib/time";
@@ -242,16 +243,6 @@ async function confirmBox(message: string, title = "提示") {
   }
 }
 
-async function askLogin(chapterId?: number | string) {
-  if (!(await confirmBox("您还未登录或登录失效，是否前往登录？"))) return;
-  await router.push({
-    path: "/login/index",
-    query: {
-      redirect: chapterId != null ? `${route.path}?start=${chapterId}` : route.fullPath,
-    },
-  });
-}
-
 function startPractice(course?: CourseLessonVo) {
   const current = detail.value;
   if (!course || !current) return;
@@ -270,7 +261,7 @@ function startPractice(course?: CourseLessonVo) {
 async function openPractice(course?: CourseLessonVo) {
   if (!course) return;
   if (!getToken()) {
-    await askLogin(course.id);
+    await ensureLogin({ chapterId: course.id });
     return;
   }
   if (!access.value.allowed) {
@@ -284,7 +275,7 @@ async function setCollect(next: boolean) {
   const current = detail.value;
   if (!current || (next && current.isCollect)) return;
   if (!getToken()) {
-    await askLogin();
+    await ensureLogin();
     return;
   }
   if (!next && !(await confirmBox("确定要取消收藏吗？"))) return;

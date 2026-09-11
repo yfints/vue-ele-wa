@@ -162,6 +162,7 @@ import { Clock, Delete, Star, Switch, VideoPlay } from "@element-plus/icons-vue"
 import { deleteMyLesson, fetchMyLessonDetails, toggleCollect } from "@/api/course";
 import { getToken } from "@/api/token";
 import { isPhone } from "@/composables/useLayout";
+import { ensureLogin } from "@/composables/useAuth";
 import { getDemoMyLessonDetails, localAsset, type MyLessonCourse, type MyLessonDetails } from "@/data/mall";
 import { formatPracticeMinutes } from "@/lib/time";
 import ModePop from "@/components/ModePop.vue";
@@ -255,20 +256,6 @@ async function removeLesson() {
   }
 }
 
-async function askLogin() {
-  try {
-    await ElMessageBox.confirm("您还未登录或登录失效，是否前往登录？", "提示", {
-      confirmButtonText: "确认",
-      cancelButtonText: "先不登录",
-      type: "warning",
-      closeOnClickModal: false,
-    });
-    await router.push({ path: "/login/index", query: { redirect: route.fullPath } });
-  } catch {
-    /* 先不登录 */
-  }
-}
-
 onMounted(async () => {
   if (getToken()) {
     try {
@@ -283,6 +270,6 @@ onMounted(async () => {
   }
   usingDemo.value = true;
   lesson.value = getDemoMyLessonDetails(userLessonId.value);
-  await askLogin();
+  await ensureLogin();
 });
 </script>
