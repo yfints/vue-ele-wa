@@ -153,8 +153,6 @@ function persistList() {
 }
 
 export function gameBackPath(session = gameSession.value) {
-  const userLessonId = session?.userLessonId;
-  if (userLessonId && userLessonId !== "0") return `/courseMall/detail/${userLessonId}`;
   if (session?.courseId) return `/courseMall/${session.courseId}`;
   return "/courseMall/index";
 }

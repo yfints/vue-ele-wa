@@ -32,9 +32,5 @@ const props = defineProps<{
   lesson: MallLesson;
 }>();
 
-const detailTo = computed(() =>
-  props.lesson.is_have && props.lesson.user_lesson_id
-    ? `/courseMall/detail/${props.lesson.user_lesson_id}`
-    : `/courseMall/${props.lesson.id}`,
-);
+const detailTo = computed(() => `/courseMall/${props.lesson.id}`);
 </script>

@@ -22,6 +22,16 @@ export function normalizeSentence(text: string) {
     .trim();
 }
 
+export function sameSentence(input: string, target: string, ignoreCase = true) {
+  const clean = (text: string) => {
+    const value = ignoreCase ? String(text || "").toLowerCase() : String(text || "");
+    return value.replace(/[^a-zA-Z0-9'\s]/g, " ").replace(/\s+/g, " ").trim();
+  };
+  const left = clean(input);
+  const right = clean(target);
+  return Boolean(right) && left === right;
+}
+
 export function oralMatch(heard: string, target: string) {
   const left = normalizeSentence(heard);
   const right = normalizeSentence(target);

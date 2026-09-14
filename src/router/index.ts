@@ -29,7 +29,8 @@ const router = createRouter({
           children: [
             { path: "", component: CourseMallPage },
             { path: "index", component: CourseMallPage },
-            { path: "detail/:id", component: CourseDetailPage, meta: { title: "课程详情" } },
+            { path: "detail", redirect: "/courseMall/index" },
+            { path: "detail/:id", redirect: (to: any) => `/courseMall/${String(to.params.id)}` },
             { path: ":courseId", component: CourseDetailPage, meta: { title: "课程详情" } },
           ],
         },

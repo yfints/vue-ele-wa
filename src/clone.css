@@ -288,6 +288,9 @@ button {
 .size26 {
   font-size: 0.92857rem;
 }
+.lh40 {
+  line-height: 1.42857rem;
+}
 .size28 {
   font-size: 1rem;
 }
@@ -2266,6 +2269,14 @@ html.dark .loginContent {
   color: transparent;
   animation: linearTitleFlow 3s linear infinite;
 }
+.linearTxt {
+  display: inline-block;
+  background: linear-gradient(to right, #00cae0, #68a9fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 .smallScreen {
   display: none;
 }
@@ -2648,13 +2659,26 @@ html.dark .botitem {
     background: linear-gradient(to right, #604bff4d, #74eaff4d);
   }
 }
-.contentRow {
-  padding: 0.71429rem 0;
-  border-bottom: 1px solid var(--theme-border);
-  cursor: pointer;
+.listPop {
+  overflow: hidden;
 }
-.contentRow.act {
-  color: #4162ff;
+html:not(.dark) .listPop .galssPop {
+  background-color: #241e48d1;
+}
+.listCell {
+  background: #fff3;
+  padding: 1.07143rem;
+  border-radius: 0.71429rem;
+  margin-bottom: 0.71429rem;
+  color: #fff;
+}
+@media (hover: hover) {
+  .listCell:hover {
+    background: linear-gradient(to right, #604bff4d, #74eaff4d);
+  }
+}
+.listAct {
+  background: linear-gradient(to right, #604bff4d, #74eaff4d) !important;
 }
 
 @keyframes jackInTheBox {

@@ -13,7 +13,7 @@
       :swing="swing"
       @exit="openLeave"
       @setting="settingOpen = true"
-      @list="listOpen = true"
+      @list="openList"
       @mode="modeRef?.open()"
       @pause="openPause"
       @reset="resetOpen = true"
@@ -205,6 +205,42 @@
           </div>
         </div>
       </div>
+
+      <div v-if="listOpen" class="searchLayer">
+        <div class="van-overlay vanPopupMask" />
+        <div class="van-popup van-popup--center listPop" role="dialog" aria-label="学习内容">
+          <div class="galssPop popL">
+            <div class="galssHead flex jb ac mb30">
+              <div class="size30 white">学习内容</div>
+              <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="closeList">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
+                  <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
+            <el-scrollbar ref="listScrollbarRef" height="70vh">
+              <div class="pl40 pr40">
+                <div
+                  v-for="(item, index) in gameList"
+                  :key="item.id"
+                  :ref="(el) => setListCell(el, index)"
+                  class="listCell flex jb hand"
+                  :class="{ listAct: index === gameIndex }"
+                  @click="jumpTo(index)"
+                >
+                  <div class="minw0">
+                    <div class="size26 lh40 bold6">{{ item.english }}</div>
+                    <div class="size-22 opc6 mt20">{{ item.chinese }}</div>
+                  </div>
+                  <div class="size26 lh40 bold ml30 flex0 linearTxt"># {{ index + 1 }}</div>
+                </div>
+              </div>
+            </el-scrollbar>
+            <div class="gap40" />
+          </div>
+        </div>
+      </div>
     </Teleport>
 
     <el-drawer v-if="hasGame" v-model="settingOpen" title="设置" size="20rem">
@@ -233,19 +269,6 @@
       </el-form>
     </el-drawer>
 
-    <el-drawer v-if="hasGame" v-model="listOpen" title="学习内容" size="24rem">
-      <div
-        v-for="(item, index) in gameList"
-        :key="item.id"
-        class="contentRow"
-        :class="{ act: index === gameIndex }"
-        @click="jumpTo(index)"
-      >
-        <div class="size20">{{ index + 1 }}. {{ item.chinese || item.english }}</div>
-        <div class="opc6 size-18 mt10">{{ item.english }}</div>
-      </div>
-    </el-drawer>
-
     <el-dialog v-if="hasGame" v-model="feedbackOpen" title="报告错误" width="28rem">
       <el-input v-model="feedbackText" type="textarea" :rows="4" placeholder="请输入错误描述" />
       <template #footer>
@@ -257,9 +280,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
+import type { ScrollbarInstance } from "element-plus";
 import GameHeader from "@/components/GameHeader.vue";
 import GameWords from "@/components/GameWords.vue";
 import GameListen from "@/components/GameListen.vue";
@@ -283,7 +307,7 @@ import {
   saveGameSetting,
 } from "@/composables/useGame";
 import { isPhone, initLayoutViewport } from "@/composables/useLayout";
-import { formatClock } from "@/lib/gameText";
+import { formatClock, sameSentence } from "@/lib/gameText";
 import { getToken } from "@/api/token";
 import { ensureLogin } from "@/composables/useAuth";
 
@@ -298,6 +322,8 @@ const leaveOpen = ref(false);
 const resetOpen = ref(false);
 const settingOpen = ref(false);
 const listOpen = ref(false);
+const listScrollbarRef = ref<ScrollbarInstance>();
+const listCells: HTMLElement[] = [];
 const feedbackOpen = ref(false);
 const feedbackText = ref("");
 const swing = ref(false);
@@ -305,7 +331,7 @@ const paused = ref(false);
 const elapsed = ref(gameTime.value || 0);
 const wordsRef = ref<{ submit: () => void; reveal: () => void; injectKey: (key: string) => void; getAnswer: () => string } | null>(null);
 const typingRef = ref<{ typeKey: (key: string) => void } | null>(null);
-const listenRef = ref<{ submit: () => void; getAnswer: () => string } | null>(null);
+const listenRef = ref<{ submit: () => void; getAnswer: () => string; markWrong: () => void } | null>(null);
 const modeRef = ref<{ open: () => void } | null>(null);
 const playing = ref(false);
 const recording = ref(false);
@@ -503,12 +529,20 @@ async function reportProgress(index: number, status: 0 | 1) {
   }
 }
 
+function isRetryInputMode() {
+  return mode.value === "SentenceListen" || (mode.value === "SentenceTranslate" && translateType.value === 1);
+}
+
 function isWrongResult(result?: string) {
   const value = String(result ?? "").trim().toLowerCase();
   return value === "wrong" || value === "incorrect" || value === "false" || value === "0" || value === "fail";
 }
 
 async function applyResult(res: { result?: string; expected?: string; nextIndex?: number; finished?: boolean }, currentIndexValue: number) {
+  if (isWrongResult(res.result) && isRetryInputMode()) {
+    listenRef.value?.markWrong();
+    return;
+  }
   lastResult.value = res.result || "";
   lastExpected.value = isWrongResult(res.result) ? res.expected || "" : "";
   answering.value = false;
@@ -546,7 +580,12 @@ async function onAnswerSubmit(answer: string) {
   const id = lessonId();
   const text = String(answer || "").trim();
   if (!item || !id) return;
-  if (!text) {
+  if (isRetryInputMode()) {
+    if (!sameSentence(text, item.english, gameSetting.value.ignore_case)) {
+      listenRef.value?.markWrong();
+      return;
+    }
+  } else if (!text) {
     ElMessage.warning("答案不能为空");
     return;
   }
@@ -793,9 +832,26 @@ function prev() {
   resetItem();
 }
 
+function setListCell(el: unknown, index: number) {
+  if (el instanceof HTMLElement) listCells[index] = el;
+}
+
+async function openList() {
+  listOpen.value = true;
+  paused.value = true;
+  await nextTick();
+  const cell = listCells[gameIndex.value];
+  if (cell) listScrollbarRef.value?.scrollTo({ top: cell.offsetTop, behavior: "smooth" });
+}
+
+function closeList() {
+  listOpen.value = false;
+  paused.value = false;
+}
+
 function jumpTo(index: number) {
   gameIndex.value = index;
-  listOpen.value = false;
+  closeList();
   resetItem();
 }
 
@@ -823,6 +879,7 @@ function openLeave() {
 function resume() {
   pauseOpen.value = false;
   leaveOpen.value = false;
+  listOpen.value = false;
   paused.value = false;
   if (!hasGame.value) {
     void router.replace("/gameLoad");

@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { tokenize } from "@/lib/gameText";
+import { tokenize, sameWord } from "@/lib/gameText";
 
 interface WordToken {
   id: number;
@@ -208,13 +208,31 @@ function getAnswer() {
   return tokens.value.filter((item) => item.isWord).map((item) => item.answer).join("|");
 }
 
+function flashShake(item: WordToken) {
+  item.shake = true;
+  window.setTimeout(() => {
+    item.shake = false;
+  }, 1000);
+}
+
 function submit() {
-  const answer = getAnswer();
-  if (!answer.replace(/\|/g, "").trim()) {
-    emit("error");
+  let firstWrong = -1;
+  tokens.value.forEach((item, index) => {
+    if (!item.isWord) return;
+    if (sameWord(item.answer, item.word, props.ignoreCase)) return;
+    item.errorCount += 1;
+    flashShake(item);
+    if (firstWrong < 0) firstWrong = index;
+    if (props.autoShowTimes > 0 && item.errorCount >= props.autoShowTimes) {
+      item.answer = item.word;
+    }
+  });
+  if (firstWrong < 0) {
+    emit("submit", getAnswer());
     return;
   }
-  emit("submit", answer);
+  emit("error");
+  focusWord(firstWrong);
 }
 
 function reveal() {
