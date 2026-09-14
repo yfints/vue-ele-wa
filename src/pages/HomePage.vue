@@ -36,7 +36,7 @@
           <div class="dashCardLabel">{{ card.label }}</div>
           <div class="dashCardValue">{{ card.value }}</div>
           <el-button class="dashCardArrow" circle>
-            <el-icon><ArrowRight /></el-icon>
+            <el-icon><Right /></el-icon>
           </el-button>
         </div>
         <img :src="card.icon" class="dashCardIcon" alt="" />
@@ -174,7 +174,7 @@ import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import {
   ArrowDown,
-  ArrowRight,
+  Right,
   Calendar,
   CircleCheckFilled,
   Histogram,
