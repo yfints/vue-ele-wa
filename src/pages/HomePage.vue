@@ -1,7 +1,7 @@
 <template>
-  <div class="contentBox dashPage">
-    <header class="dashHead">
-      <div class="dashTabs">
+  <div class="contentBox dashPage" style="padding-top: 0;padding-left: 0;">
+    <header class="dashHead" style="background: white;height: 60px;">
+      <div class="dashTabs" style="padding-left: 20px;">
         <el-button
           v-for="tab in studyTabs"
           :key="tab.value"
@@ -20,7 +20,6 @@
         </button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="soon('个人中心')">个人中心</el-dropdown-item>
             <el-dropdown-item @click="toggleTheme">
               {{ isDark ? "白天模式" : "夜间模式" }}
             </el-dropdown-item>
@@ -30,140 +29,144 @@
       </el-dropdown>
     </header>
 
-    <section class="  dashCards">
-      <article v-for="card in metricCards" :key="card.label" class="dashCard" :class="card.tone">
-        <div class="dashCardBody">
-          <div class="dashCardLabel">{{ card.label }}</div>
-          <div class="dashCardValue">{{ card.value }}</div>
-          <el-button class="dashCardArrow" circle>
-            <el-icon><Right /></el-icon>
-          </el-button>
-        </div>
-        <img :src="card.icon" class="dashCardIcon" alt="" />
-      </article>
-    </section>
+    <div style="padding-top: 16px;padding-left: 24px;">
+      <section class="  dashCards" >
+        <article v-for="card in metricCards" :key="card.label" class="dashCard" :class="card.tone">
+          <div class="dashCardBody">
+            <div class="dashCardLabel">{{ card.label }}</div>
+            <div class="dashCardValue">{{ card.value }}</div>
+            <el-button class="dashCardArrow" circle>
+              <el-icon><Right /></el-icon>
+            </el-button>
+          </div>
+          <img :src="card.icon" class="dashCardIcon" alt="" />
+        </article>
+      </section>
 
-    <section class="dashStatsRow">
-      <div class="dashPanel">
-        <div class="dashPanelTitle">
-          <el-icon class="dashPanelIcon isBlue"><Histogram /></el-icon>
-          学习时长
-        </div>
-        <div class="dashDuration">
-          <div v-for="item in durationCards" :key="item.label" class="dashDurationItem">
-            <div class="dashDurationNum">
-              <span>{{ item.hours }}</span>
-              <small>小时</small>
-              <span>{{ pad2(item.minutes) }}</span>
-              <small>分</small>
+      <section class="dashStatsRow">
+        <div class="dashPanel">
+          <div class="dashPanelTitle">
+            <el-icon class="dashPanelIcon isBlue"><Histogram /></el-icon>
+            学习时长
+          </div>
+          <div class="dashDuration">
+            <div v-for="item in durationCards" :key="item.label" class="dashDurationItem">
+              <div class="dashDurationNum">
+                <span>{{ item.hours }}</span>
+                <small>小时</small>
+                <span>{{ pad2(item.minutes) }}</span>
+                <small>分</small>
+              </div>
+              <div class="dashDurationLabel">{{ item.label }}</div>
             </div>
-            <div class="dashDurationLabel">{{ item.label }}</div>
           </div>
         </div>
-      </div>
-      <div class="dashPanel">
-        <div class="dashPanelTitle">
-          <el-icon class="dashPanelIcon isCyan"><Opportunity /></el-icon>
-          打卡统计
+        <div class="dashPanel">
+          <div class="dashPanelTitle">
+            <el-icon class="dashPanelIcon isCyan"><Opportunity /></el-icon>
+            打卡统计
+          </div>
+          <div class="dashCheckStats">
+            <div class="dashCheckStat">
+              <div class="dashCheckNum">{{ Number(checkInStat.currentStreak || 0) }}<small>天</small></div>
+              <div class="dashDurationLabel">连续打卡</div>
+            </div>
+            <div class="dashCheckStat">
+              <div class="dashCheckNum">{{ Number(checkInStat.maxStreak || 0) }}<small>天</small></div>
+              <div class="dashDurationLabel">最高连续打卡</div>
+            </div>
+            <div class="dashCheckStat">
+              <div class="dashCheckNum">{{ Number(checkInStat.totalCheckIn || 0) }}<small>天</small></div>
+              <div class="dashDurationLabel">累计打卡</div>
+            </div>
+          </div>
         </div>
-        <div class="dashCheckStats">
-          <div class="dashCheckStat">
-            <div class="dashCheckNum">{{ Number(checkInStat.currentStreak || 0) }}<small>天</small></div>
-            <div class="dashDurationLabel">连续打卡</div>
-          </div>
-          <div class="dashCheckStat">
-            <div class="dashCheckNum">{{ Number(checkInStat.maxStreak || 0) }}<small>天</small></div>
-            <div class="dashDurationLabel">最高连续打卡</div>
-          </div>
-          <div class="dashCheckStat">
-            <div class="dashCheckNum">{{ Number(checkInStat.totalCheckIn || 0) }}<small>天</small></div>
-            <div class="dashDurationLabel">累计打卡</div>
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="dashCheckin">
-      <img src="/clone-assets/home/checkin-hero.png" class="dashCheckinHero" alt="" />
-      <div class="dashPanelTitle">
-        <el-icon class="dashPanelIcon isBlue"><Calendar /></el-icon>
-        今日打卡
-      </div>
-      <div class="dashCheckinMain">
-        <div class="dashCheckinDate">
-          <div class="dashCheckinMonth">{{ signMonth }}</div>
-          <div class="dashCheckinDay">{{ pad2(signDay) }}</div>
-          <div class="dashCheckinHint">学习打卡</div>
+      <section class="dashCheckin">
+        <img src="/clone-assets/home/checkin-hero.png" class="dashCheckinHero" alt="" />
+        <div class="dashPanelTitle">
+          <el-icon class="dashPanelIcon isBlue"><Calendar /></el-icon>
+          今日打卡
         </div>
-        <div class="dashCheckinInfo">
-          <div class="dashCheckinLine">
-            <el-icon class="isOk"><CircleCheckFilled /></el-icon>
-            <span>完成 <em>20分钟</em> 学习即可打卡</span>
+        <div class="dashCheckinMain">
+          <div class="dashCheckinDate">
+            <div class="dashCheckinMonth">{{ signMonth }}</div>
+            <div class="dashCheckinDay">{{ pad2(signDay) }}</div>
+            <div class="dashCheckinHint">学习打卡</div>
           </div>
-          <div class="dashCheckinLine">
-            <el-icon class="isBlue"><User /></el-icon>
-            <span>
+          <div class="dashCheckinInfo">
+            <div class="dashCheckinLine">
+              <el-icon class="isOk"><CircleCheckFilled /></el-icon>
+              <span>完成 <em>20分钟</em> 学习即可打卡</span>
+            </div>
+            <div class="dashCheckinLine">
+              <el-icon class="isBlue"><User /></el-icon>
+              <span>
               已有
               <em>{{ Number(homeIndex.all_check_in || 0).toLocaleString() }}</em>
               人打卡
             </span>
-          </div>
-          <div class="dashCheckinLine">
-            <el-icon class="isGold"><Trophy /></el-icon>
-            <span>
+            </div>
+            <div class="dashCheckinLine">
+              <el-icon class="isGold"><Trophy /></el-icon>
+              <span>
               累计打卡
               <em>{{ Number(checkInStat.totalCheckIn || 0) }}</em>
               天
             </span>
-          </div>
-          <el-button
-            class="dashCheckinBtn"
-            type="primary"
-            :disabled="checkedIn || signProgress < 100"
-            @click="doClockIn"
-          >
-            {{ checkedIn ? "已打卡" : "今日打卡" }}
-          </el-button>
-        </div>
-      </div>
-    </section>
-
-    <section class="dashChart">
-      <div class="dashPanelTitle">
-        <el-icon class="dashPanelIcon isBlue"><Timer /></el-icon>
-        每日学习时长
-      </div>
-      <div class="dashChartBody">
-        <div class="dashChartAxis">
-          <span v-for="tick in chartTicks" :key="tick">{{ tick }}min</span>
-        </div>
-        <div class="dashChartBars">
-          <el-tooltip
-            v-for="item in weekDays"
-            :key="item.label"
-            :content="`${item.minutes}min`"
-            placement="top"
-          >
-            <div class="dashChartCol">
-              <div class="dashChartTrack">
-                <div
-                  v-if="item.minutes > 0 && item.peak"
-                  class="dashChartTip"
-                >
-                  {{ item.minutes }}min
-                </div>
-                <div
-                  class="dashChartBar"
-                  :class="{ isToday: item.isToday, isPeak: item.peak }"
-                  :style="{ height: `${item.percent}%` }"
-                />
-              </div>
-              <div class="dashChartLabel">{{ item.label }}</div>
             </div>
-          </el-tooltip>
+            <el-button
+                class="dashCheckinBtn"
+                type="primary"
+                :disabled="checkedIn || signProgress < 100"
+                @click="doClockIn"
+            >
+              {{ checkedIn ? "已打卡" : "今日打卡" }}
+            </el-button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section class="dashChart">
+        <div class="dashPanelTitle">
+          <el-icon class="dashPanelIcon isBlue"><Timer /></el-icon>
+          每日学习时长
+        </div>
+        <div class="dashChartBody">
+          <div class="dashChartAxis">
+            <span v-for="tick in chartTicks" :key="tick">{{ tick }}min</span>
+          </div>
+          <div class="dashChartBars">
+            <el-tooltip
+                v-for="item in weekDays"
+                :key="item.label"
+                :content="`${item.minutes}min`"
+                placement="top"
+            >
+              <div class="dashChartCol">
+                <div class="dashChartTrack">
+                  <div
+                      v-if="item.minutes > 0 && item.peak"
+                      class="dashChartTip"
+                  >
+                    {{ item.minutes }}min
+                  </div>
+                  <div
+                      class="dashChartBar"
+                      :class="{ isToday: item.isToday, isPeak: item.peak }"
+                      :style="{ height: `${item.percent}%` }"
+                  />
+                </div>
+                <div class="dashChartLabel">{{ item.label }}</div>
+              </div>
+            </el-tooltip>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
   </div>
 </template>
 
