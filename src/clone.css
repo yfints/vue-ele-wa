@@ -2971,8 +2971,8 @@ html.dark .colLine {
     transform: translateX(-50%);
     padding: 2px 8px;
     border-radius: 8px;
-    background: #3b82f6;
-    color: #fff;
+
+    color: #3b82f6;
     font-size: 11px;
     white-space: nowrap;
 }
