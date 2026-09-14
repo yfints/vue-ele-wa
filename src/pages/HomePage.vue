@@ -135,7 +135,12 @@
         </div>
         <div class="dashChartBody">
           <div class="dashChartAxis">
-            <span v-for="tick in chartTicks" :key="tick">{{ tick }}min</span>
+            <span
+              v-for="tick in chartTicks"
+              :key="tick.value"
+              class="dashChartTick"
+              :style="{ top: `${tick.pos}%` }"
+            >{{ tick.value }}min</span>
           </div>
           <div class="dashChartBars">
             <el-tooltip
@@ -277,9 +282,13 @@ const durationCards = computed(() => [
 ]);
 
 const chartTicks = computed(() => {
-  const max = Math.max(...weekDays.value.map((item) => item.minutes), 40);
-  const top = Math.ceil(max / 10) * 10 || 40;
-  return [top, Math.round(top * 0.75), Math.round(top * 0.5), Math.round(top * 0.25), 0];
+  const max = Math.max(...weekDays.value.map((item) => item.minutes), 0);
+  const top = Math.ceil(max / 10) * 10;
+  if (!top) return [{ value: 0, pos: 100 }];
+  return [top, Math.round(top * 0.75), Math.round(top * 0.5), Math.round(top * 0.25), 0].map((value, index) => ({
+    value,
+    pos: index * 25,
+  }));
 });
 
 function pad2(n: number) {
