@@ -17,30 +17,57 @@
 </template>
 
 <script setup lang="ts">
-import { markRaw } from "vue";
-import {
-  Calendar,
-  Collection,
-  EditPen,
-  Headset,
-  House,
-  Notebook,
-  Present,
-  Reading,
-  Star,
-} from "@element-plus/icons-vue";
 import { menuOpen } from "@/composables/useLayout";
 import MenuItem from "./MenuItem.vue";
 
 const primary = [
-  { label: "首页", icon: markRaw(House), to: "/home/index" },
-  { label: "课程广场", icon: markRaw(Reading), to: "/courseMall/index" },
-  { label: "教材学习", icon: markRaw(Notebook) },
-  { label: "单词库", icon: markRaw(Collection) },
-  { label: "音标练习", icon: markRaw(Headset) },
-  { label: "学习计划", icon: markRaw(Calendar) },
-  { label: "学习手帐", icon: markRaw(EditPen) },
-  { label: "我的收藏", icon: markRaw(Star), to: "/myCourse/sentence" },
-  { label: "开通会员", icon: markRaw(Present), tone: "dashVip" },
+  {
+    label: "首页",
+    icon: "/clone-assets/menu/home.svg",
+    activeIcon: "/clone-assets/menu/home-active.svg",
+    to: "/home/index",
+  },
+  {
+    label: "课程广场",
+    icon: "/clone-assets/menu/course.svg",
+    activeIcon: "/clone-assets/menu/course-active.svg",
+    to: "/courseMall/index",
+  },
+  {
+    label: "教材学习",
+    icon: "/clone-assets/menu/book.svg",
+    activeIcon: "/clone-assets/menu/book-active.svg",
+  },
+  {
+    label: "单词库",
+    icon: "/clone-assets/menu/word.svg",
+    activeIcon: "/clone-assets/menu/word-active.svg",
+  },
+  {
+    label: "音标练习",
+    icon: "/clone-assets/menu/phonetic.svg",
+    activeIcon: "/clone-assets/menu/phonetic-active.svg",
+  },
+  {
+    label: "学习计划",
+    icon: "/clone-assets/menu/plan.svg",
+    activeIcon: "/clone-assets/menu/plan-active.svg",
+  },
+  {
+    label: "学习手帐",
+    icon: "/clone-assets/menu/journal.svg",
+    activeIcon: "/clone-assets/menu/journal-active.svg",
+  },
+  {
+    label: "我的收藏",
+    icon: "/clone-assets/menu/favorite.svg",
+    activeIcon: "/clone-assets/menu/favorite-active.svg",
+    to: "/myCourse/sentence",
+  },
+  {
+    label: "开通会员",
+    icon: "/clone-assets/menu/vip.png",
+    tone: "dashVip",
+  },
 ];
 </script>

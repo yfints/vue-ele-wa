@@ -490,6 +490,12 @@ button {
     font-size: 18px;
 }
 
+.dashMenuIconImg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
 .dashLogo {
     width: 100%;
     color: inherit;
