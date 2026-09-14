@@ -281,9 +281,12 @@ const durationCards = computed(() => [
   { label: "本月学习时长", ...formatDurationParts(stats.value.month_seconds) },
 ]);
 
+function chartTop(list: { minutes: number }[]) {
+  return Math.ceil(Math.max(...list.map((item) => item.minutes), 0) / 10) * 10;
+}
+
 const chartTicks = computed(() => {
-  const max = Math.max(...weekDays.value.map((item) => item.minutes), 0);
-  const top = Math.ceil(max / 10) * 10;
+  const top = chartTop(weekDays.value);
   if (!top) return [{ value: 0, pos: 100 }];
   return [top, Math.round(top * 0.75), Math.round(top * 0.5), Math.round(top * 0.25), 0].map((value, index) => ({
     value,
@@ -331,11 +334,11 @@ async function loadWeekChart() {
       peak: false,
     };
   });
-  const max = Math.max(...mapped.map((item) => item.minutes), 1);
+  const top = chartTop(mapped);
   const peakIndex = mapped.reduce((best, item, index) => (item.minutes > mapped[best].minutes ? index : best), 0);
   weekDays.value = mapped.map((item, index) => ({
     ...item,
-    percent: Math.max(item.minutes > 0 ? 8 : 0, Math.round((item.minutes / max) * 100)),
+    percent: top > 0 ? Math.max(item.minutes > 0 ? 8 : 0, Math.round((item.minutes / top) * 100)) : 0,
     peak: index === peakIndex && mapped[peakIndex].minutes > 0,
   }));
 }
