@@ -2,32 +2,38 @@
   <div class="menu ani" :class="[tone, collapsed ? 'menuClose' : '']">
     <RouterLink v-if="to" :to="to" class="hand" :style="{ color: 'inherit' }">
       <div class="card flex ac hand" :class="{ cardAct: active }">
-        <img :src="iconSrc" class="img34" alt="" />
+        <el-icon v-if="iconComp" class="dashMenuIcon"><component :is="iconComp" /></el-icon>
+        <img v-else :src="iconSrc" class="img34" alt="" />
         <div class="ml10 size28 bold">{{ label }}</div>
       </div>
     </RouterLink>
-    <div v-else class="card flex ac hand" :class="{ cardAct: active }">
-      <img :src="iconSrc" class="img34" alt="" />
+    <div v-else class="card flex ac hand" :class="{ cardAct: active }" @click="onSoon">
+      <el-icon v-if="iconComp" class="dashMenuIcon"><component :is="iconComp" /></el-icon>
+      <img v-else :src="iconSrc" class="img34" alt="" />
       <div class="ml10 size28 bold">{{ label }}</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, type Component } from "vue";
 import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
 import { isPhone, menuOpen } from "@/composables/useLayout";
 
 const props = defineProps<{
   label: string;
-  icon: string;
+  icon: string | Component;
   to?: string;
   active?: boolean;
   tone?: string;
 }>();
 
 const route = useRoute();
-const iconSrc = computed(() => `/clone-assets/icons/${props.icon}.png`);
+const iconComp = computed(() => (typeof props.icon === "string" ? null : props.icon));
+const iconSrc = computed(() =>
+  typeof props.icon === "string" ? `/clone-assets/icons/${props.icon}.png` : "",
+);
 const collapsed = computed(() => !menuOpen.value && !isPhone.value);
 const active = computed(() => {
   if (props.active) return true;
@@ -39,4 +45,8 @@ const active = computed(() => {
   if (props.to.startsWith("/myCourse")) return route.path.startsWith("/myCourse");
   return route.path === props.to;
 });
+
+function onSoon() {
+  ElMessage.info(`${props.label}即将上线`);
+}
 </script>

@@ -19,6 +19,14 @@ export function formatHowLong(total = 0) {
   return parts.join("") || "没有学习";
 }
 
+export function formatDurationParts(total = 0) {
+  const t = Math.max(0, Number(total) || 0);
+  return {
+    hours: Math.floor(t / 3600),
+    minutes: Math.floor((t % 3600) / 60),
+  };
+}
+
 export function formatRankTime(total = 0) {
   const t = Number(total) || 0;
   if (t === 0) return "没有学习";

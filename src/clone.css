@@ -401,8 +401,65 @@ button {
   background: var(--bg-container);
 }
 .cardAct {
-  background: linear-gradient(to right, #96b0fb, #5a49b4) !important;
+  background: #0056b5 !important;
   color: #fff;
+}
+.dashVip .card {
+  color: #e6a23c;
+}
+.dashMenuIcon {
+  font-size: 18px;
+}
+.page.isHome .sideBar {
+  padding: 16px 12px 20px;
+  background: #fff;
+  flex: 0 0 200px;
+  width: 200px;
+}
+.page.isHome .sideBarClose {
+  flex-basis: 72px !important;
+  width: 72px !important;
+}
+.page.isHome .sideBar .top {
+  height: auto;
+  min-height: 64px;
+  padding: 8px 8px 16px;
+}
+.dashLogo {
+  width: 100%;
+  color: inherit;
+}
+.dashLogoImg {
+  height: 36px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+.page.isHome .menu {
+  width: 100%;
+}
+.page.isHome .menu .card {
+  height: 40px;
+  border-radius: 12px;
+  padding-left: 14px;
+}
+.page.isHome .menu .size28 {
+  font-size: 14px;
+  font-weight: 500;
+}
+.dashMenuWrap {
+  margin-bottom: 4px;
+}
+.dashSlogan {
+  width: 140px;
+  max-width: 100%;
+  margin: 12px auto 8px;
+  display: block;
+  opacity: 0.9;
+}
+.page.isHome .sideBarClose .dashSlogan,
+.page.isHome .sideBarClose .dashLogoImg {
+  display: none;
 }
 .highMenu1 {
   color: #7d7dff;
@@ -445,6 +502,10 @@ button {
 .onMenuClose {
   width: calc(100vw - 4.42857rem);
 }
+.container.onHome {
+  padding-top: 0;
+  background: #f7f7f7;
+}
 .contentBox {
   position: relative;
   z-index: 1;
@@ -452,6 +513,18 @@ button {
   overflow-y: hidden;
   height: calc(100vh - 4.28571rem);
   height: calc(100dvh - 4.28571rem);
+}
+.page.isHome .onMenuOpen {
+  width: calc(100vw - 200px);
+}
+.page.isHome .onMenuClose {
+  width: calc(100vw - 72px);
+}
+.onHome .contentBox {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  background: #f7f7f7;
 }
 
 .headBar {
@@ -2139,6 +2212,352 @@ html.dark .colLine {
   }
   to {
     background-position: -200% -50%;
+  }
+}
+
+.dashPage {
+  --dash-primary: #0056b5;
+  padding: 16px 24px 28px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+.dashHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  min-width: 0;
+}
+.dashTabs .el-button {
+  min-width: 56px;
+  height: 32px;
+  padding: 0 16px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  color: #666;
+  font-weight: 500;
+}
+.dashTabs .el-button--primary {
+  background: var(--dash-primary) !important;
+  color: #fff;
+}
+.dashUser {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+}
+.dashUserAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.dashCards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.dashCard {
+  position: relative;
+  min-height: 128px;
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  overflow: hidden;
+}
+.dashCard.purple { background: #f4f2f9; }
+.dashCard.mint { background: #eef8f6; }
+.dashCard.pink { background: #f8eef0; }
+.dashCard.green { background: #f3f9f2; }
+.dashCard.orange { background: #f9f6f2; }
+.dashCard.blue { background: #f2f5fa; }
+.dashCardLabel {
+  font-size: 14px;
+  color: #666;
+}
+.dashCardValue {
+  margin-top: 8px;
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.dashCardArrow.el-button {
+  margin-top: 16px;
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border: none;
+  background: #fff;
+  color: #8b8b8b;
+}
+.dashCard.purple .dashCardArrow { color: #8b6fd6; }
+.dashCard.mint .dashCardArrow { color: #2db7a0; }
+.dashCard.pink .dashCardArrow { color: #e36b7a; }
+.dashCard.green .dashCardArrow { color: #4caf6a; }
+.dashCard.orange .dashCardArrow { color: #e09a3a; }
+.dashCard.blue .dashCardArrow { color: #4a86d6; }
+.dashCardIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 92px;
+  height: auto;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.dashStatsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+.dashPanel {
+  min-width: 0;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 20px 18px;
+}
+.dashPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.dashPanelIcon { font-size: 18px; }
+.dashPanelIcon.isBlue { color: #3b82f6; }
+.dashPanelIcon.isCyan { color: #22a6c5; }
+.dashDuration,
+.dashCheckStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  background: #f6faff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.dashCheckStats {
+  background: #eef9ff;
+}
+.dashDurationItem,
+.dashCheckStat {
+  min-width: 0;
+  padding: 18px 8px;
+  text-align: center;
+}
+.dashDurationNum,
+.dashCheckNum {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.dashDurationNum small,
+.dashCheckNum small {
+  margin: 0 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #666;
+}
+.dashDurationLabel {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #999;
+}
+.dashCheckin {
+  position: relative;
+  margin-top: 16px;
+  padding: 16px 24px 18px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+.dashCheckin .dashPanelTitle {
+  position: relative;
+  z-index: 1;
+}
+.dashCheckinMain {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 28px;
+  min-height: 148px;
+}
+.dashCheckinHero {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 52%;
+  object-fit: cover;
+  object-position: right center;
+  pointer-events: none;
+}
+.dashCheckinDate {
+  width: 120px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f6faff;
+  border-radius: 12px;
+  color: #1a1a1a;
+}
+.dashCheckinMonth,
+.dashCheckinHint {
+  font-size: 13px;
+  color: #888;
+}
+.dashCheckinDay {
+  margin: 4px 0;
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 700;
+}
+.dashCheckinInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-width: 220px;
+}
+.dashCheckinLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555;
+}
+.dashCheckinLine em {
+  margin: 0 4px;
+  font-style: normal;
+  font-weight: 700;
+  color: #0056b5;
+}
+.dashCheckinLine .isOk { color: #22c55e; }
+.dashCheckinLine .isBlue { color: #3b82f6; }
+.dashCheckinLine .isGold { color: #f59e0b; }
+.dashCheckinBtn.el-button {
+  width: fit-content;
+  margin-top: 8px;
+  padding: 10px 28px;
+  background: var(--dash-primary) !important;
+  border: none;
+}
+.dashChart {
+  margin-top: 16px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 20px 20px;
+  min-width: 0;
+}
+.dashChartBody {
+  display: flex;
+  min-height: 200px;
+  gap: 12px;
+}
+.dashChartAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 48px;
+  padding: 8px 0 28px;
+  font-size: 11px;
+  color: #b0b0b0;
+  text-align: right;
+}
+.dashChartBars {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 8px;
+}
+.dashChartCol {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.dashChartTrack {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-image: linear-gradient(#eef0f3 1px, transparent 1px);
+  background-size: 100% 25%;
+}
+.dashChartBar {
+  width: 36px;
+  max-width: 70%;
+  border-radius: 4px 4px 0 0;
+  background: #d7e8ff;
+}
+.dashChartBar.isToday,
+.dashChartBar.isPeak {
+  background: linear-gradient(#7eb6ff, #3b82f6);
+}
+.dashChartTip {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.dashChartLabel {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+}
+@media (max-width: 1100px) {
+  .dashCards,
+  .dashStatsRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .dashCheckinHero {
+    max-width: 36%;
+    opacity: 0.9;
+  }
+}
+@media (max-width: 760px) {
+  .dashPage {
+    padding: 16px;
+  }
+  .dashHead {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .dashCards,
+  .dashStatsRow,
+  .dashDuration,
+  .dashCheckStats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashCheckinMain {
+    flex-direction: column;
+  }
+  .dashCheckinHero {
+    display: none;
+  }
+  .dashCheckinDate {
+    width: 100%;
+    padding: 16px 0;
   }
 }
 
