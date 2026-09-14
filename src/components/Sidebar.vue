@@ -63,6 +63,7 @@ const primary = [
   {label: "教材同步", icon: "教材同步"},
   {label: "单词仓库", icon: "单词仓库"},
   {label: "音标课程", icon: "音标课程"},
+  {label: "我的收藏", icon: "我的收藏", to: "/myCourse/sentence"},
   /*  { label: "AI 对话", icon: "AI对话" },
     { label: "PK竞技场", icon: "PK竞技场" },*/
 ];

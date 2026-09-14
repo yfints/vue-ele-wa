@@ -95,8 +95,8 @@ export async function fetchLessonDetails(id: string | number) {
   return get<CourseDetailVo>(`/courses/${id}`, undefined, { skipAuthRedirect: true });
 }
 
-export function toggleCollect(courseId: string | number) {
-  return post("/collect/toggle", { courseId: courseId, type: 0 }, { skipAuthRedirect: true });
+export function toggleCollect(courseId: string | number, type = 0) {
+  return post("/collect/toggle", { courseId, type }, { skipAuthRedirect: true });
 }
 
 export function deleteMyLesson(userLessonId: string | number) {
@@ -163,8 +163,82 @@ export function topStudyPlanLesson(body: { userLessonId?: string | number; cours
   return post("/study-plan/lessons/top", body);
 }
 
-export function fetchCollectLessons(params?: { type?: number; page?: number; limit?: number }) {
-  return get("/collect/lessons", params);
+export interface CollectLessonItem {
+  id: number | string;
+  courseId: number | string;
+  name: string;
+  image: string;
+  heat: number;
+  isHave: boolean;
+  userLessonId?: number | string | null;
+  founderName: string;
+  founderAvatar: string;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
+}
+
+function textOf(value: unknown) {
+  return typeof value === "string" || typeof value === "number" ? String(value) : "";
+}
+
+export function normalizeCollectItem(row: unknown): CollectLessonItem | null {
+  const raw = asRecord(row);
+  if (!raw) return null;
+  const detail = asRecord(raw.detail) || asRecord(raw.course) || raw;
+  const founder = asRecord(detail.founder) || {};
+  const courseId = detail.id ?? raw.courseId ?? raw.lesson_id ?? raw.lessonId;
+  if (courseId == null || courseId === "") return null;
+  return {
+    id: (raw.id as number | string | undefined) ?? (courseId as number | string),
+    courseId: courseId as number | string,
+    name: textOf(detail.name),
+    image: textOf(detail.image || detail.cover),
+    heat: Number(detail.heat ?? 0) || 0,
+    isHave: detail.is_have == 1 || detail.isHave === true,
+    userLessonId: (detail.user_lesson_id ?? detail.userLessonId) as number | string | null | undefined,
+    founderName: textOf(founder.nickname || founder.name),
+    founderAvatar: textOf(founder.head_img || founder.avatar || founder.headImg),
+  };
+}
+
+export function unwrapCollectPage(data: unknown): { items: CollectLessonItem[]; total?: number } {
+  const obj = asRecord(data);
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(obj?.records)
+      ? obj.records
+      : Array.isArray(obj?.list)
+        ? obj.list
+        : Array.isArray(obj?.rows)
+          ? obj.rows
+          : [];
+  const items = list.map(normalizeCollectItem).filter((item): item is CollectLessonItem => Boolean(item));
+  const total = obj?.total ?? obj?.count;
+  return { items, total: total == null ? undefined : Number(total) };
+}
+
+export function fetchCollectLessons(params?: {
+  type?: number;
+  page?: number;
+  limit?: number;
+  current?: number;
+  size?: number;
+}) {
+  const page = params?.page ?? params?.current ?? 1;
+  const limit = params?.limit ?? params?.size ?? 50;
+  return get(
+    "/collect/lessons",
+    {
+      type: params?.type ?? 0,
+      page,
+      limit,
+      current: page,
+      size: limit,
+    },
+    { skipAuthRedirect: true },
+  );
 }
 
 export function addStudyPlanWords(courseId: string | number) {

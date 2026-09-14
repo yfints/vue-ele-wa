@@ -4,6 +4,7 @@ import AppLayout from "@/layouts/AppLayout.vue";
 import CourseDetailPage from "@/pages/CourseDetailPage.vue";
 import CourseMallPage from "@/pages/CourseMallPage.vue";
 import HomePage from "@/pages/HomePage.vue";
+import MyCourseCollectPage from "@/pages/MyCourseCollectPage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import GameLoadPage from "@/pages/GameLoadPage.vue";
 import GamePage from "@/pages/GamePage.vue";
@@ -39,6 +40,17 @@ const router = createRouter({
           path: "courses/:courseId",
           redirect: (to: any) => `/courseMall/${String(to.params.courseId)}`,
           meta: { public: true },
+        },
+        { path: "myCourse", redirect: "/myCourse/sentence", meta: { public: true } },
+        {
+          path: "myCourse/sentence",
+          component: MyCourseCollectPage,
+          meta: { public: true, title: "我的收藏" },
+        },
+        {
+          path: "myCourse/word",
+          component: MyCourseCollectPage,
+          meta: { public: true, title: "我的收藏" },
         },
         { path: ":pathMatch(.*)*", redirect: "/home/index" },
       ],

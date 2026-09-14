@@ -36,6 +36,7 @@ const active = computed(() => {
   if (props.to.startsWith("/courseMall")) {
     return route.path.startsWith("/courseMall") || route.path.startsWith("/courses");
   }
+  if (props.to.startsWith("/myCourse")) return route.path.startsWith("/myCourse");
   return route.path === props.to;
 });
 </script>

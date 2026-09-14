@@ -2775,3 +2775,126 @@ html:not(.dark) .listPop .galssPop {
   animation-name: headShake;
   animation-timing-function: ease-in-out;
 }
+
+.mr46 {
+  margin-right: 1.64286rem;
+}
+.pt100 {
+  padding-top: 3.57143rem;
+}
+.nodata {
+  width: 10.71429rem;
+  height: 10.71429rem;
+  object-fit: contain;
+  animation:
+    nodataEnter 0.6s ease-out forwards,
+    nodataFloat 2.4s ease-in-out infinite 0.6s;
+}
+.nodataBtn {
+  height: 2.14286rem;
+  line-height: 2.14286rem;
+  text-align: center;
+  border-radius: 1.07143rem;
+  font-size: 0.78571rem;
+  color: #fff;
+  width: 8.92857rem;
+  background: linear-gradient(#8d49fd, #7f56f3, #5691f3);
+  box-shadow:
+    0 -1px 0.10714rem #89def64d inset,
+    0 -0.10714rem 1px #e9d1ff33 inset,
+    0 1px 0.10714rem #090c3c1a,
+    0 0.07143rem 0.28571rem #090c3c26,
+    0 0.14286rem 0.42857rem #090c3c26;
+}
+
+.collectPage .headTab {
+  background-color: var(--bg-container);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 2.14286rem;
+}
+.collectPage .headTab .act {
+  display: inline-block;
+  background: linear-gradient(to right, #74eaff, #604bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.collectPage .listScroll {
+  height: calc(100vh - 7.5rem);
+  height: calc(100dvh - 7.5rem);
+}
+.collectEmpty {
+  min-height: calc(100% - 1rem);
+  justify-content: center;
+  padding-bottom: 2.14286rem;
+}
+.collectCard {
+  border-radius: 0.53571rem;
+  transition: all 0.3s;
+  background-color: var(--bg-card);
+  position: relative;
+  padding: 0.53571rem;
+  color: inherit;
+}
+.collectCard .cardimg {
+  width: 100%;
+  aspect-ratio: 260 / 356;
+  object-fit: cover;
+  border-radius: 0.35714rem;
+  transition: all 0.3s;
+  display: block;
+}
+.collectCard .cardimgFallback {
+  width: 100%;
+  height: 100%;
+  background: var(--el-fill-color-light);
+}
+.collectCard .delBox {
+  position: absolute;
+  right: 0.35714rem;
+  top: 0.35714rem;
+  z-index: 1;
+  cursor: pointer;
+  transform: scale(0);
+  border-radius: 50%;
+  background-color: var(--bg-card);
+}
+.collectCard .imgBox {
+  overflow: hidden;
+  border-radius: 0.35714rem;
+  position: relative;
+}
+.collectCard .cardtag {
+  padding: 0.14286rem 0.35714rem;
+  border-radius: 0.35714rem;
+  background-color: #00000080;
+  color: #fff;
+  position: absolute;
+  bottom: 0.35714rem;
+  right: 0.35714rem;
+  z-index: 1;
+  font-size: 0.71429rem;
+}
+@media (hover: hover) {
+  .collectCard:hover {
+    background: linear-gradient(to right, #604bff33, #74eaff33);
+  }
+  .collectCard:hover .delBox {
+    transform: scale(1);
+  }
+  .collectCard:hover .cardimg {
+    transform: scale(1.1);
+  }
+  .collectCard .delBox:hover {
+    color: #4162ff;
+    transform: scale(1.2) !important;
+  }
+}
+@media (min-width: 575px) {
+  .collectCard {
+    margin-right: 0.71429rem;
+  }
+}
