@@ -1,4 +1,4 @@
-import { get, post } from "./http";
+import { del, get, post } from "./http";
 
 export interface MyLessonCourse {
   id: number | string;
@@ -81,6 +81,7 @@ export interface CourseDetailVo {
   courseNum?: number;
   isHave?: boolean;
   userLessonId?: number | string | null;
+  userWordId?: number | string | null;
   isCollect?: boolean;
   access?: { allowed?: boolean; reason?: string };
   lessons?: CourseLessonVo[];
@@ -172,4 +173,16 @@ export function fetchCourses(params?: {
   size?: number;
 }) {
   return get<CoursePage>("/courses", params, { skipAuthRedirect: true });
+}
+
+export function studyPlanLesson(courseId: string | number) {
+  return post<{ userLessonId?: number | string; userWordId?: number | string }>(
+    "/study-plan/lessons",
+    { courseId: courseId, type: 0 },
+    { skipAuthRedirect: true },
+  );
+}
+
+export function removeStudyPlanWord(userWordId: string | number) {
+  return del(`/study-plan/lessons/${userWordId}`, undefined, { skipAuthRedirect: true });
 }

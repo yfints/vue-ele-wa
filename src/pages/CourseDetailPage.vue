@@ -32,6 +32,7 @@
                     :icon="VideoPlay"
                     round
                     class="flex ac"
+                    :loading="starting"
                     @click="openPractice(continueLesson)"
                   >
                     {{ isMine ? "继续学习" : "开始学习" }}
@@ -64,8 +65,20 @@
           <el-tag type="success" round>学习：{{ studyTimeText }}</el-tag>
           <el-tag round class="ml20 mr20">最近：{{ detail.lastStudyTime || "未开始" }}</el-tag>
           <div class="progress">
+
             <el-progress :percentage="Number(progress.percentage || 0)" :stroke-width="15" />
           </div>
+          <el-button
+              v-if="!isPhone"
+              type="danger"
+              round
+              :icon="Delete"
+              size="small"
+              plain
+              @click="removeLesson"
+          >
+            删除课程
+          </el-button>
         </div>
 
         <el-row :gutter="10">
@@ -148,9 +161,11 @@
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Clock, Star, VideoPlay } from "@element-plus/icons-vue";
+import {Clock, Delete, Star, VideoPlay} from "@element-plus/icons-vue";
 import {
   fetchLessonDetails,
+  removeStudyPlanWord,
+  studyPlanLesson,
   toggleCollect,
   type CourseDetailVo,
   type CourseLessonVo,
@@ -168,10 +183,11 @@ const ACCESS_LABELS: Record<string, string> = {
   NEED_LOGIN: "需登录后学习",
   NEED_BUY: "需购买后学习",
 };
-
+const usingDemo = ref(false);
 const route = useRoute();
 const router = useRouter();
 const modeRef = ref<{ open: () => void } | null>(null);
+const starting = ref(false);
 const detail = ref<CourseDetailVo | undefined>();
 const loading = ref(false);
 let requestSeq = 0;
@@ -228,7 +244,30 @@ async function load() {
     }
   }
 }
-
+async function removeLesson() {
+  const current = detail.value;
+  const planId = current?.userWordId ?? current?.userLessonId;
+  if (!planId) {
+    ElMessage.warning("未找到学习计划记录，无法删除");
+    return;
+  }
+  try {
+    await ElMessageBox.confirm("确定要删除此课程包吗?此操作不可恢复。", "提示", {
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+  } catch {
+    return;
+  }
+  try {
+    if (getToken() && !usingDemo.value) await removeStudyPlanWord(courseId.value);
+    ElMessage.success("删除成功");
+    await router.push("/courseMall/index");
+  } catch {
+    /* unwrap 已提示 */
+  }
+}
 async function confirmBox(message: string, title = "提示") {
   try {
     await ElMessageBox.confirm(message, title, {
@@ -259,7 +298,7 @@ function startPractice(course?: CourseLessonVo) {
 }
 
 async function openPractice(course?: CourseLessonVo) {
-  if (!course) return;
+  if (!course || starting.value) return;
   if (!getToken()) {
     await ensureLogin({ chapterId: course.id });
     return;
@@ -267,6 +306,21 @@ async function openPractice(course?: CourseLessonVo) {
   if (!access.value.allowed) {
     ElMessage.info(access.value.text ? `该课程为${access.value.text}，暂无法学习` : "暂无法学习该课程");
     return;
+  }
+  if (!isMine.value) {
+    starting.value = true;
+    try {
+      const data = await studyPlanLesson(courseId.value);
+      if (detail.value) {
+        detail.value.isHave = true;
+        if (data?.userLessonId != null) detail.value.userLessonId = data.userLessonId;
+        if (data?.userWordId != null) detail.value.userWordId = data.userWordId;
+      }
+    } catch {
+      return;
+    } finally {
+      starting.value = false;
+    }
   }
   startPractice(course);
 }
