@@ -1,9 +1,9 @@
 <template>
   <div class="headbarWrap">
     <div class="headbar flex jb ac">
-      <div class="flex ac mr30">
-        <img src="/clone-assets/ico.png" class="img40 hand" alt="" @click="emit('exit')" />
-        <div class="ml15">
+      <div class="flex ac mr30 minw0">
+        <img src="/clone-assets/game/logo.png" class="img30 hand" alt="" @click="emit('exit')" />
+        <div class="ml15 minw0">
           <div class="size24 bold flex ac linearTitle line1">
             {{ title }}({{ index + 1 }}/{{ total || 1 }})
           </div>
@@ -13,29 +13,29 @@
 
       <div class="flex ac">
         <template v-if="!immersive">
-          <div class="flex ac largeScreen">
+          <div class="flex ac largeScreen animate__animated animate__fadeInRight ani5">
             <div class="headerItem noBr" @click="emit('setting')">
-              <el-icon class="img40 hand"><Setting /></el-icon>
+              <img src="/clone-assets/game/setting.png" class="img40 hand" alt="" />
               设置
             </div>
             <div class="headerItem noBr" @click="emit('list')">
-              <el-icon class="img40 hand"><Notebook /></el-icon>
+              <img src="/clone-assets/game/list.png" class="img40 hand" alt="" />
               学习内容
             </div>
             <div v-if="showMode" class="headerItem noBr" @click="emit('mode')">
-              <el-icon class="img40 hand"><Operation /></el-icon>
+              <img src="/clone-assets/game/mode.png" class="img40 hand" alt="" />
               练习模式
             </div>
             <div class="headerItem noBr" @click="emit('pause')">
-              <el-icon class="img40 hand"><VideoPause /></el-icon>
+              <img src="/clone-assets/game/pause.svg" class="img40 hand" alt="" />
               暂停练习
             </div>
             <div class="headerItem noBr" @click="emit('reset')">
-              <el-icon class="img40 hand"><RefreshRight /></el-icon>
+              <img src="/clone-assets/game/reset.png" class="img40 hand" alt="" />
               重置进度
             </div>
             <div class="headerItem noBr" @click="emit('feedback')">
-              <el-icon class="img40 hand"><WarningFilled /></el-icon>
+              <img src="/clone-assets/game/feedback.png" class="img40 hand" alt="" />
               报告错误
             </div>
           </div>
@@ -43,19 +43,59 @@
             <el-icon class="img30 hand"><MoreFilled /></el-icon>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="emit('setting')">设置</el-dropdown-item>
-                <el-dropdown-item @click="emit('list')">查看课程学习内容</el-dropdown-item>
-                <el-dropdown-item v-if="showMode" @click="emit('mode')">切换练习模式</el-dropdown-item>
-                <el-dropdown-item @click="emit('pause')">暂停练习</el-dropdown-item>
-                <el-dropdown-item @click="emit('reset')">重置当前课程进度</el-dropdown-item>
-                <el-dropdown-item @click="emit('feedback')">报告错误</el-dropdown-item>
-                <el-dropdown-item @click="emit('toggleImmersive')">沉浸模式</el-dropdown-item>
-                <el-dropdown-item @click="emit('fullscreen')">全屏模式</el-dropdown-item>
+                <el-dropdown-item @click="emit('setting')">
+                  <div class="flex ac pt10 pb10">
+                    <img src="/clone-assets/game/setting.png" class="img30" alt="" />
+                    <div class="size24 ml20">设置</div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="emit('list')">
+                  <div class="flex ac pt10 pb10">
+                    <img src="/clone-assets/game/list.png" class="img30" alt="" />
+                    <div class="size24 ml20">查看课程学习内容</div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item v-if="showMode" @click="emit('mode')">
+                  <div class="flex ac pt10 pb10">
+                    <img src="/clone-assets/game/mode.png" class="img30" alt="" />
+                    <div class="size24 ml20">切换练习模式</div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="emit('pause')">
+                  <div class="flex ac pt10 pb10">
+                    <img src="/clone-assets/game/pause.svg" class="img30" alt="" />
+                    <div class="size24 ml20">暂停练习</div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="emit('reset')">
+                  <div class="flex ac pt10 pb10">
+                    <img src="/clone-assets/game/reset.png" class="img30" alt="" />
+                    <div class="size24 ml20">重置当前课程进度</div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="emit('feedback')">
+                  <div class="flex ac pt10 pb10">
+                    <img src="/clone-assets/game/feedback.png" class="img30" alt="" />
+                    <div class="size24 ml20">报告错误</div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="emit('toggleImmersive')">
+                  <div class="flex ac pt10 pb10">
+                    <el-icon class="img30"><View v-if="immersive" /><Hide v-else /></el-icon>
+                    <div class="size24 ml20">沉浸模式</div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="emit('fullscreen')">
+                  <div class="flex ac pt10 pb10">
+                    <img src="/clone-assets/game/fullscreen.png" class="img30" alt="" />
+                    <div class="size24 ml20">全屏模式</div>
+                  </div>
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </template>
-        <el-tooltip content="沉浸模式" placement="bottom" :disabled="!isDesktop">
+        <el-tooltip content="沉浸模式" placement="bottom" :disabled="!isDesktop" popper-class="immersive-mode-popper">
           <div class="img35 immersiveHeaderIcon hand ml10" @click="emit('toggleImmersive')">
             <el-icon :size="22">
               <View v-if="immersive" />
@@ -63,35 +103,31 @@
             </el-icon>
           </div>
         </el-tooltip>
-        <div v-if="!immersive" class="headerItem noBr largeScreen" @click="emit('fullscreen')">
-          <el-icon class="img40 hand"><FullScreen /></el-icon>
-          全屏模式
-        </div>
-        <div class="gameTime flex ac ml10">
-          <el-icon class="img30" :class="{ animate__animated: true, animate__swing: swing }">
-            <Timer />
-          </el-icon>
+        <el-tooltip v-if="!immersive" content="全屏模式" placement="bottom" :disabled="!isDesktop">
+          <img
+            src="/clone-assets/game/fullscreen.png"
+            class="img40 hand ml20 largeScreen"
+            alt=""
+            @click="emit('fullscreen')"
+          />
+        </el-tooltip>
+        <div class="tag timeTag size24 flex ac ml10">
+          <img
+            src="/clone-assets/home/time.svg"
+            class="img30"
+            :class="{ animate__animated: true, animate__swing: swing }"
+            alt=""
+          />
           <div class="ml10">{{ clock }}</div>
         </div>
       </div>
     </div>
+    <div class="headbarPlaceholder" aria-hidden="true" />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  FullScreen,
-  Hide,
-  MoreFilled,
-  Notebook,
-  Operation,
-  RefreshRight,
-  Setting,
-  Timer,
-  VideoPause,
-  View,
-  WarningFilled,
-} from "@element-plus/icons-vue";
+import { Hide, MoreFilled, View } from "@element-plus/icons-vue";
 
 defineProps<{
   title: string;

@@ -1,5 +1,6 @@
 <template>
   <div class="gamePage gamePageFixed">
+    <template v-if="hasGame">
     <GameHeader
       :title="session?.gameTitle || '练习'"
       :course-name="session?.courseName || ''"
@@ -103,17 +104,19 @@
       :next-key="nextKey"
       :error-key="errorKey"
       :active-key="activeKey"
+      :translate-type="translateType"
       @prev="prev"
       @next="next"
       @speak="speak"
       @record="toggleRecord"
-          @submit="onBarSubmit"
+      @submit="onBarSubmit"
       @reveal="wordsRef?.reveal()"
       @toggle-letters="toggleLetters"
       @key="onKeyboard"
     />
 
     <ModePop ref="modeRef" />
+    </template>
 
     <Teleport to="body">
       <div v-if="pauseOpen" class="searchLayer">
@@ -192,7 +195,7 @@
       </div>
     </Teleport>
 
-    <el-drawer v-model="settingOpen" title="设置" size="20rem">
+    <el-drawer v-if="hasGame" v-model="settingOpen" title="设置" size="20rem">
       <el-form label-position="left" label-width="8rem">
         <el-form-item label="显示翻译">
           <el-switch v-model="gameSetting.show_translate" @change="persistSetting" />
@@ -218,7 +221,7 @@
       </el-form>
     </el-drawer>
 
-    <el-drawer v-model="listOpen" title="学习内容" size="24rem">
+    <el-drawer v-if="hasGame" v-model="listOpen" title="学习内容" size="24rem">
       <div
         v-for="(item, index) in gameList"
         :key="item.id"
@@ -231,7 +234,7 @@
       </div>
     </el-drawer>
 
-    <el-dialog v-model="feedbackOpen" title="报告错误" width="28rem">
+    <el-dialog v-if="hasGame" v-model="feedbackOpen" title="报告错误" width="28rem">
       <el-input v-model="feedbackText" type="textarea" :rows="4" placeholder="请输入错误描述" />
       <template #footer>
         <el-button @click="feedbackOpen = false">取消</el-button>
@@ -269,11 +272,14 @@ import {
 } from "@/composables/useGame";
 import { isPhone, initLayoutViewport } from "@/composables/useLayout";
 import { formatClock } from "@/lib/gameText";
+import { getToken } from "@/api/token";
+import { ensureLogin } from "@/composables/useAuth";
 
 const router = useRouter();
 const session = computed(() => gameSession.value);
 const current = computed(() => currentSentence.value);
 const mode = computed(() => session.value?.gameMode || "SentenceTranslate");
+const hasGame = computed(() => Boolean(session.value?.chapterId && gameList.value.length));
 const answering = ref(true);
 const pauseOpen = ref(false);
 const leaveOpen = ref(false);
@@ -791,6 +797,9 @@ function resume() {
   pauseOpen.value = false;
   leaveOpen.value = false;
   paused.value = false;
+  if (!hasGame.value) {
+    void router.replace("/gameLoad");
+  }
 }
 
 async function leave() {
@@ -900,9 +909,10 @@ watch(
 onMounted(() => {
   stopViewport = initLayoutViewport();
   window.addEventListener("keydown", onShortcut);
-  if (!session.value?.chapterId || !gameList.value.length) {
-    ElMessage.warning("请先选择课程");
-    void router.replace(gameBackPath(session.value));
+  if (!hasGame.value) {
+    pauseOpen.value = true;
+    paused.value = true;
+    if (!getToken()) void ensureLogin({ message: "您还未登录或登录失效，是否前往登录？" });
     return;
   }
   elapsed.value = gameTime.value || 0;

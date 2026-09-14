@@ -2009,6 +2009,19 @@ html.dark .loginContent {
   cursor: pointer;
   border-radius: 0.28571rem;
   background-color: var(--botborContent_bgc);
+  white-space: nowrap;
+}
+.headerItem img {
+  margin-right: 0.17857rem;
+  width: 1.07143rem;
+  height: 1.07143rem;
+  object-fit: contain;
+  vertical-align: middle;
+}
+@media (hover: hover) {
+  .headerItem:hover {
+    background: linear-gradient(to right, #604bff4d, #74eaff4d);
+  }
 }
 .cusFont {
   font-family: var(
@@ -2198,8 +2211,33 @@ html.dark .loginContent {
   font-size: 2.5rem;
 }
 .popXS {
-  width: 24.28571rem;
-  max-width: calc(100vw - 2.14286rem);
+  width: 28.57143rem;
+  max-width: calc(100vw - 2.85714rem);
+}
+.galssPop .smallConfirm {
+  height: 2.42857rem;
+  background: linear-gradient(to right, #6cccff, #5c4bff);
+  padding: 0 1.78571rem;
+  border-radius: 0.71429rem;
+  font-size: 1rem;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.galssPop .smallCancel {
+  height: 2.42857rem;
+  border: 1px solid #fff;
+  padding: 0 1.78571rem;
+  border-radius: 0.71429rem;
+  font-size: 1rem;
+  color: #fff;
+  opacity: 0.4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
 .smallConfirm,
 .smallCancel {
@@ -2245,27 +2283,48 @@ html.dark .loginContent {
 }
 
 .gamePage {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: var(--bg-page);
+  background-color: var(--game-page-bg);
   color: var(--game-font-color);
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior-x: none;
 }
 .gamePageFixed {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 .headbarWrap {
+  --headbar-height: 3.57143rem;
+  flex-shrink: 0;
+  width: 100%;
   position: relative;
   z-index: 10;
-  background-color: var(--theme-color);
 }
 .headbar {
-  height: 4.28571rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  box-sizing: border-box;
+  width: 100vw;
+  height: var(--headbar-height);
   padding: 0 1.07143rem;
+  border-bottom: 1px solid var(--theme-border);
+  background-color: var(--game-page-bg);
+}
+.headbarPlaceholder {
+  width: 100%;
+  height: var(--headbar-height);
+  flex-shrink: 0;
+  pointer-events: none;
 }
 .headerItem.noBr {
   background: transparent;
@@ -2282,11 +2341,30 @@ html.dark .loginContent {
   justify-content: center;
 }
 .immersiveHeaderIcon {
-  color: var(--text-default);
+  color: #8b5fff;
 }
-.gameTime {
+.immersive-mode-popper.el-popover.el-popper,
+.immersive-mode-popper.el-popper {
+  min-width: 0;
+  padding: 6px 10px;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+.timeTag {
+  width: 6.07143rem;
+  padding: 0.5rem 0 0.5rem 0.53571rem;
   font-size: 0.85714rem;
-  min-width: 4.28571rem;
+  background-color: var(--botborContent_bgc);
+  border-radius: 0.35714rem;
+}
+@media (hover: hover) {
+  .timeTag:hover {
+    background: linear-gradient(to right, #604bff4d, #74eaff4d);
+  }
+}
+.minw0 {
+  min-width: 0;
 }
 .gameBody {
   flex: 1;
@@ -2316,10 +2394,11 @@ html.dark .loginContent {
   position: relative;
   padding: 0 0.35714rem;
   margin: 0 0.35714rem 0.71429rem;
-  border-bottom: 0.07143rem solid #888;
+  border-bottom: 0.21429rem solid #888;
   min-height: 1.15em;
   cursor: text;
   line-height: 1.2;
+  white-space: nowrap;
 }
 .itemPlaceholder {
   visibility: hidden;
@@ -2359,14 +2438,31 @@ html.dark .loginContent {
 }
 .botbar {
   position: relative;
+  flex: 0 0 auto;
   flex-shrink: 0;
   width: 100%;
   padding: 0.35714rem 1.07143rem calc(0.71429rem + env(safe-area-inset-bottom));
-  background-color: var(--theme-color);
   color: var(--text-default);
 }
 .botbar--immersive {
   background: transparent;
+}
+.botbar .botbox {
+  background-color: var(--botborContent_bgc);
+  border-radius: 0.35714rem;
+  padding: 0.35714rem 0.17857rem 0.17857rem;
+}
+.botbar--immersive .botboxWrap,
+.botbar--immersive .botbox {
+  width: fit-content;
+  max-width: 100%;
+}
+.botbar .botitem .bold6.mr10:not(.opc6),
+.botbar .botitem .img25 {
+  opacity: 0.8;
+}
+.botbar .botitem .bold6:not(.mr10) {
+  opacity: 0.6;
 }
 .oralLine {
   max-width: 48.21429rem;
@@ -2510,7 +2606,20 @@ html.dark .key {
   }
 }
 .botitem {
-  min-height: 2.14286rem;
+  padding-top: 0.35714rem;
+  padding-bottom: 0.35714rem;
+  height: 1.78571rem;
+  min-height: 1.78571rem;
+  border-radius: 0.35714rem;
+  background: #0000001a;
+}
+html.dark .botitem {
+  background: #ffffff1a;
+}
+@media (hover: hover) {
+  .botitem:hover {
+    background: linear-gradient(to right, #604bff4d, #74eaff4d);
+  }
 }
 .contentRow {
   padding: 0.71429rem 0;
@@ -2591,8 +2700,21 @@ html.dark .key {
 .animate__jackInTheBox {
   animation-name: jackInTheBox;
 }
-.animate__zoomIn {
-  animation-name: zoomIn;
+.animate__fadeInRight {
+  animation-name: fadeInRight;
+}
+.ani5 {
+  animation-delay: 0.5s;
+}
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 .animate__swing {
   animation-name: swing;

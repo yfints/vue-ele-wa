@@ -9,7 +9,7 @@
     />
     <GameWave v-if="showWave" :active="playing || recording" />
     <div class="botboxWrap">
-      <div class="mt10 botbox flex wrap jc ac">
+      <div class="mt10 botbox flex wrap jc ac animate__animated animate__zoomIn ani5">
         <div class="pl10 pr10 pb10">
           <div class="botitem flex ac hand" :class="{ opc6: disabledPrev }" @click="emit('prev')">
             <el-icon class="img25"><ArrowLeft /></el-icon>
@@ -17,19 +17,19 @@
           </div>
         </div>
 
-        <div v-if="mode === 'SentenceTranslate' && answering" class="pl10 pr10 pb10">
+        <div v-if="mode === 'SentenceTranslate' && translateType !== 1 && answering" class="pl10 pr10 pb10">
           <div class="botitem flex ac">
             <span class="bold6 mr10">空格 / ←→</span>
             <span class="opc6">跳格</span>
           </div>
         </div>
-        <div v-else-if="mode === 'SentenceTranslate' && !answering" class="pl10 pr10 pb10">
+        <div v-else-if="mode === 'SentenceTranslate' && translateType !== 1 && !answering" class="pl10 pr10 pb10">
           <div class="botitem flex ac">
             <span class="bold6 mr10">←→</span>
             <span class="opc6">朗读</span>
           </div>
         </div>
-        <div v-else-if="mode === 'SentenceListen'" class="pl10 pr10 pb10">
+        <div v-else-if="mode === 'SentenceListen' || (mode === 'SentenceTranslate' && translateType === 1)" class="pl10 pr10 pb10">
           <div class="botitem flex ac hand" @click="onTranslateSpace">
             <span class="bold6 mr10">空格 / Enter</span>
             <span :class="answering ? '' : 'opc6'">{{ answering ? "提交" : "下一题" }}</span>
@@ -43,13 +43,13 @@
           </div>
         </div>
 
-        <div v-if="mode === 'SentenceTranslate'" class="pl10 pr10 pb10">
+        <div v-if="mode === 'SentenceTranslate' && translateType !== 1" class="pl10 pr10 pb10">
           <div class="botitem flex ac hand" @click="onTranslateSpace">
             <span class="bold6 mr10">空格</span>
             <span :class="answering ? '' : 'opc6'">{{ answering ? "提交" : "下一题" }}</span>
           </div>
         </div>
-        <div v-if="mode === 'SentenceTranslate' && answering" class="pl10 pr10 pb10">
+        <div v-if="mode === 'SentenceTranslate' && translateType !== 1 && answering" class="pl10 pr10 pb10">
           <div class="botitem flex ac hand" @click="emit('reveal')">
             <span class="bold6 mr10">↓ ↑</span>
             <span class="opc6">答案</span>
@@ -108,6 +108,7 @@ const props = defineProps<{
   nextKey: string;
   errorKey: string;
   activeKey: string;
+  translateType?: number;
 }>();
 
 const emit = defineEmits<{

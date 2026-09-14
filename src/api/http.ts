@@ -50,7 +50,7 @@ function parseLosslessJson(text: string): unknown {
 
 export const http: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 15000,
+  timeout: 65000,
   headers: {
     "Content-Type": "application/json",
   },

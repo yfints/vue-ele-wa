@@ -13,8 +13,9 @@ const router = createRouter({
   routes: [
     { path: "/login", redirect: "/login/index" },
     { path: "/login/index", component: LoginPage },
-    { path: "/gameLoad", component: GameLoadPage },
-    { path: "/game", component: GamePage },
+    { path: "/gam", redirect: "/game", meta: { public: true } },
+    { path: "/gameLoad", component: GameLoadPage, meta: { public: true } },
+    { path: "/game", component: GamePage, meta: { public: true } },
     {
       path: "/",
       component: AppLayout,
