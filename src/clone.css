@@ -1295,37 +1295,12 @@ html.dark .myLessonDetail .top {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-.loginFit {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.loginFit .loginBg,
-.loginBg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: max(100%, calc(100dvh * 1440 / 1024));
-  height: max(100%, calc(100vw * 1024 / 1440));
-  transform: translate(-50%, -50%);
-  object-fit: fill;
-  pointer-events: none;
-  user-select: none;
-}
-.loginFrame {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(100%, calc(100dvh * 1440 / 1024));
-  height: min(100%, calc(100vw * 1024 / 1440));
-  transform: translate(-50%, -50%);
-  container-type: inline-size;
-  z-index: 1;
+  background: #d4e9fd url("/clone-assets/login/hero.png") center / 100% 100% no-repeat;
+  container-type: size;
 }
 .loginHeroCopy {
   position: absolute;
-  left:0;
+  left: 11.5278%;
   top: 21.7773%;
   z-index: 1;
   width: 32%;
@@ -1353,13 +1328,14 @@ html.dark .myLessonDetail .top {
   color: #999;
 }
 .loginCard {
-  container-type: inline-size;
+  container-type: size;
   position: absolute;
   top: 20.703125%;
   left: 58.333333%;
   width: 34.722222%;
-  height: 58.203125%;
+  height: 58.496094%;
   z-index: 1;
+  display: flex;
   background: #fff;
   border-radius: 20px;
   padding: 0;
@@ -1367,7 +1343,12 @@ html.dark .myLessonDetail .top {
   overflow: hidden;
 }
 .loginCardInner {
-  padding: 52px 50px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 52px 50px 50px;
+  box-sizing: border-box;
 }
 .loginBrand {
   display: flex;
@@ -1386,8 +1367,17 @@ html.dark .myLessonDetail .top {
   font-weight: 700;
   color: #333;
 }
-.loginForm .el-form-item {
-  margin-bottom: 0;
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.loginBrand,
+.loginTitle,
+.loginField,
+.loginAgree {
+  flex-shrink: 0;
 }
 .loginField {
   display: flex;
@@ -1475,6 +1465,7 @@ html.dark .myLessonDetail .top {
   color: var(--login-primary);
 }
 .loginPage .loginSubmit.el-button {
+  flex-shrink: 0;
   width: 100%;
   height: 58px;
   border: none;
@@ -1499,27 +1490,27 @@ html.dark .myLessonDetail .top {
   }
   .loginHeroBar {
     width: 3.1944cqi;
-    height: 0.4167cqi;
-    margin-top: 2.1528cqi;
+    height: 0.5859cqh;
+    margin-top: 3.0273cqh;
   }
   .loginHeroSub {
-    margin-top: 1.875cqi;
+    margin-top: 2.6367cqh;
     font-size: 1.1111cqi;
   }
   .loginCardInner {
-    padding: 10.4cqi 10cqi;
+    padding: 8.72cqh 10cqi 8.4cqh;
   }
   .loginLogo {
     width: 40cqi;
-    height: 11.8cqi;
+    height: 9.9cqh;
   }
   .loginTitle {
-    margin: 11cqi 0;
-    font-size: 6.4cqi;
+    margin: 9.23cqh 0;
+    font-size: 5.37cqh;
   }
   .loginField {
-    height: 12cqi;
-    margin-bottom: 4cqi;
+    height: 10.07cqh;
+    margin-bottom: 3.36cqh;
     border-radius: 999px;
     padding: 0 1.6cqi 0 4cqi;
   }
@@ -1527,15 +1518,15 @@ html.dark .myLessonDetail .top {
     font-size: 3.6cqi;
   }
   .loginPage .loginInput .el-input__inner {
-    height: 12cqi;
+    height: 10.07cqh;
     font-size: 2.8cqi;
   }
   .loginPage .loginSmsBtn.el-button {
-    height: 7.2cqi;
+    height: 6.04cqh;
     min-width: 22cqi;
     padding: 0 3.2cqi;
     margin-right: 2.4cqi;
-    border-radius: 999px;
+    border-radius: 12px;
     font-size: 2.4cqi;
   }
   .loginAgree,
@@ -1544,11 +1535,12 @@ html.dark .myLessonDetail .top {
     font-size: 2.4cqi;
   }
   .loginAgree {
-    margin: 6.4cqi 0 9.6cqi;
+    margin: 5.37cqh 0 8.05cqh;
   }
   .loginPage .loginSubmit.el-button {
-    height: 11.6cqi;
-    border-radius: 999px;
+    flex-shrink: 0;
+    height: 9.73cqh;
+    border-radius: 16px;
     font-size: 3.2cqi;
   }
 }
@@ -1563,35 +1555,8 @@ html.dark .myLessonDetail .top {
     height: auto;
     min-height: 100dvh;
     overflow: visible;
-  }
-  .loginFit {
-    position: fixed;
-    inset: 0;
-    width: auto;
-    height: auto;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .loginFit .loginBg,
-  .loginBg {
-    position: absolute;
-    inset: 0;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: none;
-    object-fit: cover;
-    object-position: 18% 40%;
-  }
-  .loginFrame {
-    position: relative;
-    top: auto;
-    left: auto;
-    width: 100%;
-    height: auto;
-    min-height: 100dvh;
-    transform: none;
+    background-size: cover;
+    background-position: 18% 40%;
   }
   .loginHeroCopy {
     left: 20px;
@@ -1624,6 +1589,7 @@ html.dark .myLessonDetail .top {
     padding: 0;
     border-radius: 20px;
     box-shadow: 0 16px 40px rgba(31, 86, 165, 0.12);
+    container-type: inline-size;
   }
   .loginCardInner {
     padding: 32px 24px 28px;

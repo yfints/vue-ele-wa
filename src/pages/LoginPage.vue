@@ -1,80 +1,77 @@
 <template>
   <div class="loginPage">
-    <div class="loginStage" style="background-image: url('/clone-assets/login/hero.png?v=4');background-size: 100% 100%;background-repeat: no-repeat">
-
-      <div class="loginFrame">
-        <div class="loginHeroCopy">
-          <p class="loginHeroTitle">用英语，<br />打开更大的自己</p>
-          <span class="loginHeroBar"></span>
-          <p class="loginHeroSub">成人英语学习平台 · 随时随地高效学英语</p>
-        </div>
-        <div class="loginCard">
-          <div class="loginCardInner">
-            <div class="loginBrand">
-              <img src="/clone-assets/login/logo-englishgo.png" class="loginLogo" alt="Englishgo" />
-            </div>
-            <h1 class="loginTitle">欢迎登录</h1>
-
-            <el-form class="loginForm" @submit.prevent="submit">
-              <div class="loginField" :class="{ isError: Boolean(errors.phone) }">
-                <el-icon class="loginFieldIcon"><User /></el-icon>
-                <el-input
-                  v-model="phone"
-                  class="loginInput"
-                  type="tel"
-                  inputmode="numeric"
-                  maxlength="11"
-                  placeholder="请输入手机号"
-                  @blur="touch('phone')"
-                />
-              </div>
-              <p v-if="errors.phone" class="fieldError">{{ errors.phone }}</p>
-
-              <div class="loginField" :class="{ isError: Boolean(errors.sms) }">
-                <el-icon class="loginFieldIcon"><Lock /></el-icon>
-                <el-input
-                  v-model="sms"
-                  class="loginInput"
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="6"
-                  placeholder="请输入验证码"
-                  @blur="touch('sms')"
-                />
-                <el-button
-                  class="loginSmsBtn"
-                  type="primary"
-                  :disabled="cooldown > 0"
-                  @click="sendCode"
-                >
-                  {{ cooldown > 0 ? `${cooldown}s` : "获取验证码" }}
-                </el-button>
-              </div>
-              <p v-if="errors.sms" class="fieldError">{{ errors.sms }}</p>
-
-              <el-checkbox v-model="agreed" class="loginAgree">
-                我已阅读并同意
-                <el-link type="primary" :underline="false" @click.stop.prevent="openDoc('用户协议')">
-                  《用户协议》
-                </el-link>
-                和
-                <el-link type="primary" :underline="false" @click.stop.prevent="openDoc('隐私协议')">
-                  《隐私协议》
-                </el-link>
-              </el-checkbox>
-              <p v-if="errors.agreed" class="fieldError">{{ errors.agreed }}</p>
-
-              <el-button
-                class="loginSubmit"
-                type="primary"
-                native-type="submit"
-                :loading="submitting"
-                :disabled="submitting"
-              >
-                {{ submitting ? "登录中..." : "登录" }}
-              </el-button>
-            </el-form>
+    <div class="loginStage">
+      <div class="loginHeroCopy">
+        <p class="loginHeroTitle">用英语，<br />打开更大的自己</p>
+        <span class="loginHeroBar"></span>
+        <p class="loginHeroSub">成人英语学习平台 · 随时随地高效学英语</p>
+      </div>
+      <div class="loginCard">
+        <div class="loginCardInner">
+          <div class="loginBrand">
+            <img src="/clone-assets/login/logo-englishgo.png" class="loginLogo" alt="Englishgo" />
           </div>
+          <h1 class="loginTitle">欢迎登录</h1>
+
+          <el-form class="loginForm" @submit.prevent="submit">
+            <div class="loginField" :class="{ isError: Boolean(errors.phone) }">
+              <el-icon class="loginFieldIcon"><User /></el-icon>
+              <el-input
+                v-model="phone"
+                class="loginInput"
+                type="tel"
+                inputmode="numeric"
+                maxlength="11"
+                placeholder="请输入手机号"
+                @blur="touch('phone')"
+              />
+            </div>
+            <p v-if="errors.phone" class="fieldError">{{ errors.phone }}</p>
+
+            <div class="loginField" :class="{ isError: Boolean(errors.sms) }">
+              <el-icon class="loginFieldIcon"><Lock /></el-icon>
+              <el-input
+                v-model="sms"
+                class="loginInput"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="请输入验证码"
+                @blur="touch('sms')"
+              />
+              <el-button
+                class="loginSmsBtn"
+                type="primary"
+                :disabled="cooldown > 0"
+                @click="sendCode"
+              >
+                {{ cooldown > 0 ? `${cooldown}s` : "获取验证码" }}
+              </el-button>
+            </div>
+            <p v-if="errors.sms" class="fieldError">{{ errors.sms }}</p>
+
+            <el-checkbox v-model="agreed" class="loginAgree">
+              我已阅读并同意
+              <el-link type="primary" :underline="false" @click.stop.prevent="openDoc('用户协议')">
+                《用户协议》
+              </el-link>
+              和
+              <el-link type="primary" :underline="false" @click.stop.prevent="openDoc('隐私协议')">
+                《隐私协议》
+              </el-link>
+            </el-checkbox>
+            <p v-if="errors.agreed" class="fieldError">{{ errors.agreed }}</p>
+
+            <el-button
+              class="loginSubmit"
+              type="primary"
+              native-type="submit"
+              :loading="submitting"
+              :disabled="submitting"
+            >
+              {{ submitting ? "登录中..." : "登录" }}
+            </el-button>
+          </el-form>
         </div>
       </div>
     </div>
