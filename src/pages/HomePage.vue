@@ -30,7 +30,7 @@
       </el-dropdown>
     </header>
 
-    <section class="dashCards">
+    <section class="  dashCards">
       <article v-for="card in metricCards" :key="card.label" class="dashCard" :class="card.tone">
         <div class="dashCardBody">
           <div class="dashCardLabel">{{ card.label }}</div>

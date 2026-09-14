@@ -414,10 +414,10 @@ button {
     height: 100vh;
     height: 100dvh;
     position: relative;
-    padding-left: 0.71429rem;
-    padding-right: 0.71429rem;
-    flex: 0 0 10.35714rem;
-    background-color: var(--theme-color);
+    padding: 16px 12px 20px;
+    flex: 0 0 200px;
+    width: 200px;
+    background: #fff;
 }
 
 @media (min-width: 576px) {
@@ -430,8 +430,8 @@ button {
 }
 
 .sideBarClose {
-    width: 3.57143rem !important;
-    flex: 0 0 4.42857rem !important;
+    flex-basis: 72px !important;
+    width: 72px !important;
 }
 
 .menuClose {
@@ -439,7 +439,9 @@ button {
 }
 
 .sideBar .top {
-    height: 5.35714rem;
+    height: auto;
+    min-height: 64px;
+    padding: 8px 8px 16px;
 }
 
 .sideBar .logo {
@@ -459,16 +461,16 @@ button {
 }
 
 .menu {
-    width: 8.92857rem;
+    width: 100%;
     position: relative;
     overflow: hidden;
     white-space: nowrap;
 }
 
 .menu .card {
-    height: 1.96429rem;
-    border-radius: 0.42857rem;
-    padding-left: 0.60714rem;
+    height: 40px;
+    border-radius: 12px;
+    padding-left: 14px;
 }
 
 .menu .card:hover {
@@ -488,24 +490,6 @@ button {
     font-size: 18px;
 }
 
-.page.isHome .sideBar {
-    padding: 16px 12px 20px;
-    background: #fff;
-    flex: 0 0 200px;
-    width: 200px;
-}
-
-.page.isHome .sideBarClose {
-    flex-basis: 72px !important;
-    width: 72px !important;
-}
-
-.page.isHome .sideBar .top {
-    height: auto;
-    min-height: 64px;
-    padding: 8px 8px 16px;
-}
-
 .dashLogo {
     width: 100%;
     color: inherit;
@@ -518,17 +502,7 @@ button {
     object-fit: contain;
 }
 
-.page.isHome .menu {
-    width: 100%;
-}
-
-.page.isHome .menu .card {
-    height: 40px;
-    border-radius: 12px;
-    padding-left: 14px;
-}
-
-.page.isHome .menu .size28 {
+.menu .size28 {
     font-size: 14px;
     font-weight: 500;
 }
@@ -545,8 +519,8 @@ button {
     opacity: 0.9;
 }
 
-.page.isHome .sideBarClose .dashSlogan,
-.page.isHome .sideBarClose .dashLogoImg {
+.sideBarClose .dashSlogan,
+.sideBarClose .dashLogoImg {
     display: none;
 }
 
@@ -591,11 +565,11 @@ button {
 }
 
 .onMenuOpen {
-    width: calc(100vw - 10.35714rem);
+    width: calc(100vw - 200px);
 }
 
 .onMenuClose {
-    width: calc(100vw - 4.42857rem);
+    width: calc(100vw - 72px);
 }
 
 .container.onHome {
@@ -610,14 +584,6 @@ button {
     overflow-y: hidden;
     height: calc(100vh - 4.28571rem);
     height: calc(100dvh - 4.28571rem);
-}
-
-.page.isHome .onMenuOpen {
-    width: calc(100vw - 200px);
-}
-
-.page.isHome .onMenuClose {
-    width: calc(100vw - 72px);
 }
 
 .onHome .contentBox {
@@ -643,13 +609,13 @@ button {
 
 @media (min-width: 575px) {
     .head1 {
-        width: calc(100vw - 10.35714rem);
-        left: 10.35714rem;
+        width: calc(100vw - 200px);
+        left: 200px;
     }
 
     .head2 {
-        width: calc(100vw - 3.71429rem);
-        left: 3.71429rem;
+        width: calc(100vw - 72px);
+        left: 72px;
     }
 }
 
@@ -1337,7 +1303,7 @@ html.dark .myLessonDetail .top {
         position: fixed;
         top: 0;
         z-index: 103;
-        background-color: var(--theme-color);
+        background: #fff;
         width: 10.35714rem !important;
         flex: 0 0 10.35714rem !important;
         overflow: hidden;
