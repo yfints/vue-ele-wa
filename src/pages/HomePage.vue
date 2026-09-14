@@ -149,6 +149,7 @@
                   <div
                       v-if="item.minutes > 0 && item.peak"
                       class="dashChartTip"
+                      :style="{ bottom: `calc(${item.percent}% + 6px)` }"
                   >
                     {{ item.minutes }}min
                   </div>
@@ -283,10 +284,6 @@ const chartTicks = computed(() => {
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
-}
-
-function soon(name: string) {
-  ElMessage.info(`${name}即将上线`);
 }
 
 function onLogout() {

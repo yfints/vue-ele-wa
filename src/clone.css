@@ -2908,6 +2908,7 @@ html.dark .colLine {
 
 .dashChartBody {
     display: flex;
+    height: 220px;
     min-height: 200px;
     gap: 12px;
 }
@@ -2917,7 +2918,7 @@ html.dark .colLine {
     flex-direction: column;
     justify-content: space-between;
     width: 48px;
-    padding: 8px 0 28px;
+    padding: 0 0 24px;
     font-size: 11px;
     color: #b0b0b0;
     text-align: right;
@@ -2928,19 +2929,23 @@ html.dark .colLine {
     min-width: 0;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: 100%;
     align-items: stretch;
     gap: 8px;
+    height: 100%;
 }
 
 .dashChartCol {
     display: flex;
     flex-direction: column;
+    min-height: 0;
     height: 100%;
 }
 
 .dashChartTrack {
     position: relative;
     flex: 1;
+    min-height: 0;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -2962,7 +2967,6 @@ html.dark .colLine {
 
 .dashChartTip {
     position: absolute;
-    top: 8px;
     left: 50%;
     transform: translateX(-50%);
     padding: 2px 8px;
@@ -2975,6 +2979,8 @@ html.dark .colLine {
 
 .dashChartLabel {
     margin-top: 8px;
+    height: 16px;
+    line-height: 16px;
     text-align: center;
     font-size: 12px;
     color: #888;
