@@ -16,11 +16,18 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import { fetchExercisePage, fetchGameTime, startGame } from "@/api/game";
+import { fetchAllLessonPractice } from "@/api/practice";
 import { getToken } from "@/api/token";
-import { gameIndex, gameList, gameSession, gameTime, gameBackPath, resetGameData, saveGameInfo } from "@/composables/useGame";
-import { demoSentences } from "@/data/game-demo";
-import { mapSentences } from "@/lib/mapSentences";
+import {
+  gameIndex,
+  gameList,
+  gameSession,
+  gameBackPath,
+  resetGameData,
+  saveGameInfo,
+  MODE_TO_PRACTICE,
+} from "@/composables/useGame";
+import { pickPractices } from "@/lib/mapPractices";
 
 const router = useRouter();
 const progress = ref(0);
@@ -30,27 +37,24 @@ let cancelled = false;
 
 async function loadRemote() {
   const session = gameSession.value;
-  if (!session || !getToken()) return false;
-  try {
-    await fetchGameTime().then((data) => {
-      gameTime.value = typeof data === "number" ? data : Number(data?.time || 0);
-    });
-    const started = await startGame(session.courseId, session.chapterId);
-    const page = await fetchExercisePage({
-      lesson_id: session.courseId,
-      lesson_course_id: session.chapterId,
-      limit: 10,
-    });
-    const list = mapSentences(page?.sentences?.length ? page.sentences : started?.sentences || []);
-    if (list.length) {
-      gameList.value = list;
-      gameIndex.value = 0;
-      return true;
-    }
-  } catch {
-    /* 走本地预览 */
+  if (!session?.chapterId) return false;
+  if (!getToken()) {
+    ElMessage.warning("请先登录");
+    return false;
   }
-  return false;
+  const payload = await fetchAllLessonPractice(session.chapterId);
+  const mode = session.practiceMode ?? MODE_TO_PRACTICE[session.gameMode] ?? 3;
+  const list = pickPractices(payload.sentences, mode);
+  if (!list.length) {
+    ElMessage.warning("该模式暂无练习题");
+    return false;
+  }
+  const cursor = Number(payload.meta?.progressIndex || 0);
+  const start = list.findIndex((item) => Number(item.index) >= cursor);
+  gameList.value = list;
+  gameIndex.value = start >= 0 ? start : 0;
+  saveGameInfo({ practiceMode: mode });
+  return true;
 }
 
 onMounted(async () => {
@@ -64,13 +68,21 @@ onMounted(async () => {
   timer = window.setInterval(() => {
     if (progress.value < 92) progress.value += Math.max(1, Math.round((92 - progress.value) / 8));
   }, 120);
-  const ok = await loadRemote();
-  if (!ok) gameList.value = demoSentences.map((item) => ({ ...item }));
+  let ok = false;
+  try {
+    ok = await loadRemote();
+  } catch {
+    ok = false;
+  }
   if (cancelled) return;
+  if (!ok) {
+    await router.replace(gameBackPath());
+    return;
+  }
   progress.value = 100;
   window.setTimeout(() => {
     if (!cancelled) void router.replace("/game");
-  }, 1000);
+  }, 600);
 });
 
 onUnmounted(() => {

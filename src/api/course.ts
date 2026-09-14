@@ -95,38 +95,6 @@ export async function fetchLessonDetails(id: string | number) {
   return get<CourseDetailVo>(`/courses/${id}`, undefined, { skipAuthRedirect: true });
 }
 
-/** `/courses/:id` 返回 `{ course, lessons }` 结构 */
-interface CourseDetailPayload {
-  course?: {
-    id?: number | string;
-    name?: string;
-    cover?: string | null;
-    description?: string | null;
-  };
-  lessons?: Array<{
-    id?: number | string;
-    name?: string;
-  }>;
-}
-
-function unwrapCourseDetail(data: unknown): MyLessonDetails | undefined {
-  if (!data || typeof data !== "object") return undefined;
-  const { course, lessons } = data as CourseDetailPayload;
-  if (!course) return undefined;
-  return {
-    id: course.id ?? "",
-    name: course.name,
-    describe: course.description || undefined,
-    image: course.cover || undefined,
-    course_published_count: lessons?.length ?? 0,
-    lesson_courses: (lessons || []).map((item) => ({
-      id: item.id ?? "",
-      name: item.name || "",
-      describe: item.name || "",
-    })),
-  };
-}
-
 export function toggleCollect(courseId: string | number) {
   return post("/collect/toggle", { courseId: courseId, type: 0 }, { skipAuthRedirect: true });
 }
@@ -183,6 +151,44 @@ export function studyPlanLesson(courseId: string | number) {
   );
 }
 
-export function removeStudyPlanWord(userWordId: string | number) {
-  return del(`/study-plan/lessons/${userWordId}`, undefined, { skipAuthRedirect: true });
+export function removeStudyPlanLesson(userLessonId: string | number) {
+  return del(`/study-plan/lessons/${userLessonId}`, undefined, { skipAuthRedirect: true });
 }
+
+export function fetchStudyPlanLessons(params?: { page?: number; limit?: number }) {
+  return get("/study-plan/lessons", params);
+}
+
+export function topStudyPlanLesson(body: { userLessonId?: string | number; courseId?: string | number; isTop: boolean }) {
+  return post("/study-plan/lessons/top", body);
+}
+
+export function fetchCollectLessons(params?: { type?: number; page?: number; limit?: number }) {
+  return get("/collect/lessons", params);
+}
+
+export function addStudyPlanWords(courseId: string | number) {
+  return post("/study-plan/words", { courseId });
+}
+
+export function fetchWordPractice(courseId: string | number) {
+  return get("/study-plan/word-practice", { courseId });
+}
+
+export function learnStudyPlanWord(body: { courseId: string | number; itemId: string | number }) {
+  return post("/study-plan/words/learn", body);
+}
+
+export function fetchStudyPlanWords(params?: { page?: number; limit?: number }) {
+  return get("/study-plan/words", params);
+}
+
+export function topStudyPlanWord(body: { userWordId?: string | number; courseId?: string | number; isTop: boolean }) {
+  return post("/study-plan/words/top", body);
+}
+
+export function removeStudyPlanWords(userWordId: string | number) {
+  return del(`/study-plan/words/${userWordId}`);
+}
+
+export const removeStudyPlanWord = removeStudyPlanLesson;

@@ -65,6 +65,7 @@ interface ModeItem {
   desc: string;
   bg: string;
   gameMode: GameMode;
+  practiceMode: 0 | 1 | 2 | 3;
 }
 
 const router = useRouter();
@@ -79,6 +80,7 @@ const modes = computed<ModeItem[]>(() => [
     desc: "看到中文提示，尝试用英文表达。练习运用所学词汇和语法",
     bg: "/clone-assets/mode/translate.png",
     gameMode: "SentenceTranslate",
+    practiceMode: 3,
   },
   {
     title: "听力模式",
@@ -86,6 +88,7 @@ const modes = computed<ModeItem[]>(() => [
     desc: "播放英语音频，让你沉浸在语言环境中。培养语感，熟悉发音",
     bg: "/clone-assets/mode/listen.png",
     gameMode: "SentenceListen",
+    practiceMode: 0,
   },
   {
     title: "打字练习",
@@ -93,6 +96,7 @@ const modes = computed<ModeItem[]>(() => [
     desc: "在练题过程中提升打字速度与拼写准确率",
     bg: "/clone-assets/mode/typing.png",
     gameMode: "SentenceTypeing",
+    practiceMode: 1,
   },
   {
     title: "口语练习",
@@ -100,6 +104,7 @@ const modes = computed<ModeItem[]>(() => [
     desc: "跟读句子并练习发音，让口语表达更自然流畅",
     bg: "/clone-assets/mode/oral.png",
     gameMode: "SentenceOral",
+    practiceMode: 2,
   },
 ]);
 
@@ -135,7 +140,7 @@ function select(index: number) {
 function confirm() {
   const item = modes.value[active.value];
   if (!item) return;
-  saveGameInfo({ gameMode: item.gameMode });
+  saveGameInfo({ gameMode: item.gameMode, practiceMode: item.practiceMode });
   visible.value = false;
   void router.push("/gameLoad");
 }

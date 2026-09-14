@@ -6,6 +6,21 @@ export type GameMode =
   | "SentenceListen"
   | "SentenceTypeing"
   | "SentenceOral";
+export type PracticeMode = 0 | 1 | 2 | 3;
+
+export const MODE_TO_PRACTICE: Record<GameMode, PracticeMode> = {
+  SentenceListen: 0,
+  SentenceTypeing: 1,
+  SentenceOral: 2,
+  SentenceTranslate: 3,
+};
+
+export const PRACTICE_TO_MODE: Record<PracticeMode, GameMode> = {
+  0: "SentenceListen",
+  1: "SentenceTypeing",
+  2: "SentenceOral",
+  3: "SentenceTranslate",
+};
 
 export interface GameSession {
   courseId: string;
@@ -14,7 +29,19 @@ export interface GameSession {
   courseName: string;
   gameType: GameType;
   gameMode: GameMode;
+  practiceMode: PracticeMode;
   userLessonId: string;
+}
+
+export interface PracticeSettings {
+  autoPlay?: boolean;
+  playCount?: number;
+  hintLevel?: number;
+  caseSensitive?: boolean;
+  punctuationSensitive?: boolean;
+  translateType?: number;
+  showAnalysis?: boolean;
+  seconds?: number;
 }
 
 export interface GameSentence {
@@ -26,6 +53,14 @@ export interface GameSentence {
   part_of_speech?: string;
   audio?: string;
   pic?: string;
+  itemId?: string;
+  index?: number;
+  mode?: number;
+  phoneticHint?: string;
+  settings?: PracticeSettings;
+  explanation?: string;
+  clauseExplanations?: string[];
+  wordSurfaces?: string[];
 }
 
 export interface GameSetting {
@@ -116,10 +151,16 @@ export function gameBackPath(session = gameSession.value) {
 }
 
 export function saveGameInfo(partial: Partial<GameSession> = {}) {
-  const next = { ...(gameSession.value || ({} as GameSession)), ...partial };
-  gameSession.value = next;
+  const merged = { ...(gameSession.value || ({} as GameSession)), ...partial };
+  if (merged.gameMode && merged.practiceMode == null) {
+    merged.practiceMode = MODE_TO_PRACTICE[merged.gameMode];
+  }
+  if (merged.practiceMode != null && !merged.gameMode) {
+    merged.gameMode = PRACTICE_TO_MODE[merged.practiceMode];
+  }
+  gameSession.value = merged;
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
   } catch {
     /* ignore */
   }

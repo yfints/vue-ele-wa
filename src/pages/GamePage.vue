@@ -25,28 +25,28 @@
       <GamePic v-if="showPic" :pic="current?.pic" />
       <template v-if="current && answering">
         <div
-          v-if="showChinese && mode === 'SentenceTranslate'"
+          v-if="showChinese && mode === 'SentenceTranslate' && translateType !== 1"
           class="mb50 tc ani size40 gameChinese"
         >
           {{ current.chinese }}
         </div>
         <GameWords
-          v-if="mode === 'SentenceTranslate'"
+          v-if="mode === 'SentenceTranslate' && translateType !== 1"
           :key="`${gameIndex}-${current.id}-${mode}`"
           ref="wordsRef"
           :english="current.english"
           :ignore-case="gameSetting.ignore_case"
           :auto-show-times="gameSetting.answer_auto_show_error_times"
-          @success="onSuccess"
+          @submit="onAnswerSubmit"
         />
         <GameListen
-          v-else-if="mode === 'SentenceListen'"
-          :english="current.english"
+          v-else-if="mode === 'SentenceListen' || (mode === 'SentenceTranslate' && translateType === 1)"
+          :key="`${gameIndex}-${current.id}-input`"
+          ref="listenRef"
           :chinese="current.chinese"
-          :phonetic="phonetic"
-          :part-of-speech="current.part_of_speech"
-          :show-chinese="gameSetting.show_translate"
-          @speak-word="speakWord"
+          :phonetic-hint="current.phoneticHint"
+          :placeholder="mode === 'SentenceListen' ? '输入你听到的英文' : '输入英文翻译'"
+          @submit="onAnswerSubmit"
         />
         <GameTyping
           v-else-if="mode === 'SentenceTypeing'"
@@ -55,8 +55,11 @@
           :english="current.english"
           :chinese="current.chinese"
           :part-of-speech="current.part_of_speech"
+          :phonetic-hint="current.phoneticHint"
           :show-chinese="gameSetting.show_translate"
           :show-letters="gameSetting.typeing_show"
+          :hint-level="current.settings?.hintLevel"
+          :case-sensitive="current.settings?.caseSensitive"
           @success="onTypingSuccess"
           @next-key="onNextKey"
           @error-key="onErrorKey"
@@ -82,6 +85,9 @@
         :words="successWords"
         :part-of-speech="current.part_of_speech"
         :chinese="current.chinese"
+        :result="lastResult"
+        :expected="lastExpected"
+        :analysis="analysisText"
       />
     </div>
 
@@ -101,7 +107,7 @@
       @next="next"
       @speak="speak"
       @record="toggleRecord"
-      @submit="wordsRef?.submit()"
+          @submit="onBarSubmit"
       @reveal="wordsRef?.reveal()"
       @toggle-letters="toggleLetters"
       @key="onKeyboard"
@@ -248,6 +254,7 @@ import GameSuccess from "@/components/GameSuccess.vue";
 import GameBotbar from "@/components/GameBotbar.vue";
 import GameOral from "@/components/GameOral.vue";
 import ModePop from "@/components/ModePop.vue";
+import { sendStudyHeartbeat, submitPractice, submitSpeech, syncLessonProgress } from "@/api/practice";
 import {
   currentSentence,
   gameBackPath,
@@ -257,10 +264,11 @@ import {
   gameSetting,
   gameTime,
   isImmersiveMode,
+  MODE_TO_PRACTICE,
   saveGameSetting,
 } from "@/composables/useGame";
 import { isPhone, initLayoutViewport } from "@/composables/useLayout";
-import { formatClock, oralMatch } from "@/lib/gameText";
+import { formatClock } from "@/lib/gameText";
 
 const router = useRouter();
 const session = computed(() => gameSession.value);
@@ -277,8 +285,9 @@ const feedbackText = ref("");
 const swing = ref(false);
 const paused = ref(false);
 const elapsed = ref(gameTime.value || 0);
-const wordsRef = ref<{ submit: () => void; reveal: () => void; injectKey: (key: string) => void } | null>(null);
+const wordsRef = ref<{ submit: () => void; reveal: () => void; injectKey: (key: string) => void; getAnswer: () => string } | null>(null);
 const typingRef = ref<{ typeKey: (key: string) => void } | null>(null);
+const listenRef = ref<{ submit: () => void; getAnswer: () => string } | null>(null);
 const modeRef = ref<{ open: () => void } | null>(null);
 const playing = ref(false);
 const recording = ref(false);
@@ -291,6 +300,12 @@ const oralAudioUrl = ref("");
 const nextKey = ref("");
 const errorKey = ref("");
 const activeKey = ref("");
+const submitting = ref(false);
+const lastResult = ref("");
+const lastExpected = ref("");
+const playUsed = ref(0);
+const answeredCount = ref(0);
+let lastBeatAt = 0;
 let tick: number | undefined;
 let autoNextTimer: number | undefined;
 let audioEl: HTMLAudioElement | null = null;
@@ -304,6 +319,15 @@ let captureCancelled = false;
 
 const isDesktop = computed(() => !isPhone.value);
 const clock = computed(() => formatClock(elapsed.value));
+const practiceMode = computed(
+  () => session.value?.practiceMode ?? MODE_TO_PRACTICE[mode.value] ?? 3,
+);
+const translateType = computed(() => current.value?.settings?.translateType ?? 1);
+const analysisText = computed(() => {
+  if (!current.value?.settings?.showAnalysis) return "";
+  const parts = [current.value.explanation, ...(current.value.clauseExplanations || [])].filter(Boolean);
+  return parts.join("\n");
+});
 const showChinese = computed(() => {
   if (mode.value === "SentenceListen") return false;
   return gameSetting.value.show_translate;
@@ -338,7 +362,13 @@ function markPlaying(on: boolean) {
 function speak() {
   const item = current.value;
   if (!item) return;
+  const max = Number(item.settings?.playCount || 0);
+  if (max > 0 && playUsed.value >= max) {
+    ElMessage.info("已达到播放次数上限");
+    return;
+  }
   stopSpeak();
+  playUsed.value += 1;
   if (item.audio) {
     audioEl = new Audio(item.audio);
     audioEl.onplay = () => markPlaying(true);
@@ -400,7 +430,144 @@ function speakWord(word: string) {
 }
 
 function onTypingSuccess() {
+  void onAnswerSubmit(current.value?.english || "");
+}
+
+function onBarSubmit() {
+  if (!answering.value) {
+    next();
+    return;
+  }
+  if (mode.value === "SentenceTranslate" && translateType.value !== 1) {
+    wordsRef.value?.submit();
+    return;
+  }
+  if (mode.value === "SentenceListen" || (mode.value === "SentenceTranslate" && translateType.value === 1)) {
+    listenRef.value?.submit();
+  }
+}
+
+function lessonId() {
+  return session.value?.chapterId || "";
+}
+
+async function flushHeartbeat(seconds?: number) {
+  const id = lessonId();
+  const value = Math.min(120, Math.max(0, Math.floor(seconds ?? elapsed.value - lastBeatAt)));
+  if (!id || value < 1) return;
+  lastBeatAt = elapsed.value;
+  try {
+    await sendStudyHeartbeat({
+      lessonId: id,
+      source: 1,
+      seconds: value,
+      sentenceCount: answeredCount.value,
+      wordCount: 0,
+    });
+    answeredCount.value = 0;
+  } catch {
+    /* 心跳失败不打断练习 */
+  }
+}
+
+async function reportProgress(index: number, status: 0 | 1) {
+  const id = lessonId();
+  if (!id) return;
+  try {
+    await syncLessonProgress(id, { progressIndex: index, status });
+  } catch {
+    /* unwrap 已提示 */
+  }
+}
+
+async function applyResult(res: { result?: string; expected?: string; nextIndex?: number; finished?: boolean }, currentIndexValue: number) {
+  lastResult.value = res.result || "";
+  lastExpected.value = res.result === "wrong" ? res.expected || "" : "";
+  answering.value = false;
+  answeredCount.value += 1;
+  await reportProgress(currentIndexValue, 0);
+  if (res.finished) {
+    await reportProgress(currentIndexValue, 1);
+    await flushHeartbeat();
+    ElMessage.success("本轮练习已完成");
+    await leave();
+    return;
+  }
+  if (gameSetting.value.success_auto_next && res.result !== "wrong") {
+    autoNextTimer = window.setTimeout(() => nextFromServer(res.nextIndex), 300);
+  }
+}
+
+function nextFromServer(nextIndex?: number) {
+  if (nextIndex == null) {
+    next();
+    return;
+  }
+  const found = gameList.value.findIndex((item) => Number(item.index) === Number(nextIndex));
+  if (found >= 0) {
+    gameIndex.value = found;
+    resetItem();
+    return;
+  }
   next();
+}
+
+async function onAnswerSubmit(answer: string) {
+  const item = current.value;
+  const id = lessonId();
+  const text = String(answer || "").trim();
+  if (!item || !id) return;
+  if (!text) {
+    ElMessage.warning("答案不能为空");
+    return;
+  }
+  if (submitting.value) return;
+  submitting.value = true;
+  try {
+    const res = await submitPractice({
+      lessonId: id,
+      itemId: item.itemId || item.id,
+      mode: item.mode ?? practiceMode.value,
+      answer: text,
+    });
+    await applyResult(res || {}, Number(item.index ?? 0));
+  } catch {
+    /* unwrap 已提示 */
+  } finally {
+    submitting.value = false;
+  }
+}
+
+async function submitOralAudio(blob: Blob) {
+  const item = current.value;
+  const id = lessonId();
+  if (!item || !id) return;
+  if (submitting.value) return;
+  submitting.value = true;
+  evaluating.value = true;
+  try {
+    const mime = blob.type || "audio/webm";
+    const filename = mime.includes("ogg")
+      ? "say.ogg"
+      : mime.includes("mp4") || mime.includes("m4a")
+        ? "say.m4a"
+        : mime.includes("mpeg") || mime.includes("mp3")
+          ? "say.mp3"
+          : "say.webm";
+    const res = await submitSpeech({
+      lessonId: id,
+      itemId: item.itemId || item.id,
+      audio: blob,
+      filename,
+    });
+    oralCompleted.value = true;
+    await applyResult(res || { result: "correct" }, Number(item.index ?? 0));
+  } catch {
+    oralHint.value = "提交失败，请再录一次";
+  } finally {
+    evaluating.value = false;
+    submitting.value = false;
+  }
 }
 
 function getRecognizer(): SpeechRecognition | null {
@@ -417,13 +584,16 @@ function toggleRecord() {
   }
   if (recording.value) {
     stopRecord();
-    if (!getRecognizer()) {
-      evaluating.value = true;
-      window.setTimeout(() => {
+    evaluating.value = true;
+    window.setTimeout(() => {
+      const blob = oralAudioBlob.value;
+      if (!blob) {
         evaluating.value = false;
-        onSuccess();
-      }, 400);
-    }
+        oralHint.value = "没有录到声音，请再录一次";
+        return;
+      }
+      void submitOralAudio(blob);
+    }, 250);
     return;
   }
   startRecord();
@@ -451,7 +621,7 @@ function startRecord() {
       .trim();
     oralTranscript.value = result;
     if (event.results[event.results.length - 1]?.isFinal) {
-      checkOral(result);
+      oralTranscript.value = result;
     }
   };
   rec.onerror = () => {
@@ -461,9 +631,6 @@ function startRecord() {
   rec.onend = () => {
     recording.value = false;
     stopAudioCapture();
-    if (oralTranscript.value && answering.value) {
-      checkOral(oralTranscript.value);
-    }
   };
   recording.value = true;
   rec.start();
@@ -487,7 +654,11 @@ async function startAudioCapture() {
       return;
     }
     mediaStream = stream;
-    const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
+    const mimeType = MediaRecorder.isTypeSupported("audio/ogg")
+      ? "audio/ogg"
+      : MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "";
     const recorder = mimeType
       ? new MediaRecorder(stream, { mimeType })
       : new MediaRecorder(stream);
@@ -545,32 +716,15 @@ function releaseOralAudio() {
   oralAudioBlob.value = null;
 }
 
-function checkOral(text: string) {
-  if (!current.value || !answering.value) return;
-  if (oralMatch(text, current.value.english)) {
-    oralHint.value = "";
-    onSuccess();
-    return;
-  }
-  oralHint.value = "请再录一次";
-}
-
-function onSuccess() {
-  answering.value = false;
-  recording.value = false;
-  evaluating.value = false;
-  if (mode.value === "SentenceOral") oralCompleted.value = true;
-  if (gameSetting.value.success_auto_next) {
-    autoNextTimer = window.setTimeout(() => next(), 300);
-  }
-}
-
 function resetItem() {
   answering.value = true;
   oralTranscript.value = "";
   oralHint.value = "";
   oralCompleted.value = false;
   evaluating.value = false;
+  lastResult.value = "";
+  lastExpected.value = "";
+  playUsed.value = 0;
   nextKey.value = "";
   errorKey.value = "";
   activeKey.value = "";
@@ -642,6 +796,8 @@ function resume() {
 async function leave() {
   pauseOpen.value = false;
   leaveOpen.value = false;
+  gameTime.value = elapsed.value;
+  await flushHeartbeat();
   await router.replace(gameBackPath(session.value));
 }
 
@@ -695,9 +851,9 @@ function onShortcut(event: KeyboardEvent) {
   }
 
   if (currentMode === "SentenceListen") {
-    if (key === " " || event.code === "Space") {
+    if (key === "Enter") {
       event.preventDefault();
-      next();
+      onBarSubmit();
       return;
     }
     if (key === "ArrowLeft" || key === "ArrowRight") {
@@ -726,10 +882,16 @@ function onShortcut(event: KeyboardEvent) {
   }
 }
 
+function shouldAutoSpeak() {
+  if (mode.value === "SentenceListen") return current.value?.settings?.autoPlay !== false;
+  if (mode.value === "SentenceOral") return true;
+  return gameSetting.value.speaker_read_auto;
+}
+
 watch(
   () => [gameIndex.value, mode.value],
   () => {
-    if (gameSetting.value.speaker_read_auto || mode.value === "SentenceListen" || mode.value === "SentenceOral") {
+    if (shouldAutoSpeak()) {
       window.setTimeout(() => speak(), 300);
     }
   },
@@ -744,9 +906,13 @@ onMounted(() => {
     return;
   }
   elapsed.value = gameTime.value || 0;
+  lastBeatAt = elapsed.value;
   tick = window.setInterval(() => {
     if (paused.value) return;
     elapsed.value += 1;
+    if (elapsed.value > 0 && elapsed.value % 10 === 0) {
+      void flushHeartbeat();
+    }
     if (elapsed.value > 0 && elapsed.value % 60 === 0) {
       swing.value = true;
       window.setTimeout(() => {
@@ -754,7 +920,7 @@ onMounted(() => {
       }, 1000);
     }
   }, 1000);
-  if (gameSetting.value.speaker_read_auto || mode.value === "SentenceListen" || mode.value === "SentenceOral") {
+  if (shouldAutoSpeak()) {
     window.setTimeout(() => speak(), 300);
   }
 });

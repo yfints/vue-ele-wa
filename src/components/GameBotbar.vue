@@ -30,9 +30,9 @@
           </div>
         </div>
         <div v-else-if="mode === 'SentenceListen'" class="pl10 pr10 pb10">
-          <div class="botitem flex ac">
-            <span class="bold6 mr10">←→</span>
-            <span class="opc6">朗读</span>
+          <div class="botitem flex ac hand" @click="onTranslateSpace">
+            <span class="bold6 mr10">空格 / Enter</span>
+            <span :class="answering ? '' : 'opc6'">{{ answering ? "提交" : "下一题" }}</span>
           </div>
         </div>
 

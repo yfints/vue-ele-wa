@@ -22,7 +22,7 @@
                 fontGlass: shouldGlass(ch),
               }"
             >
-              {{ ch.word }}
+              {{ displayChar(ch) }}
             </div>
             <div v-if="ch.isWord && current === ch.cur" class="line" />
             <div v-else class="lineGap" />
@@ -30,6 +30,7 @@
         </div>
       </template>
     </div>
+    <div v-if="phoneticHint" class="opc6 noBr tc mt20 size24">{{ phoneticHint }}</div>
     <div v-if="partOfSpeech" class="opc6 noBr tc mt30 size30">{{ partOfSpeech }}</div>
     <div v-if="showChinese && chinese" class="mt30 tc size40">{{ chinese }}</div>
   </div>
@@ -41,6 +42,7 @@ import { onMounted, onUnmounted, ref, watch } from "vue";
 interface TypeChar {
   word: string;
   isWord: boolean;
+  isFirst: boolean;
   cur: number;
   answerStatus: 0 | 1 | 2;
 }
@@ -54,8 +56,11 @@ const props = defineProps<{
   english: string;
   chinese: string;
   partOfSpeech?: string;
+  phoneticHint?: string;
   showChinese: boolean;
   showLetters: boolean;
+  hintLevel?: number;
+  caseSensitive?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -77,11 +82,12 @@ function rebuild() {
   const words = String(props.english || "").split(" ");
   words.forEach((word, index) => {
     if (word.length) {
-      const chars = word.split("").map((ch) => {
+      const chars = word.split("").map((ch, cIndex) => {
         const isWord = /^[a-zA-Z]$/.test(ch);
         const item: TypeChar = {
           word: ch,
           isWord,
+          isFirst: isWord && !word.slice(0, cIndex).split("").some((c) => /^[a-zA-Z]$/.test(c)),
           cur: isWord ? cursor++ : -1,
           answerStatus: 0,
         };
@@ -105,10 +111,19 @@ function emitNext() {
 }
 
 function shouldGlass(ch: TypeChar) {
-  if (props.showLetters) return false;
-  if (!ch.isWord) return true;
+  if (props.showLetters || props.hintLevel === 2) return false;
+  if (!ch.isWord) return false;
   if (ch.answerStatus === 1) return false;
-  return current.value <= ch.cur;
+  if (props.hintLevel === 1 && ch.isFirst) return false;
+  return true;
+}
+
+function displayChar(ch: TypeChar) {
+  if (ch.answerStatus === 1) return ch.word;
+  if (props.showLetters || props.hintLevel === 2) return ch.word;
+  if (props.hintLevel === 1 && ch.isFirst) return ch.word;
+  if (props.hintLevel === 1 && ch.isWord) return "*";
+  return ch.word;
 }
 
 function speakWord(group: TypeGroup) {
@@ -121,7 +136,7 @@ function typeKey(raw: string) {
   if (/^[a-zA-Z]$/.test(raw)) {
     const item = letters.value[current.value];
     if (!item) return;
-    if (item.word.toUpperCase() === raw.toUpperCase()) {
+    if (item.word.toUpperCase() === raw.toUpperCase() && (!props.caseSensitive || item.word === raw)) {
       item.answerStatus = 1;
       if (current.value + 1 >= letters.value.length) {
         done.value = true;

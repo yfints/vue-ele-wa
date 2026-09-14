@@ -102,7 +102,7 @@ export function fetchRankList() {
 }
 
 export function clockIn() {
-  return post("/game/clock_in");
+  return post("/dashboard/today_checkin");
 }
 
 /** 打卡统计卡片（/dashboard/checkin_stat_info，驼峰结构直接渲染） */

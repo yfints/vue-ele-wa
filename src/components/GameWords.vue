@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { sameWord, tokenize } from "@/lib/gameText";
+import { tokenize } from "@/lib/gameText";
 
 interface WordToken {
   id: number;
@@ -60,6 +60,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   success: [];
   error: [];
+  submit: [answer: string];
 }>();
 
 const tokens = ref<WordToken[]>([]);
@@ -203,36 +204,24 @@ function onSpace() {
   else submit();
 }
 
+function getAnswer() {
+  return tokens.value.filter((item) => item.isWord).map((item) => item.answer).join("|");
+}
+
 function submit() {
-  let firstError = -1;
-  tokens.value.forEach((item, index) => {
-    if (!item.isWord) return;
-    if (sameWord(item.answer, item.word, props.ignoreCase)) return;
-    item.errorCount += 1;
-    item.shake = true;
-    window.setTimeout(() => {
-      item.shake = false;
-    }, 1000);
-    if (props.autoShowTimes > 0 && item.errorCount >= props.autoShowTimes) {
-      item.answer = item.word;
-    }
-    if (firstError < 0) firstError = index;
-  });
-  if (firstError < 0) {
-    currentIndex.value = -1;
-    emit("success");
+  const answer = getAnswer();
+  if (!answer.replace(/\|/g, "").trim()) {
+    emit("error");
     return;
   }
-  missRound.value += 1;
-  emit("error");
-  focusWord(firstError);
+  emit("submit", answer);
 }
 
 function reveal() {
   tokens.value.forEach((item) => {
     if (item.isWord) item.answer = item.word;
   });
-  emit("success");
+  emit("submit", getAnswer());
 }
 
 function injectKey(key: string) {
@@ -266,7 +255,7 @@ function injectKey(key: string) {
   draft.value = item.answer;
 }
 
-defineExpose({ submit, reveal, focusFirst, injectKey });
+defineExpose({ submit, reveal, focusFirst, injectKey, getAnswer });
 
 watch(() => props.english, rebuild, { immediate: true });
 

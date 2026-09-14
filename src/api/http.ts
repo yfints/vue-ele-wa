@@ -69,6 +69,9 @@ export const http: AxiosInstance = axios.create({
 http.interceptors.request.use((config) => {
   const token = getToken();
   config.headers.Authorization = `Bearer ${token}`;
+  if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
   return config;
 });
 
