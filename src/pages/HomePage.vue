@@ -119,7 +119,6 @@
           <el-button
             class="dashCheckinBtn"
             type="primary"
-            round
             :disabled="checkedIn || signProgress < 100"
             @click="doClockIn"
           >
