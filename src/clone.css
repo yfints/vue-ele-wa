@@ -2301,6 +2301,33 @@ html.dark .loginContent {
   display: flex;
   flex-direction: column;
 }
+.gameLearnProgress.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+  width: 100vw;
+  height: 0.21429rem;
+  padding: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  background: #5c4bff2e;
+}
+.gameLearnProgress .progress__value {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(to right, #6cccff, #5c4bff);
+  border-radius: 0 0.10714rem 0.10714rem 0;
+  box-shadow: 0 0 0.28571rem #5c4bffcc;
+  transition: width 0.2s ease;
+}
+html.dark .gameLearnProgress.progress {
+  background: #00f0ff2e;
+}
+html.dark .gameLearnProgress .progress__value {
+  background: #00f0ff;
+  box-shadow: 0 0 0.28571rem #00f0ffcc;
+}
 .headbarWrap {
   --headbar-height: 3.57143rem;
   flex-shrink: 0;

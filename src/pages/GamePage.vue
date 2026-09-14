@@ -115,6 +115,18 @@
       @key="onKeyboard"
     />
 
+    <Teleport to="body">
+      <div
+        class="progress gameLearnProgress"
+        role="progressbar"
+        :aria-valuenow="learnPercent"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div class="progress__value" :style="{ width: `${learnPercent}%` }" />
+      </div>
+    </Teleport>
+
     <ModePop ref="modeRef" />
     </template>
 
@@ -324,6 +336,11 @@ let captureToken = 0;
 let captureCancelled = false;
 
 const isDesktop = computed(() => !isPhone.value);
+const learnPercent = computed(() => {
+  const total = gameList.value.length;
+  if (!total) return 0;
+  return Math.floor(Math.min(1, (gameIndex.value + 1) / total) * 10000) / 100;
+});
 const clock = computed(() => formatClock(elapsed.value));
 const practiceMode = computed(
   () => session.value?.practiceMode ?? MODE_TO_PRACTICE[mode.value] ?? 3,
@@ -486,9 +503,14 @@ async function reportProgress(index: number, status: 0 | 1) {
   }
 }
 
+function isWrongResult(result?: string) {
+  const value = String(result ?? "").trim().toLowerCase();
+  return value === "wrong" || value === "incorrect" || value === "false" || value === "0" || value === "fail";
+}
+
 async function applyResult(res: { result?: string; expected?: string; nextIndex?: number; finished?: boolean }, currentIndexValue: number) {
   lastResult.value = res.result || "";
-  lastExpected.value = res.result === "wrong" ? res.expected || "" : "";
+  lastExpected.value = isWrongResult(res.result) ? res.expected || "" : "";
   answering.value = false;
   answeredCount.value += 1;
   await reportProgress(currentIndexValue, 0);
@@ -499,8 +521,9 @@ async function applyResult(res: { result?: string; expected?: string; nextIndex?
     await leave();
     return;
   }
-  if (gameSetting.value.success_auto_next && res.result !== "wrong") {
-    autoNextTimer = window.setTimeout(() => nextFromServer(res.nextIndex), 300);
+  if (gameSetting.value.success_auto_next && !isWrongResult(res.result)) {
+    if (autoNextTimer) clearTimeout(autoNextTimer);
+    autoNextTimer = window.setTimeout(() => nextFromServer(res.nextIndex), 800);
   }
 }
 
@@ -723,6 +746,10 @@ function releaseOralAudio() {
 }
 
 function resetItem() {
+  if (autoNextTimer) {
+    clearTimeout(autoNextTimer);
+    autoNextTimer = undefined;
+  }
   answering.value = true;
   oralTranscript.value = "";
   oralHint.value = "";

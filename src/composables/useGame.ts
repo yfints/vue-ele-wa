@@ -105,7 +105,16 @@ function readNumber(key: string) {
 function readSetting(): GameSetting {
   try {
     const raw = localStorage.getItem(SETTING_KEY);
-    if (raw) return { ...defaultSetting(), ...(JSON.parse(raw) as GameSetting) };
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<GameSetting>;
+      const merged = { ...defaultSetting(), ...parsed };
+      if (localStorage.getItem("wxs-autonext-v2") !== "1") {
+        merged.success_auto_next = true;
+        localStorage.setItem("wxs-autonext-v2", "1");
+        localStorage.setItem(SETTING_KEY, JSON.stringify(merged));
+      }
+      return merged;
+    }
   } catch {
     /* ignore */
   }
@@ -116,7 +125,7 @@ export function defaultSetting(): GameSetting {
   return {
     show_translate: true,
     ignore_case: true,
-    success_auto_next: false,
+    success_auto_next: true,
     speaker_read_auto: true,
     typeing_show: true,
     show_sentence_pic: true,
