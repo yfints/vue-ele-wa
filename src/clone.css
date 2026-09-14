@@ -18,6 +18,7 @@
     --el-fill-color-blank: #ffffff;
     --auto-font-size: 16px;
     --theme-color: #ffffff;
+    --menu-icon-color: #333333;
     --theme-gray: #f4f4f4;
     --theme-border: #e4e7ed;
     --bg-page: #ffffff;
@@ -417,7 +418,7 @@ button {
     padding: 16px 12px 20px;
     flex: 0 0 200px;
     width: 200px;
-    background: #fff;
+    background: var(--bg-card);
 }
 
 @media (min-width: 576px) {
@@ -491,6 +492,23 @@ button {
 }
 
 .dashMenuIconImg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    background-color: var(--menu-icon-color);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+.cardAct .dashMenuIconImg {
+    background-color: #fff !important;
+}
+
+.dashMenuIconPng {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
@@ -1309,7 +1327,7 @@ html.dark .myLessonDetail .top {
         position: fixed;
         top: 0;
         z-index: 103;
-        background: #fff;
+        background: var(--bg-card);
         width: 10.35714rem !important;
         flex: 0 0 10.35714rem !important;
         overflow: hidden;
@@ -3034,6 +3052,7 @@ html.dark .colLine {
 
 html.dark {
     --theme-color: #000000;
+    --menu-icon-color: #e5eaf3;
     --theme-gray: #2d3035;
     --theme-border: #e6e6e64d;
     --bg-page: #000000;
@@ -3051,6 +3070,153 @@ html.dark {
     --el-text-color-regular: #cfd3dc;
     --el-text-color-secondary: #a3a6ad;
     --el-text-color-placeholder: #8d9095;
+}
+
+html.dark .container.onHome,
+html.dark .onHome .contentBox {
+    background: var(--bg-container);
+}
+
+html.dark .dashTabs .el-button {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .dashTabs .el-button--primary {
+    color: #fff;
+}
+
+html.dark .dashUser {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .dashCard {
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.35);
+}
+
+html.dark .dashCard.purple {
+    background: #2c2736;
+}
+
+html.dark .dashCard.mint {
+    background: #17302c;
+}
+
+html.dark .dashCard.pink {
+    background: #33232a;
+}
+
+html.dark .dashCard.green {
+    background: #20301f;
+}
+
+html.dark .dashCard.orange {
+    background: #332a20;
+}
+
+html.dark .dashCard.blue {
+    background: #1f2a3a;
+}
+
+html.dark .dashCardLabel {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .dashCardValue {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .dashCardArrow.el-button {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--el-text-color-secondary);
+}
+
+html.dark .dashCard.purple .dashCardArrow {
+    color: #b7a6f2;
+}
+
+html.dark .dashCard.mint .dashCardArrow {
+    color: #59d1b8;
+}
+
+html.dark .dashCard.pink .dashCardArrow {
+    color: #f18d9c;
+}
+
+html.dark .dashCard.green .dashCardArrow {
+    color: #7dcb7c;
+}
+
+html.dark .dashCard.orange .dashCardArrow {
+    color: #eeb25f;
+}
+
+html.dark .dashCard.blue .dashCardArrow {
+    color: #7ba9e7;
+}
+
+html.dark .dashPanel,
+html.dark .dashCheckin,
+html.dark .dashChart {
+    background: var(--bg-card);
+}
+
+html.dark .dashCheckinHero {
+    display: none;
+}
+
+html.dark .dashPanelTitle {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .dashDuration {
+    background: #14233a;
+}
+
+html.dark .dashCheckStats {
+    background: #0f2530;
+}
+
+html.dark .dashDurationNum,
+html.dark .dashCheckNum {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .dashDurationLabel {
+    color: var(--el-text-color-secondary);
+}
+
+html.dark .dashCheckinDate {
+    background: #14233a;
+    color: var(--el-text-color-primary);
+}
+
+html.dark .dashCheckinMonth,
+html.dark .dashCheckinHint {
+    color: var(--el-text-color-secondary);
+}
+
+html.dark .dashCheckinLine {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .dashCheckinLine em {
+    color: #7eb6ff;
+}
+
+html.dark .dashChartAxis {
+    color: var(--el-text-color-placeholder);
+}
+
+html.dark .dashChartTrack {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+}
+
+html.dark .dashChartBar {
+    background: #3a5a8c;
+}
+
+html.dark .dashChartLabel {
+    color: var(--el-text-color-secondary);
 }
 
 html.dark .headBar .menuBox img {

@@ -2,13 +2,15 @@
   <div class="menu ani" :class="[tone, collapsed ? 'menuClose' : '']">
     <RouterLink v-if="to" :to="to" class="hand" :style="{ color: 'inherit' }">
       <div class="card flex ac hand" :class="{ cardAct: active }">
-        <img v-if="iconSrc" :src="active ? activeSrc : iconSrc" class="dashMenuIconImg" alt="" />
+        <img v-if="isPngIcon" :src="iconSrc" class="dashMenuIconPng" alt="" />
+        <span v-else-if="iconSrc" class="dashMenuIconImg" :style="maskStyle" />
         <el-icon v-else-if="iconComp" class="dashMenuIcon"><component :is="iconComp" /></el-icon>
         <div class="ml10 size28 bold">{{ label }}</div>
       </div>
     </RouterLink>
     <div v-else class="card flex ac hand" :class="{ cardAct: active }" @click="onSoon">
-      <img v-if="iconSrc" :src="active ? activeSrc : iconSrc" class="dashMenuIconImg" alt="" />
+      <img v-if="isPngIcon" :src="iconSrc" class="dashMenuIconPng" alt="" />
+      <span v-else-if="iconSrc" class="dashMenuIconImg" :style="maskStyle" />
       <el-icon v-else-if="iconComp" class="dashMenuIcon"><component :is="iconComp" /></el-icon>
       <div class="ml10 size28 bold">{{ label }}</div>
     </div>
@@ -24,7 +26,6 @@ import { isPhone, menuOpen } from "@/composables/useLayout";
 const props = defineProps<{
   label: string;
   icon: string | Component;
-  activeIcon?: string;
   to?: string;
   active?: boolean;
   tone?: string;
@@ -33,7 +34,14 @@ const props = defineProps<{
 const route = useRoute();
 const iconComp = computed(() => (typeof props.icon === "string" ? null : props.icon));
 const iconSrc = computed(() => (typeof props.icon === "string" ? props.icon : ""));
-const activeSrc = computed(() => props.activeIcon || iconSrc.value);
+const isPngIcon = computed(() => iconSrc.value.toLowerCase().endsWith(".png"));
+const maskStyle = computed(() => {
+  if (!iconSrc.value || isPngIcon.value) return {};
+  return {
+    WebkitMaskImage: `url("${iconSrc.value}")`,
+    maskImage: `url("${iconSrc.value}")`,
+  };
+});
 const collapsed = computed(() => !menuOpen.value && !isPhone.value);
 const active = computed(() => {
   if (props.active) return true;
