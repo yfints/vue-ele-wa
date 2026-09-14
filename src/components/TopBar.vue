@@ -41,14 +41,13 @@
           <div class="img30" v-html="searchIcon" />
           <div class="desc">搜索课程</div>
         </div>
-        <div class="img30 opc6 phone" v-html="searchIcon" />
       </div>
       <div v-for="item in headItems" :key="item.label" class="headIcon mr30">
         <div class="flex ac headItem pc">
           <div class="img30" v-html="item.icon" />
           <div class="desc">{{ item.label }}</div>
         </div>
-        <div class="img30 opc6 phone" v-html="item.icon" />
+
       </div>
       <ThemeToggle />
       <RouterLink :to="profileTo">
