@@ -12,7 +12,7 @@
 ## 技术信号
 | 项目 | 原站 | 克隆站 |
 |---|---|---|
-| title | 哇学社 - 游戏化英语学习平台 | 哇学社 - 游戏化英语学习平台 |
+| title | Englishgo - 游戏化英语学习平台 | Englishgo - 游戏化英语学习平台 |
 | lang | en | en |
 | frameworks | vue | react |
 | scrollHeight | 900 | 900 |

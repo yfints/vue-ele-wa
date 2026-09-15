@@ -11,9 +11,9 @@
 - 未发现
 
 ## 原站品牌残留
-- index.html:13 · brand residue: 哇学社 · `哇学社`
-- index.html:16 · brand residue: 哇学社 · `哇学社`
-- src\components\Sidebar.tsx:88 · brand residue: 哇学社 · `哇学社`
+- index.html:13 · brand residue: Englishgo · `Englishgo`
+- index.html:16 · brand residue: Englishgo · `Englishgo`
+- src\components\Sidebar.tsx:88 · brand residue: Englishgo · `Englishgo`
 - src\data\asset-map.json:2 · brand residue: waxueshe · `waxueshe`
 - src\data\asset-map.json:3 · brand residue: waxueshe · `waxueshe`
 - src\data\asset-map.json:4 · brand residue: waxueshe · `waxueshe`

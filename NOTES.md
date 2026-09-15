@@ -1,10 +1,10 @@
-# 哇学社课程广场 · 克隆笔记
+# Englishgo课程广场 · 克隆笔记
 
 ## 源信息
 - 原站 URL: https://www.waxueshe.com/courseMall/index
 - 课程详情: https://www.waxueshe.com/courseMall/1653 （课 id=1653「零基础日常口语表达900句」）
-- 源码仓库: 未找到公开仓库（GitHub 检索无哇学社前端源码）
-- 原作者: 哇学社 / waxueshe.com
+- 源码仓库: 未找到公开仓库（GitHub 检索无Englishgo前端源码）
+- 原作者: Englishgo / waxueshe.com
 - 许可证: 专有（未声明开源许可，默认保留所有权利）
 - 致谢要求: 仅本地学习复刻；未经许可不得公开重新部署或商用
 
@@ -74,7 +74,7 @@ npm run preview
 - 详情横幅/装饰图 → `public/clone-assets/detail-banner.png`、`detail-deco.png`
 
 ## 部署前须替换清单（版权）
-- 品牌名「哇学社」、Logo、favicon、吉祥物头像
+- 品牌名「Englishgo」、Logo、favicon、吉祥物头像
 - 全部课程封面与用户头像（`public/clone-assets/covers/`）
 - 侧栏功能图标
 - 飞书表单外链 `https://hcn2xg5ch01u.feishu.cn/share/base/form/shrcnxt6O7BuVRjxTvMYoOJHyEh`
