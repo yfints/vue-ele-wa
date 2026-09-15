@@ -3839,6 +3839,32 @@ html.dark .gameLearnProgress .progress__value {
     margin: 0 0.35714rem 0.35714rem;
 }
 
+.oralScore {
+    color: #4162ff;
+    line-height: 1;
+}
+
+.oralScoreNum {
+    font-size: 3.57143rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.oralScoreUnit {
+    margin-left: 0.28571rem;
+    font-size: 1.14286rem;
+}
+
+.oralDims span {
+    margin: 0 0.57143rem 0.28571rem;
+    font-size: 0.85714rem;
+    opacity: 0.6;
+}
+
+.wordBad {
+    color: #e62129;
+}
+
 .gamePage .btn {
     height: 2.85714rem;
     border-radius: 2.85714rem;

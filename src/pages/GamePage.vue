@@ -89,6 +89,7 @@
         :result="lastResult"
         :expected="lastExpected"
         :analysis="analysisText"
+        :speech="oralScore"
       />
     </div>
 
@@ -293,7 +294,15 @@ import GameSuccess from "@/components/GameSuccess.vue";
 import GameBotbar from "@/components/GameBotbar.vue";
 import GameOral from "@/components/GameOral.vue";
 import ModePop from "@/components/ModePop.vue";
-import { sendStudyHeartbeat, submitPractice, submitSpeech, syncLessonProgress } from "@/api/practice";
+import {
+  evaluateSpeech,
+  sendStudyHeartbeat,
+  submitPractice,
+  syncLessonProgress,
+  type SpeechError,
+  type SpeechScore,
+} from "@/api/practice";
+import { pickAudioMime, RAW_AUDIO_CONSTRAINTS, toWav16k } from "@/lib/audio";
 import {
   currentSentence,
   gameBackPath,
@@ -341,6 +350,7 @@ const oralTranscript = ref("");
 const oralHint = ref("");
 const oralAudioBlob = ref<Blob | null>(null);
 const oralAudioUrl = ref("");
+const oralScore = ref<SpeechScore | null>(null);
 const nextKey = ref("");
 const errorKey = ref("");
 const activeKey = ref("");
@@ -360,6 +370,7 @@ let mediaRecorder: MediaRecorder | null = null;
 let audioChunks: BlobPart[] = [];
 let captureToken = 0;
 let captureCancelled = false;
+let oralGuard: number | undefined;
 
 const isDesktop = computed(() => !isPhone.value);
 const learnPercent = computed(() => {
@@ -613,29 +624,42 @@ async function submitOralAudio(blob: Blob) {
   if (submitting.value) return;
   submitting.value = true;
   evaluating.value = true;
+  oralHint.value = "评测中…";
   try {
-    const mime = blob.type || "audio/webm";
-    const filename = mime.includes("ogg")
-      ? "say.ogg"
-      : mime.includes("mp4") || mime.includes("m4a")
-        ? "say.m4a"
-        : mime.includes("mpeg") || mime.includes("mp3")
-          ? "say.mp3"
-          : "say.webm";
-    const res = await submitSpeech({
+    // 浏览器录的是 webm/ogg/mp4，先转成服务端要的 16k/16bit/单声道 WAV
+    const wav = await toWav16k(blob);
+    // 取票 → 连 ws → 推音频 → 收多维分（票据一次性，每次评测都重新取）
+    const res = await evaluateSpeech({
       lessonId: id,
-      itemId: item.itemId || item.id,
-      audio: blob,
-      filename,
+      itemId: item.itemId || item.id || "",
+      wavBlob: wav,
     });
     oralCompleted.value = true;
+    oralScore.value = res?.speech || null;
+    oralHint.value = "";
     await applyResult(res || { result: "correct" }, Number(item.index ?? 0));
-  } catch {
-    oralHint.value = "提交失败，请再录一次";
+  } catch (error) {
+    oralScore.value = null;
+    oralHint.value = speechErrorMessage(error);
   } finally {
     evaluating.value = false;
     submitting.value = false;
   }
+}
+
+/** 按文档第 4 节的错误表把后端提示翻译成给学员看的话 */
+function speechErrorMessage(error: unknown) {
+  const status = (error as SpeechError | null)?.status;
+  // 只有评测链路自己抛的错误才把原文透出去，HTTP 层的英文报错统一换成兜底文案
+  const message =
+    error instanceof Error && error.name === "SpeechError" ? error.message : "";
+  if (status === 403 || /票据/.test(message)) return "评测凭证已失效，请重新录制";
+  if (/太短/.test(message)) return "说话时间太短，请完整朗读";
+  if (/过长|2\s*分钟/.test(message)) return "录音请在 2 分钟内";
+  if (/格式不受支持|格式无法识别|无法解析/.test(message)) return "录音格式异常，请重新录制";
+  if (/过大/.test(message)) return "录音过大，请缩短录音";
+  if (status === 503 || /繁忙|稍后重试/.test(message)) return "评测服务繁忙，请稍后重试";
+  return message || "评测失败，请重试";
 }
 
 function getRecognizer(): SpeechRecognition | null {
@@ -716,17 +740,13 @@ async function startAudioCapture() {
   const token = ++captureToken;
   captureCancelled = false;
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: RAW_AUDIO_CONSTRAINTS });
     if (token !== captureToken) {
       stream.getTracks().forEach((track) => track.stop());
       return;
     }
     mediaStream = stream;
-    const mimeType = MediaRecorder.isTypeSupported("audio/ogg")
-      ? "audio/ogg"
-      : MediaRecorder.isTypeSupported("audio/webm")
-        ? "audio/webm"
-        : "";
+    const mimeType = pickAudioMime();
     const recorder = mimeType
       ? new MediaRecorder(stream, { mimeType })
       : new MediaRecorder(stream);
@@ -759,6 +779,11 @@ async function startAudioCapture() {
       URL.revokeObjectURL(downloadUrl);*/
     };
     recorder.start();
+    // 兜底：服务端 >120 秒会拒，录满 2 分钟自动停止并提交
+    if (oralGuard) window.clearTimeout(oralGuard);
+    oralGuard = window.setTimeout(() => {
+      if (recording.value) toggleRecord();
+    }, 120000);
   } catch {
     /* 未授权麦克风时退化为仅语音识别转写 */
   }
@@ -766,6 +791,10 @@ async function startAudioCapture() {
 
 function stopAudioCapture() {
   captureToken += 1;
+  if (oralGuard) {
+    window.clearTimeout(oralGuard);
+    oralGuard = undefined;
+  }
   if (mediaRecorder && mediaRecorder.state !== "inactive") {
     try {
       mediaRecorder.stop();
@@ -792,6 +821,7 @@ function resetItem() {
   answering.value = true;
   oralTranscript.value = "";
   oralHint.value = "";
+  oralScore.value = null;
   oralCompleted.value = false;
   evaluating.value = false;
   lastResult.value = "";

@@ -16,6 +16,8 @@ export default defineConfig({
         target: "http://test-jiaopei.zrgy-bbg.com",
        // target: "https://api.waxueshe.com",
         changeOrigin: true,
+        // 口语评测走 WebSocket，代理必须透传升级请求，否则握手到 5173 就断了
+        ws: true,
       },
       "/res-cdn": {
         target: "https://res.waxueshe.com",
