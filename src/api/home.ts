@@ -65,32 +65,64 @@ export interface RankList {
   sort?: RankItem[];
 }
 
+type RawPayload = Record<string, unknown>;
+
+function pickValue(raw: RawPayload, ...keys: string[]): unknown {
+  for (const key of keys) {
+    const value = raw[key];
+    if (value !== undefined && value !== null && value !== "") return value;
+  }
+  return undefined;
+}
+
+function pickNumber(raw: RawPayload, ...keys: string[]): number {
+  const value = Number(pickValue(raw, ...keys));
+  return Number.isFinite(value) ? value : 0;
+}
+
+function pickBoolean(raw: RawPayload, ...keys: string[]): boolean {
+  const value = pickValue(raw, ...keys);
+  return value === true || value === 1 || value === "1" || value === "true";
+}
+
 export function fetchNotices() {
   return get<NoticeResult>("/index/notice", { page: 1, limit: 5 });
 }
 
-export function fetchStudyNum(type: number) {
-  return get<StudyNum>("/index/study_num", { type });
+/** /index/study_num 返回 sentenceNum / wordNum（驼峰），这里同时兼容下划线 */
+export async function fetchStudyNum(type: number): Promise<StudyNum> {
+  const raw = ((await get<RawPayload>("/index/study_num", { type })) || {}) as RawPayload;
+  return {
+    sentence_num: pickNumber(raw, "sentenceNum", "sentence_num"),
+    word_num: pickNumber(raw, "wordNum", "word_num"),
+  };
 }
 
 export function fetchStudyCount() {
   return get<StudyCount>("/index/count");
 }
 
-export function fetchHomeIndex() {
-  return get<HomeIndex>("/index/index");
+/** /index/index 返回 todayIsCheckIn / todayCheckInCount / todayTime（驼峰） */
+export async function fetchHomeIndex(): Promise<HomeIndex> {
+  const raw = ((await get<RawPayload>("/index/index")) || {}) as RawPayload;
+  return {
+    all_check_in: pickNumber(raw, "todayCheckInCount", "today_check_in_count", "allCheckIn"),
+    today_is_check_in: pickBoolean(raw, "todayIsCheckIn", "today_is_check_in"),
+    today_time: pickNumber(raw, "todayTime", "today_time"),
+  };
 }
 
-export async function fetchHomeStats() {
-  const raw = (await get<HomeStats>("/index/user_count")) || {};
+/** /index/user_count 返回 totalSeconds / todaySeconds / monthSeconds（驼峰），对应首页「学习时长」 */
+export async function fetchHomeStats(): Promise<HomeStats> {
+  const raw = ((await get<RawPayload>("/index/user_count")) || {}) as RawPayload;
   return {
-    current_streak: Number(raw.current_streak || 0),
-    max_streak: Number(raw.max_streak || 0),
-    total_check_in: Number(raw.total_check_in || 0),
-    total_seconds: Number(raw.total_seconds || 0),
-    today_seconds: Number(raw.today_seconds || 0),
-    month_seconds: Number(raw.month_seconds || 0),
-  } satisfies HomeStats;
+    current_streak: pickNumber(raw, "currentStreak", "current_streak"),
+    max_streak: pickNumber(raw, "maxStreak", "max_streak"),
+    total_check_in: pickNumber(raw, "totalCheckIn", "total_check_in"),
+    total_seconds: pickNumber(raw, "totalSeconds", "total_seconds"),
+    today_seconds: pickNumber(raw, "todaySeconds", "today_seconds"),
+    month_seconds: pickNumber(raw, "monthSeconds", "month_seconds"),
+  };
 }
 
 export function fetchDateHot(date: string) {
