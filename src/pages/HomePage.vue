@@ -1,6 +1,6 @@
 <template>
   <div class="contentBox dashPage" style="padding-top: 0;padding-left: 0;padding-right: 0;">
-    <header class="dashHead" style="background: white;height: 60px;">
+    <header class="dashHead">
       <div class="dashTabs" style="padding-left: 20px;">
         <el-button
           v-for="tab in studyTabs"

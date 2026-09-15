@@ -2581,6 +2581,9 @@ html.dark .colLine {
     justify-content: space-between;
     margin-bottom: 16px;
     min-width: 0;
+    height: 60px;
+    background: #fff;
+    transition: background-color 0.3s;
 }
 
 .dashTabs .el-button {
@@ -3086,7 +3089,9 @@ html.dark .onHome .contentBox {
 html.dark .dashTabs .el-button {
     color: var(--el-text-color-regular);
 }
-
+html.dark .dashHead {
+    background: var(--bg-container);
+}
 html.dark .dashTabs .el-button--primary {
     color: #fff;
 }
