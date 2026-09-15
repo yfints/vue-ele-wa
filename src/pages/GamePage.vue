@@ -455,6 +455,7 @@ function speakFallback(text: string) {
   }
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "en-US";
+  utter.rate = 0.85;
   utter.onstart = () => markPlaying(true);
   utter.onend = () => markPlaying(false);
   utter.onerror = () => markPlaying(false);
