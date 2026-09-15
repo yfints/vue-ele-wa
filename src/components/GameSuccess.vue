@@ -32,6 +32,10 @@
     <div v-if="chinese" class="mt30 tc size50">{{ chinese }}</div>
     <div v-if="expected" class="mt30 tc size28">正确答案：{{ expected }}</div>
     <div v-if="analysis" class="mt20 tc size20 opc6" style="max-width: 40rem">{{ analysis }}</div>
+
+    <div v-if="retryable" class="flex jc mt30">
+      <el-button type="primary" round @click="emit('retry')">重新录制</el-button>
+    </div>
   </div>
 </template>
 
@@ -48,6 +52,11 @@ const props = defineProps<{
   expected?: string;
   analysis?: string;
   speech?: SpeechScore | null;
+  retryable?: boolean;
+}>();
+
+const emit = defineEmits<{
+  retry: [];
 }>();
 
 /** 口语评测有逐词分就按逐词标色，其它模式沿用原来的英文分词 */

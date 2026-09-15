@@ -90,6 +90,8 @@
         :expected="lastExpected"
         :analysis="analysisText"
         :speech="oralScore"
+        :retryable="oralRetryable"
+        @retry="toggleRecord"
       />
     </div>
 
@@ -100,6 +102,7 @@
       :playing="playing"
       :recording="recording"
       :completed="oralCompleted"
+      :retryable="oralRetryable"
       :answering="answering"
       :show-letters="gameSetting.typeing_show"
       :next-key="nextKey"
@@ -395,6 +398,10 @@ const showChinese = computed(() => {
 const phonetic = computed(() => current.value?.phonetic_uk || current.value?.phonetic_us || "");
 const successWords = computed(() => (current.value?.english || "").split(/\s+/).filter(Boolean));
 const showPic = computed(() => gameSetting.value.show_sentence_pic && Boolean(current.value?.pic));
+/** 口语答错后允许重新录制再提交；答对直接进入下一题，不需要重录 */
+const oralRetryable = computed(
+  () => mode.value === "SentenceOral" && isWrongResult(lastResult.value),
+);
 
 function persistSetting() {
   saveGameSetting({ ...gameSetting.value });
@@ -669,9 +676,14 @@ function getRecognizer(): SpeechRecognition | null {
 }
 
 function toggleRecord() {
-  // 判分完成后（含答错）本题不允许再次提交，只能切到下一题
+  // 判分完成后：答错可以重新录制再提交，答对直接进入下一题
   if (oralCompleted.value && !answering.value) {
-    ElMessage.info("本题已提交，点击「下一题」继续");
+    if (!oralRetryable.value) {
+      ElMessage.info("本题已作答，点击「下一题」继续");
+      return;
+    }
+    resetItem();
+    startRecord();
     return;
   }
   // 评测中不允许重新开录，避免一次答题推多份音频

@@ -64,7 +64,7 @@
         </div>
 
         <div v-if="mode === 'SentenceOral'" class="pl10 pr10 pb10">
-          <div class="botitem flex ac" :class="completed ? 'opc6' : 'hand'" @click="onRecord">
+          <div class="botitem flex ac" :class="oralDisabled ? 'opc6' : 'hand'" @click="onRecord">
             <span class="bold6 mr10">空格</span>
             <span class="opc6">{{ oralAction }}</span>
           </div>
@@ -103,6 +103,7 @@ const props = defineProps<{
   playing: boolean;
   recording: boolean;
   completed: boolean;
+  retryable?: boolean;
   answering: boolean;
   showLetters: boolean;
   nextKey: string;
@@ -125,15 +126,16 @@ const emit = defineEmits<{
 const showWave = computed(
   () => props.mode === "SentenceListen" || props.mode === "SentenceOral" || props.playing,
 );
+/** 已判分且不允许重录时，口语那项变成不可点的「已提交」 */
+const oralDisabled = computed(() => props.completed && !props.retryable);
 const oralAction = computed(() => {
-  if (props.completed) return "已提交";
+  if (props.completed) return props.retryable ? "重录" : "已提交";
   if (props.recording) return "结束";
   return "录制";
 });
 
 function onRecord() {
-  // 本题已判分，不允许再次提交；只保留「下一题」
-  if (props.completed) return;
+  if (oralDisabled.value) return;
   emit("record");
 }
 
