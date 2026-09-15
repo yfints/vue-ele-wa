@@ -21,6 +21,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.4.1",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/tsconfig": "^0.9.1",
     "tailwindcss": "^4.3.3",

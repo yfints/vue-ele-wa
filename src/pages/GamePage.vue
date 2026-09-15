@@ -905,6 +905,11 @@ function startRecord() {
   oralHint.value = "";
   releaseOralAudio();
   void startAudioCapture();
+  // 手机端语音识别会和 MediaRecorder 抢麦克风（iOS 上会把录音顶掉），评测服务端已经能识别，直接跳过
+  if (isPhone.value) {
+    recording.value = true;
+    return;
+  }
   const rec = getRecognizer();
   if (!rec) {
     recording.value = true;
@@ -944,7 +949,13 @@ function stopRecord() {
 }
 
 async function startAudioCapture() {
-  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") return;
+  // 手机端 getUserMedia 必须有安全来源（https 或 localhost），否则 mediaDevices 直接是 undefined
+  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+    oralHint.value = window.isSecureContext
+      ? "当前浏览器不支持录音，请换 Chrome / Safari 再试"
+      : "录音需要 https 或 localhost 打开，当前是 http 局域网地址";
+    return;
+  }
   const token = ++captureToken;
   captureCancelled = false;
   try {
@@ -992,9 +1003,24 @@ async function startAudioCapture() {
     oralGuard = window.setTimeout(() => {
       if (recording.value) toggleRecord();
     }, 120000);
-  } catch {
-    /* 未授权麦克风时退化为仅语音识别转写 */
+  } catch (error) {
+    // 麦克风打不开时给出明确原因，不要静默失败（否则用户只会看到"没有录到声音"）
+    oralHint.value = micErrorMessage(error);
   }
+}
+
+function micErrorMessage(error: unknown) {
+  const name = (error as DOMException | null)?.name || "";
+  if (name === "NotAllowedError" || name === "SecurityError") {
+    return "麦克风权限被拒绝：请在浏览器设置里允许本站使用麦克风";
+  }
+  if (name === "NotFoundError" || name === "OverconstrainedError") {
+    return "没有检测到可用的麦克风";
+  }
+  if (name === "NotReadableError") {
+    return "麦克风被其它应用占用，请关掉其它录音应用后重试";
+  }
+  return "无法打开麦克风，请重试";
 }
 
 function stopAudioCapture() {

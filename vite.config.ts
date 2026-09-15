@@ -1,10 +1,13 @@
 import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  // basicSsl：开发服务器走 HTTPS。手机端 getUserMedia（录音）要求安全来源，
+  // 用 http://192.168.x.x:5173 打开时 navigator.mediaDevices 直接是 undefined，录不了音。
+  plugins: [vue(), tailwindcss(), basicSsl()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
