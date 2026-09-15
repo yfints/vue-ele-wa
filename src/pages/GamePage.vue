@@ -322,6 +322,7 @@ import { isPhone, initLayoutViewport } from "@/composables/useLayout";
 import { formatClock, sameSentence } from "@/lib/gameText";
 import { getToken } from "@/api/token";
 import { ensureLogin } from "@/composables/useAuth";
+import { localAsset } from "@/data/mall";
 
 const router = useRouter();
 const session = computed(() => gameSession.value);
@@ -366,6 +367,8 @@ let lastBeatAt = 0;
 let tick: number | undefined;
 let autoNextTimer: number | undefined;
 let audioEl: HTMLAudioElement | null = null;
+let silentSourceUrl = "";
+let audioUnlocked = false;
 let stopViewport: (() => void) | undefined;
 let recognition: SpeechRecognition | null = null;
 let mediaStream: MediaStream | null = null;
@@ -435,16 +438,148 @@ function speak() {
     return;
   }
   stopSpeak();
-  playUsed.value += 1;
-  /*if (item.audio) {
-    audioEl = new Audio(item.audio);
-    audioEl.onplay = () => markPlaying(true);
-    audioEl.onended = () => markPlaying(false);
-    audioEl.onerror = () => speakFallback(item.english);
-    void audioEl.play().catch(() => speakFallback(item.english));
-    return;
-  }*/
+  // 播放次数在真正出声时才 +1（见 onplay / utter.onstart）：
+  // 手机端自动播放常被浏览器拦下，如果这时就计数，用户手点「朗读」会直接提示"已达上限"而彻底没声
+  // 有音频资源就播「当前 item.english 对应的」那段音频，没有再退回浏览器朗读
+  if (item.audio) {
+    const sources = audioSources(item.audio);
+    if (sources.length) {
+      playAudioUrl(sources, item.english);
+      return;
+    }
+  }
   speakFallback(item.english);
+}
+
+/**
+ * 音频地址候选：
+ * 1) 和图片一样走 localAsset（res.waxueshe.com → /res-cdn 代理，绝对地址原样返回）
+ * 2) 相对路径再补一个「当前后端域名」兜底（开发环境 localAsset 会补生产域名，真机可能 404）
+ */
+function audioSources(raw: string) {
+  const list: string[] = [];
+  const resolved = localAsset(raw);
+  if (resolved) list.push(resolved);
+  if (!/^(https?:|data:|blob:)/i.test(raw)) {
+    const origin = (
+      import.meta.env.DEV
+        ? "http://test-jiaopei.zrgy-bbg.com"
+        : import.meta.env.VITE_API_BASE_URL || ""
+    ).replace(/\/$/, "");
+    if (origin) {
+      const fallback = `${origin}${raw.startsWith("/") ? raw : `/${raw}`}`;
+      if (!list.includes(fallback)) list.push(fallback);
+    }
+  }
+  return list;
+}
+
+/** 生成一段 8bit 静音 WAV，用来在用户手势里解锁音频 */
+function silentWavSource() {
+  if (silentSourceUrl) return silentSourceUrl;
+  const rate = 8000;
+  const samples = 400;
+  const buffer = new ArrayBuffer(44 + samples);
+  const view = new DataView(buffer);
+  const writeText = (offset: number, text: string) => {
+    for (let i = 0; i < text.length; i += 1) view.setUint8(offset + i, text.charCodeAt(i));
+  };
+  writeText(0, "RIFF");
+  view.setUint32(4, 36 + samples, true);
+  writeText(8, "WAVE");
+  writeText(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, rate, true);
+  view.setUint32(28, rate, true);
+  view.setUint16(32, 1, true);
+  view.setUint16(34, 8, true);
+  writeText(36, "data");
+  view.setUint32(40, samples, true);
+  new Uint8Array(buffer, 44).fill(128);
+  silentSourceUrl = URL.createObjectURL(new Blob([buffer], { type: "audio/wav" }));
+  return silentSourceUrl;
+}
+
+function ensureAudioEl() {
+  if (!audioEl) {
+    audioEl = new Audio();
+    audioEl.preload = "auto";
+  }
+  return audioEl;
+}
+
+/**
+ * 手机端（iOS Safari / 微信）会拦截「非用户手势」的播放：
+ * 先在第一次点击/触摸里用同一个 audio 元素播一次静音，后续自动朗读才不会被拦。
+ */
+function unlockAudio() {
+  if (audioUnlocked) return;
+  const el = ensureAudioEl();
+  el.muted = true;
+  el.src = silentWavSource();
+  const started = el.play();
+  if (!started || typeof started.then !== "function") {
+    audioUnlocked = true;
+    return;
+  }
+  void started
+    .then(() => {
+      audioUnlocked = true;
+    })
+    .catch((error: unknown) => {
+      // 解锁时被"切歌"打断不算失败，其余情况留给下一次手势重试
+      if ((error as DOMException | null)?.name !== "AbortError") audioUnlocked = false;
+    });
+}
+
+/** 依次尝试候选音频地址；全部失败才降级朗读（手机端 TTS 常常不可用，所以音频优先） */
+function playAudioUrl(sources: string[], fallbackText: string) {
+  const el = ensureAudioEl();
+  const list = sources.filter(Boolean);
+  let index = 0;
+
+  function next() {
+    index += 1;
+    if (index < list.length) {
+      start();
+      return;
+    }
+    console.warn("[audio] 音频加载失败，降级为朗读：", list.join(" | "));
+    speakFallback(fallbackText);
+  }
+
+  function start() {
+    const url = list[index];
+    el.muted = false;
+    el.onplay = () => {
+      playUsed.value += 1;
+      markPlaying(true);
+    };
+    el.onended = () => markPlaying(false);
+    el.onerror = () => next();
+    el.src = url;
+    try {
+      el.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
+    const started = el.play();
+    if (!started || typeof started.catch !== "function") return;
+    started.catch((error: unknown) => {
+      markPlaying(false);
+      // 自动播放被拦（NotAllowedError）不是加载失败，不要降级 TTS —— 手机端 TTS 同样会被拦
+      if ((error as DOMException | null)?.name === "NotAllowedError") return;
+      next();
+    });
+  }
+
+  if (!list.length) {
+    speakFallback(fallbackText);
+    return;
+  }
+  start();
 }
 
 function speakFallback(text: string) {
@@ -456,7 +591,10 @@ function speakFallback(text: string) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "en-US";
   utter.rate = 0.85;
-  utter.onstart = () => markPlaying(true);
+  utter.onstart = () => {
+    playUsed.value += 1;
+    markPlaying(true);
+  };
   utter.onend = () => markPlaying(false);
   utter.onerror = () => markPlaying(false);
   window.speechSynthesis.cancel();
@@ -464,8 +602,12 @@ function speakFallback(text: string) {
 }
 
 function stopSpeak() {
-  audioEl?.pause();
-  audioEl = null;
+  if (audioEl) {
+    audioEl.onplay = null;
+    audioEl.onended = null;
+    audioEl.onerror = null;
+    audioEl.pause();
+  }
   window.speechSynthesis?.cancel();
   markPlaying(false);
 }
@@ -1040,6 +1182,10 @@ watch(
 onMounted(() => {
   stopViewport = initLayoutViewport();
   window.addEventListener("keydown", onShortcut);
+  // 手机端音频解锁：第一次点击/触摸时把 audio 元素激活，之后自动朗读才不会被拦
+  document.addEventListener("pointerdown", unlockAudio, { passive: true });
+  document.addEventListener("touchstart", unlockAudio, { passive: true });
+  document.addEventListener("keydown", unlockAudio);
   if (!hasGame.value) {
     pauseOpen.value = true;
     paused.value = true;
@@ -1068,11 +1214,15 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener("keydown", onShortcut);
+  document.removeEventListener("pointerdown", unlockAudio);
+  document.removeEventListener("touchstart", unlockAudio);
+  document.removeEventListener("keydown", unlockAudio);
   stopViewport?.();
   if (tick) clearInterval(tick);
   if (autoNextTimer) clearTimeout(autoNextTimer);
   stopRecord();
   stopSpeak();
   releaseOralAudio();
+  if (silentSourceUrl) URL.revokeObjectURL(silentSourceUrl);
 });
 </script>
