@@ -15,3 +15,19 @@ const app = createApp(App);
 app.use(router);
 app.use(ElementPlus, { locale: zhCn });
 app.mount("#root");
+
+/**
+ * 手机真机调试用的 vConsole：
+ * 开发环境默认打开；打包后想在真机上看日志，访问地址后面加 `?vconsole=1`（或构建时设 VITE_VCONSOLE=1）。
+ */
+const vcParam = new URLSearchParams(window.location.search).get("vconsole");
+const enableVConsole =
+  vcParam != null
+    ? vcParam !== "0"
+    : import.meta.env.DEV || import.meta.env.VITE_VCONSOLE === "1";
+
+if (enableVConsole) {
+  void import("vconsole").then(({ default: VConsole }) => {
+    new VConsole({ theme: "dark", log: { maxLogNumber: 500 } });
+  });
+}

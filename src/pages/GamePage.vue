@@ -369,6 +369,7 @@ let autoNextTimer: number | undefined;
 let audioEl: HTMLAudioElement | null = null;
 let silentSourceUrl = "";
 let audioUnlocked = false;
+let speakToken = 0;
 let stopViewport: (() => void) | undefined;
 let recognition: SpeechRecognition | null = null;
 let mediaStream: MediaStream | null = null;
@@ -444,9 +445,14 @@ function speak() {
   if (item.audio) {
     const sources = audioSources(item.audio);
     if (sources.length) {
-      playAudioUrl(sources, item.english);
+      playAudioUrl(sources, () => speakFallback(item.english));
       return;
     }
+  }
+  // audio 为 null：手机端浏览器语音合成经常不可用，直接用在线 TTS，失败再退回语音合成
+  if (item.english) {
+    playOnlineTts(item.english);
+    return;
   }
   speakFallback(item.english);
 }
@@ -534,8 +540,8 @@ function unlockAudio() {
     });
 }
 
-/** 依次尝试候选音频地址；全部失败才降级朗读（手机端 TTS 常常不可用，所以音频优先） */
-function playAudioUrl(sources: string[], fallbackText: string) {
+/** 依次尝试候选音频地址；全部失败时执行 fallback */
+function playAudioUrl(sources: string[], fallback?: () => void) {
   const el = ensureAudioEl();
   const list = sources.filter(Boolean);
   let index = 0;
@@ -546,8 +552,8 @@ function playAudioUrl(sources: string[], fallbackText: string) {
       start();
       return;
     }
-    console.warn("[audio] 音频加载失败，降级为朗读：", list.join(" | "));
-    speakFallback(fallbackText);
+    console.warn("[audio] 音频加载失败：", list.join(" | "));
+    fallback?.();
   }
 
   function start() {
@@ -576,32 +582,72 @@ function playAudioUrl(sources: string[], fallbackText: string) {
   }
 
   if (!list.length) {
-    speakFallback(fallbackText);
+    fallback?.();
     return;
   }
   start();
 }
 
-function speakFallback(text: string) {
-  if (!text) return;
-  if (!window.speechSynthesis) {
-    ElMessage.info("当前环境不支持朗读");
+/**
+ * audio 为 null 时的兜底朗读：
+ * 先用浏览器语音合成；手机端常见「不报错也不出声」（没装语音引擎 / WebView 不支持），
+ * 1.2 秒内没开始就换成在线 TTS，保证真机也有声音。
+ */
+function speakFallback(text: string, allowOnline = true) {
+  const value = String(text || "").trim();
+  if (!value) return;
+  const token = ++speakToken;
+  const synth = window.speechSynthesis;
+  if (!synth) {
+    if (allowOnline) playOnlineTts(value);
     return;
   }
-  const utter = new SpeechSynthesisUtterance(text);
+
+  let handled = false;
+  const fallbackToOnline = () => {
+    if (handled || token !== speakToken) return;
+    handled = true;
+    if (allowOnline) playOnlineTts(value);
+  };
+
+  const utter = new SpeechSynthesisUtterance(value);
   utter.lang = "en-US";
   utter.rate = 0.85;
+  const voice = synth.getVoices().find((item) => /^en/i.test(item.lang));
+  if (voice) utter.voice = voice;
   utter.onstart = () => {
+    handled = true;
     playUsed.value += 1;
     markPlaying(true);
   };
   utter.onend = () => markPlaying(false);
-  utter.onerror = () => markPlaying(false);
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
+  utter.onerror = () => {
+    markPlaying(false);
+    fallbackToOnline();
+  };
+  synth.cancel();
+  synth.speak(utter);
+  window.setTimeout(() => {
+    if (handled || token !== speakToken) return;
+    synth.cancel();
+    fallbackToOnline();
+  }, 1200);
+}
+
+/** 在线 TTS（有道发音）：audio 为 null 时的主用方案，失败再回退浏览器语音合成 */
+function playOnlineTts(text: string) {
+  const q = encodeURIComponent(text);
+  playAudioUrl(
+    [
+      `https://dict.youdao.com/dictvoice?audio=${q}&type=2`,
+      `https://dict.youdao.com/dictvoice?audio=${q}&type=1`,
+    ],
+    () => speakFallback(text, false),
+  );
 }
 
 function stopSpeak() {
+  speakToken += 1;
   if (audioEl) {
     audioEl.onplay = null;
     audioEl.onended = null;
@@ -636,7 +682,10 @@ function onErrorKey(key: string) {
 }
 
 function speakWord(word: string) {
-  speakFallback(word.replace(/[^a-zA-Z']/g, "") || word);
+  const text = word.replace(/[^a-zA-Z']/g, "") || word;
+  if (!text) return;
+  stopSpeak();
+  playOnlineTts(text);
 }
 
 function onTypingSuccess() {
