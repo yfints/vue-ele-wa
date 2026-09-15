@@ -1,5 +1,5 @@
 <template>
-  <div class="contentBox dashPage" style="padding-top: 0;padding-left: 0;">
+  <div class="contentBox dashPage" style="padding-top: 0;padding-left: 0;padding-right: 0;">
     <header class="dashHead" style="background: white;height: 60px;">
       <div class="dashTabs" style="padding-left: 20px;">
         <el-button
@@ -29,7 +29,7 @@
       </el-dropdown>
     </header>
 
-    <div style="padding-top: 16px;padding-left: 24px;">
+    <div style="padding-top: 16px;padding-left: 24px;padding-right: 24px;">
       <section class="  dashCards" >
         <article v-for="card in metricCards" :key="card.label" class="dashCard" :class="card.tone">
           <div class="dashCardBody">
