@@ -436,14 +436,14 @@ function speak() {
   }
   stopSpeak();
   playUsed.value += 1;
-  if (item.audio) {
+  /*if (item.audio) {
     audioEl = new Audio(item.audio);
     audioEl.onplay = () => markPlaying(true);
     audioEl.onended = () => markPlaying(false);
     audioEl.onerror = () => speakFallback(item.english);
     void audioEl.play().catch(() => speakFallback(item.english));
     return;
-  }
+  }*/
   speakFallback(item.english);
 }
 
