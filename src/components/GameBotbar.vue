@@ -64,7 +64,7 @@
         </div>
 
         <div v-if="mode === 'SentenceOral'" class="pl10 pr10 pb10">
-          <div class="botitem flex ac hand" @click="emit('record')">
+          <div class="botitem flex ac" :class="completed ? 'opc6' : 'hand'" @click="onRecord">
             <span class="bold6 mr10">空格</span>
             <span class="opc6">{{ oralAction }}</span>
           </div>
@@ -126,10 +126,16 @@ const showWave = computed(
   () => props.mode === "SentenceListen" || props.mode === "SentenceOral" || props.playing,
 );
 const oralAction = computed(() => {
-  if (props.completed) return "重录";
+  if (props.completed) return "已提交";
   if (props.recording) return "结束";
   return "录制";
 });
+
+function onRecord() {
+  // 本题已判分，不允许再次提交；只保留「下一题」
+  if (props.completed) return;
+  emit("record");
+}
 
 function onTranslateSpace() {
   if (props.answering) emit("submit");

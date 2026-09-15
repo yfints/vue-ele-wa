@@ -669,11 +669,13 @@ function getRecognizer(): SpeechRecognition | null {
 }
 
 function toggleRecord() {
+  // 判分完成后（含答错）本题不允许再次提交，只能切到下一题
   if (oralCompleted.value && !answering.value) {
-    resetItem();
-    startRecord();
+    ElMessage.info("本题已提交，点击「下一题」继续");
     return;
   }
+  // 评测中不允许重新开录，避免一次答题推多份音频
+  if (evaluating.value) return;
   if (recording.value) {
     stopRecord();
     evaluating.value = true;
