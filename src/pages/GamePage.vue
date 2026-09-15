@@ -660,6 +660,8 @@ function speechErrorMessage(error: unknown) {
   // 只有评测链路自己抛的错误才把原文透出去，HTTP 层的英文报错统一换成兜底文案
   const message =
     error instanceof Error && error.name === "SpeechError" ? error.message : "";
+  // 400 直接用后端 message：「录音太短」「录音格式不受支持」这些原文就是给用户看的
+  if (status === 400) return message || "录音有问题，请重新录制";
   if (status === 403 || /票据/.test(message)) return "评测凭证已失效，请重新录制";
   if (/太短/.test(message)) return "说话时间太短，请完整朗读";
   if (/过长|2\s*分钟/.test(message)) return "录音请在 2 分钟内";
