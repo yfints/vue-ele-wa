@@ -124,7 +124,7 @@ import { editionTone, gradeTone } from "@/data/textbook";
 
 /**
  * 教材页数据全部来自接口（接口已把分类拍平，children 恒为 []）：
- *  - /course/categories?type=1 → 按 kind 分成两行：2=年级、3=版本
+ *  - /course/categories?kind=2 → 第一行年级；/course/categories?kind=3 → 第二行版本（两个接口分别取）
  *  - /courses?type=1&gradeCategoryId=&versionCategoryId= → 当前年级 + 版本下的教材
  */
 interface TabItem {
@@ -247,22 +247,32 @@ function openBook(book: TextbookCard) {
 
 async function loadCategories() {
   loadingCats.value = true;
-  try {
-    const raw = await fetchCourseCategories({ type: 1 });
-    const list = Array.isArray(raw) ? raw : [];
-    gradeCats.value = list.filter((item) => Number(item.kind) === CATEGORY_KIND.GRADE);
-    editionCats.value = list.filter((item) => Number(item.kind) === CATEGORY_KIND.EDITION);
-  } catch {
-    gradeCats.value = [];
-    editionCats.value = [];
-  } finally {
-    loadingCats.value = false;
-  }
+  // 年级、版本两个 Tab 分别走各自的接口，互不阻塞
+  const [grades, editions] = await Promise.all([
+    loadCategoryList({ kind: CATEGORY_KIND.GRADE }),
+    loadCategoryList({ kind: CATEGORY_KIND.EDITION }),
+  ]);
+  gradeCats.value = grades;
+  editionCats.value = editions;
+  loadingCats.value = false;
+
   if (!gradeTabs.value.some((item) => isActive(gradeId.value, item.id))) {
     gradeId.value = gradeTabs.value[0]?.id ?? "";
   }
   if (!editionTabs.value.some((item) => isActive(editionId.value, item.id))) {
     editionId.value = editionTabs.value[0]?.id ?? "";
+  }
+}
+
+async function loadCategoryList(params: { kind: number }) {
+  try {
+    const raw = await fetchCourseCategories(params);
+    const list = Array.isArray(raw) ? raw : [];
+    // 接口已按 kind 过滤；万一是老接口把全部平铺返回，再兜一层按 kind 过滤
+    const hasKind = list.some((item) => item.kind !== undefined && item.kind !== null);
+    return hasKind ? list.filter((item) => Number(item.kind) === params.kind) : list;
+  } catch {
+    return [];
   }
 }
 
