@@ -84,14 +84,12 @@ import {
   fetchCollectLessons,
   fetchCourseCategories,
   fetchCourses,
-  fetchStudyPlanWords,
   toggleCollect,
   unwrapCollectPage,
   unwrapCoursePage,
   type CourseCategory,
   type CourseVo,
 } from "@/api/course";
-import { unwrapWordPlan } from "@/api/words";
 import { getToken } from "@/api/token";
 import { wordIcon, wordTone } from "@/data/words";
 
@@ -99,8 +97,8 @@ import { wordIcon, wordTone } from "@/data/words";
  * 单词库数据全部来自接口：
  *  - /course/categories?kind=4 → 顶部「单词集分类」Tab
  *  - /courses?categoryId=      → 该分类下的单词集（课程列表接口没有 kind 参数，只能按分类 id 过滤）
- *  - /study-plan/words         → 我加入的单词计划，用来算卡片上的「已学 x%」
  *  - /collect/lessons?type=1   → 单词收藏夹，用来点亮卡片上的爱心
+ * 卡片上的「已学 x%」直接取课程卡片的 progress 字段。
  */
 interface TabItem {
   id: string;
@@ -124,8 +122,6 @@ const categoryId = ref<string>(ALL);
 const cards = ref<WordSetCard[]>([]);
 const loading = ref(true);
 const favIds = ref<string[]>([]);
-/** courseId → 已学百分比 */
-const progressMap = ref<Record<string, number>>({});
 
 /** 分类接口返回的分类，用于「全部」时逐个分类取列表 */
 const wordCategories = ref<CourseCategory[]>([]);
@@ -150,10 +146,17 @@ function toCard(course: CourseVo, index: number): WordSetCard {
     title: String(course.name || "").trim(),
     desc: String(course.description ?? course.describe ?? "").trim(),
     tags,
-    learned: progressMap.value[String(course.id)] ?? 0,
+    learned: learnedOf(course),
     tone: wordTone(index),
     icon: course.cover || wordIcon(index),
   };
+}
+
+/** 已学百分比由接口的 progress 下发 */
+function learnedOf(course: CourseVo) {
+  const value = Number(course.progress ?? course.percentage ?? 0);
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, Math.round(value)));
 }
 
 function isFav(id: string) {
@@ -230,28 +233,6 @@ async function loadList() {
   }
 }
 
-/** 我加入的单词计划：算出每个单词集的已学进度 */
-async function loadProgress() {
-  if (!getToken()) {
-    progressMap.value = {};
-    return;
-  }
-  try {
-    const data = await fetchStudyPlanWords({ page: 1, limit: 100 });
-    const map: Record<string, number> = {};
-    unwrapWordPlan(data).forEach((entry) => {
-      const total = Number(entry.wordCount ?? 0) || 0;
-      const learned = Number(entry.learnedWordCount ?? 0) || 0;
-      if (total > 0 && entry.lessonId != null) {
-        map[String(entry.lessonId)] = Math.min(100, Math.round((learned / total) * 100));
-      }
-    });
-    progressMap.value = map;
-  } catch {
-    progressMap.value = {};
-  }
-}
-
 /** 单词收藏夹：收藏 / 取消收藏走 type=1 */
 async function loadCollect() {
   if (!getToken()) {
@@ -282,7 +263,7 @@ async function toggleFav(book: WordSetCard) {
 }
 
 async function refresh() {
-  await Promise.all([loadProgress(), loadCollect()]);
+  await loadCollect();
   await loadList();
 }
 
