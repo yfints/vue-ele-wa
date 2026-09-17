@@ -13,6 +13,8 @@ export interface MallLesson {
   name: string;
   describe: string;
   image: string;
+  /** 课程分类标签（接口 categories，按数组顺序渲染） */
+  categories?: { id: number | string; kind?: number; name?: string }[];
   lesson_category_id: number | string;
   status: number;
   heat: number;
@@ -69,12 +71,14 @@ export function toMallLesson(course: {
   describe?: string;
   categoryId?: number | string;
   lesson_category_id?: number | string;
+  categories?: { id: number | string; kind?: number; name?: string }[];
 }): MallLesson {
   return {
     id: String(course.id),
     name: course.name || "",
     describe: course.description || course.describe || "",
     image: course.cover || course.image || "",
+    categories: Array.isArray(course.categories) ? course.categories : [],
     lesson_category_id: String(course.categoryId ?? course.lesson_category_id ?? 0),
     status: 1,
     heat: 0,

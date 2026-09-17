@@ -982,6 +982,26 @@ button {
     background: linear-gradient(to right, #604bff33, #74eaff33);
 }
 
+/* 课程卡底部的分类标签（接口 categories） */
+.mallCard .mallTags {
+    gap: 0.35714rem;
+}
+
+.mallCard .mallTag {
+    padding: 0.14286rem 0.35714rem;
+    border-radius: 0.28571rem;
+    background: rgba(0, 86, 181, 0.08);
+    color: #0056b5;
+    font-size: 0.71429rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+html.dark .mallCard .mallTag {
+    background: rgba(64, 158, 255, 0.16);
+    color: #79bbff;
+}
+
 .mallCard:hover .cardimg {
     transform: scale(1.1);
 }

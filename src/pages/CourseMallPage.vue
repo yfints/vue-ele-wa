@@ -66,6 +66,7 @@ import { toMallLesson, type MallLesson } from "@/data/mall";
 import {
   fetchCourseCategories,
   fetchCourses,
+  unwrapCoursePage,
   type CourseCategory,
 } from "@/api/course";
 
@@ -104,12 +105,16 @@ async function loadCourses(reset = false) {
   }
   try {
     const result = await fetchCourses({
-      categoryId: categoryId.value || undefined,
+      // 课程广场用 type=0 取分类，列表同样按 type=0 过滤
+      type: 0,
+      categoryId: categoryId.value === 0 ? undefined : categoryId.value,
+      page: current.value,
+      limit: pageSize,
       current: current.value,
       size: pageSize,
     });
     if (seq !== requestSeq) return;
-    const records = result?.records || [];
+    const records = unwrapCoursePage(result).records;
     const items = records.map(toMallLesson);
     if (reset) filtered.value = items;
     else filtered.value.push(...items);

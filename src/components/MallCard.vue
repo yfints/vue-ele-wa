@@ -5,6 +5,9 @@
       <div class="cardtag">用户共享</div>
     </div>
     <div class="line2 size20 mt10 courseName">{{ lesson.name }}</div>
+    <div v-if="tags.length" class="mallTags flex ac wrap mt10">
+      <span v-for="tag in tags" :key="tag.id" class="mallTag">{{ tag.name }}</span>
+    </div>
     <div class="flex jb ac mt10 size14">
       <div class="flex ac flex1">
         <img
@@ -33,4 +36,10 @@ const props = defineProps<{
 }>();
 
 const detailTo = computed(() => `/courseMall/${props.lesson.id}`);
+/** 课程分类标签：接口 categories（按数组顺序，最多展示 3 个） */
+const tags = computed(() =>
+  (props.lesson.categories || [])
+    .filter((item) => String(item?.name || "").trim())
+    .slice(0, 3),
+);
 </script>

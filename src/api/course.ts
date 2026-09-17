@@ -72,6 +72,7 @@ export interface CourseProgressVo {
 export interface CourseDetailVo {
   id: number | string;
   categoryId?: number | string;
+  categories?: CourseCategoryRef[];
   name?: string;
   cover?: string | null;
   description?: string | null;
@@ -107,6 +108,11 @@ export interface CourseCategory {
   id: number | string;
   name: string;
   sortOrder?: number;
+  /**
+   * 分类类型：1=课程分类 2=教材-年级 3=教材-版本 4=单词集分类
+   * 5=音标类型 6=新概念。接口已拍平，children 恒为 []、parentId 恒为 "0"
+   */
+  kind?: number;
   /** 以下字段后端可能会带上，读取时统一做兼容 */
   cover?: string;
   image?: string;
@@ -120,11 +126,35 @@ export interface CourseCategory {
   percentage?: number;
 }
 
+/** 分类类型（对应接口的 kind 字段） */
+export const CATEGORY_KIND = {
+  /** 课程分类：课程广场 Tab / 课程卡 chip */
+  COURSE: 1,
+  /** 教材-年级：教材页第一级 Tab */
+  GRADE: 2,
+  /** 教材-版本：教材页第二级 Tab */
+  EDITION: 3,
+  /** 单词集分类：单词库 Tab */
+  WORD: 4,
+  /** 音标类型：英式 / 美式 */
+  PHONETIC: 5,
+  /** 新概念系列 */
+  NEW_CONCEPT: 6,
+} as const;
+
+/** 课程/教材上挂的分类，形如 { id: "202", kind: 2, name: "三年级" } */
+export interface CourseCategoryRef {
+  id: number | string;
+  kind?: number;
+  name?: string;
+}
+
 export interface CourseVo {
   id: number | string;
   categoryId?: number | string;
   categoryName?: string;
   category_name?: string;
+  categories?: CourseCategoryRef[];
   name?: string;
   cover?: string;
   image?: string;
@@ -153,8 +183,9 @@ export interface CoursePage {
 /**
  * 课程分类。
  * @param params.type 0=课程广场 1=教材同步 3=音标；不传=全部上线分类（平铺）
+ * @param params.kind 分类类型（见 CATEGORY_KIND）：单词库传 4、音标传 5、新概念传 6
  */
-export function fetchCourseCategories(params?: { type?: number }) {
+export function fetchCourseCategories(params?: { type?: number; kind?: number }) {
   return get<CourseCategory[]>("/course/categories", params, {
     skipAuthRedirect: true,
   });
@@ -165,6 +196,10 @@ export function fetchCourses(params?: {
   courseType?: number | string;
   /** 课程类型筛选：0=课程广场 1=教材同步 3=音标 */
   type?: number | string;
+  /** 教材页第一级：年级分类 id */
+  gradeCategoryId?: number | string;
+  /** 教材页第二级：版本分类 id（与 gradeCategoryId 之间是 AND） */
+  versionCategoryId?: number | string;
   keyword?: string;
   page?: number;
   limit?: number;
@@ -174,8 +209,15 @@ export function fetchCourses(params?: {
   return get<CoursePage>("/courses", params, { skipAuthRedirect: true });
 }
 
+/** 课程卡 / 详情卡的分类标签：按接口数组顺序渲染，前端不再排序 */
+export function categoryNames(item: { categories?: CourseCategoryRef[] } | null | undefined) {
+  const list = item?.categories;
+  if (!Array.isArray(list)) return [];
+  return list.map((category) => String(category?.name ?? "").trim()).filter(Boolean);
+}
+
 /** 分页结构兼容：records / list / rows，或者直接返回数组 */
-export function unwrapCoursePage(data: unknown): CoursePage {
+export function unwrapCoursePage(data: unknown): { records: CourseVo[]; total?: number } {
   const obj = asRecord(data);
   const list = Array.isArray(data)
     ? data

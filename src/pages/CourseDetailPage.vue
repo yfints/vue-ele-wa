@@ -18,6 +18,18 @@
               <div class="flex1">
                 <div class="size28 mb10">{{ detail.name }}</div>
                 <div class="size20 gray">{{ detail.description }}</div>
+                <div v-if="categoryTags.length" class="flex ac wrap mt10">
+                  <el-tag
+                    v-for="tag in categoryTags"
+                    :key="tag"
+                    class="mr10"
+                    size="small"
+                    effect="light"
+                    round
+                  >
+                    {{ tag }}
+                  </el-tag>
+                </div>
               </div>
               <div class="flex ac wrap">
                 <el-tag v-if="access.text" type="warning" round class="mr20">{{ access.text }}</el-tag>
@@ -163,6 +175,7 @@ import { useRoute, useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {Clock, Delete, Star, VideoPlay} from "@element-plus/icons-vue";
 import {
+  categoryNames,
   fetchLessonDetails,
   removeStudyPlanWord,
   studyPlanLesson,
@@ -196,6 +209,8 @@ const courseId = computed(() => String(route.params.courseId || route.params.id 
 const isMine = computed(() => Boolean(detail.value?.isHave || detail.value?.userLessonId));
 const cover = computed(() => localAsset(detail.value?.cover || "") || "/clone-assets/ico.png");
 const lessons = computed<CourseLessonVo[]>(() => detail.value?.lessons || []);
+/** 课程详情卡底部的分类标签（接口 categories，按数组顺序渲染） */
+const categoryTags = computed(() => categoryNames(detail.value));
 const progress = computed(() => ({
   doneCount: 0,
   total: lessons.value.length,

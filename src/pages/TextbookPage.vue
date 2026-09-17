@@ -11,7 +11,7 @@
         >
           <img src="/clone-assets/menu.png" class="img32" alt="" />
         </button>
-        <el-skeleton v-if="loading" class="tbGrades flex ac" animated>
+        <el-skeleton v-if="loadingCats" class="tbGrades flex ac" animated>
           <template #template>
             <el-skeleton-item v-for="n in 6" :key="n" variant="button" class="tbSkeletonTab" />
           </template>
@@ -19,13 +19,13 @@
         <div v-else class="tbGrades flex ac">
           <button
             v-for="item in gradeTabs"
-            :key="item"
+            :key="item.id"
             type="button"
             class="tbGrade"
-            :class="{ tbGradeAct: grade === item }"
-            @click="grade = item"
+            :class="{ tbGradeAct: isActive(gradeId, item.id) }"
+            @click="gradeId = item.id"
           >
-            {{ item }}
+            {{ item.name }}
           </button>
         </div>
       </div>
@@ -33,7 +33,7 @@
       <UserDropdown />
     </header>
 
-    <el-skeleton v-if="loading" class="tbEditions flex ac" animated>
+    <el-skeleton v-if="loadingCats" class="tbEditions flex ac" animated>
       <template #template>
         <el-skeleton-item v-for="n in 6" :key="n" variant="button" class="tbSkeletonTab" />
       </template>
@@ -41,19 +41,19 @@
     <div v-else-if="editionTabs.length" class="tbEditions flex ac">
       <button
         v-for="item in editionTabs"
-        :key="item"
+        :key="item.id"
         type="button"
         class="tbEdition"
-        :class="{ tbEditionAct: edition === item }"
-        @click="edition = item"
+        :class="{ tbEditionAct: isActive(editionId, item.id) }"
+        @click="editionId = item.id"
       >
-        {{ item }}
+        {{ item.name }}
         <span class="tbEditionBar" />
       </button>
     </div>
 
     <div class="tbBody">
-      <el-skeleton v-if="loading" animated>
+      <el-skeleton v-if="loadingList" animated>
         <template #template>
           <div class="tbGrid">
             <div v-for="n in 10" :key="n" class="tbCard tbSkeletonCard">
@@ -72,9 +72,9 @@
           </div>
         </template>
       </el-skeleton>
-      <div v-else-if="visibleList.length" class="tbGrid">
+      <div v-else-if="books.length" class="tbGrid">
         <article
-          v-for="book in visibleList"
+          v-for="book in books"
           :key="book.id"
           class="tbCard hand"
           @click="openBook(book)"
@@ -84,16 +84,15 @@
             <div class="tbTitle line1">{{ book.title }}</div>
             <div class="tbDesc line1">{{ book.desc }}</div>
             <div class="tbTags flex ac">
-              <span class="tbTag" :style="{ background: gradeTone.bg, color: gradeTone.color }">
-                {{ book.grade }}
-              </span>
               <span
+                v-for="tag in book.tags"
+                :key="tag.name"
                 class="tbTag"
-                :style="{ background: toneOf(book.edition).bg, color: toneOf(book.edition).color }"
+                :style="{ background: tag.bg, color: tag.color }"
               >
-                {{ book.edition }}
+                {{ tag.name }}
               </span>
-            <span v-if="book.units > 0" class="tbTag tbTagUnit">共{{ book.units }}单元</span>
+              <span v-if="book.units > 0" class="tbTag tbTagUnit">{{ book.unitText }}</span>
             </div>
           </div>
         </article>
@@ -112,143 +111,106 @@ import { computed, onMounted, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
-import { fetchCourseCategories, type CourseCategory } from "@/api/course";
-import { localAsset } from "@/data/mall";
 import {
-  editionTone,
-  gradeTone,
-  textbookEditions,
-  textbookGrades,
-  textbookList,
-  type TextbookItem,
-} from "@/data/textbook";
+  CATEGORY_KIND,
+  fetchCourseCategories,
+  fetchCourses,
+  unwrapCoursePage,
+  type CourseCategory,
+  type CourseVo,
+} from "@/api/course";
+import { localAsset } from "@/data/mall";
+import { editionTone, gradeTone } from "@/data/textbook";
 
 /**
- * 教材分类树：/course/categories?type=1（教材同步）返回的结构是
- * 顶层 = 年级，children = 该年级下的版本（人教版 / 外研版 …）。
- * 空数组表示接口没拿到数据（含未登录 401），此时退回设计稿的静态列表。
+ * 教材页数据全部来自接口（接口已把分类拍平，children 恒为 []）：
+ *  - /course/categories?type=1 → 按 kind 分成两行：2=年级、3=版本
+ *  - /courses?type=1&gradeCategoryId=&versionCategoryId= → 当前年级 + 版本下的教材
  */
-interface CategoryNode extends CourseCategory {
-  children?: CategoryNode[];
-  /** 卡片节点上可能带的字段 */
-  grade?: string;
-  edition?: string;
-  version?: string;
-  unitNum?: number;
-  unit_num?: number;
-  pic?: string;
+interface TabItem {
+  id: number | string;
+  name: string;
 }
 
-const grade = ref("");
-const edition = ref("");
-const categoryTree = ref<CategoryNode[]>([]);
-/** 分类接口返回前显示骨架屏，避免先闪一帧本地占位数据 */
-const loading = ref(true);
+interface CardTag {
+  name: string;
+  bg: string;
+  color: string;
+}
 
-/** 年级行：顶层分类名 */
-const gradeNames = computed(() => {
-  const names = categoryTree.value.map((node) => String(node.name || "").trim()).filter(Boolean);
-  return names.length ? names : textbookGrades.filter((name) => name !== "全部");
-});
+interface TextbookCard {
+  id: number | string;
+  title: string;
+  desc: string;
+  tags: CardTag[];
+  units: number;
+  unitText: string;
+  cover: string;
+}
 
-/** 版本行：接口的 children 字段；「全部」年级时取所有年级的 children 并集 */
-const editionNames = computed(() => {
-  const tree = categoryTree.value;
-  if (!tree.length) return textbookEditions.filter((name) => name !== "全部版本");
+const gradeCats = ref<CourseCategory[]>([]);
+const editionCats = ref<CourseCategory[]>([]);
+const gradeId = ref<number | string>("");
+const editionId = ref<number | string>("");
+const books = ref<TextbookCard[]>([]);
+/** 分类接口返回前显示骨架屏，避免先闪一帧空状态 */
+const loadingCats = ref(true);
+const loadingList = ref(true);
+/** 首屏（分类 + 第一份列表）加载完成前不响应 watch，避免重复请求 */
+let inited = false;
+let requestSeq = 0;
 
-  const parents = grade.value
-    ? tree.filter((node) => nameMatched(String(node.name || ""), grade.value))
-    : tree;
-  const names: string[] = [];
-  for (const parent of parents) {
-    for (const child of parent.children || []) {
-      const name = String(child.name || "").trim();
-      if (!name || name === "全部版本" || names.includes(name)) continue;
-      // 没有第三层（教材）的版本不展示，例如数据里的「新概念英语」
-      if (!child.children || !child.children.length) continue;
-      names.push(name);
-    }
-  }
-  if (names.length) return names;
-
-  // 兜底：接口给的是扁平列表（全都没有 children）时按名称判别
-  const hasChildren = tree.some((node) => (node.children || []).length > 0);
-  if (!hasChildren) {
-    const flat = tree
-      .map((node) => String(node.name || "").trim())
-      .filter((name) => name && name !== "全部" && name !== "全部版本" && !isGradeName(name));
-    if (flat.length) return flat;
-  }
-  return [];
-});
-
-/** 年级行不再带「全部」，默认选中第一个年级 */
-const gradeTabs = computed(() => gradeNames.value);
-/** 版本行也不带「全部版本」，默认选中当前年级的第一个版本 */
-const editionTabs = computed(() => editionNames.value);
-
-/**
- * 卡片数据 = 树的第三层：年级.children（版本）→ children（教材）。
- * 版本下没有第三层时，就把版本本身当一张卡片兜底。
- */
-const apiCards = computed<TextbookItem[]>(() => {
-  const tree = categoryTree.value;
-  if (!tree.length) return [];
-  const out: TextbookItem[] = [];
-  for (const gradeNode of tree) {
-    const gradeName = String(gradeNode.name || "").trim();
-    for (const editionNode of gradeNode.children || []) {
-      const editionName = String(editionNode.name || "").trim();
-      // 只渲染第三层教材；没有 children 的节点（例如「新概念英语」）直接跳过，不当作卡片
-      for (const item of editionNode.children || []) {
-        out.push(toCard(item, gradeName, editionName, out.length));
-      }
-    }
-  }
-  return out;
-});
-
-/** 接口没卡片数据时，用设计稿的本地列表兜底 */
-const sourceList = computed(() => (apiCards.value.length ? apiCards.value : textbookList));
-
-const visibleList = computed(() =>
-  sourceList.value.filter(
-    (book) => nameMatched(book.grade, grade.value) && nameMatched(book.edition, edition.value),
-  ),
+const gradeTabs = computed<TabItem[]>(() =>
+  gradeCats.value.map((item) => ({ id: item.id, name: String(item.name || "").trim() })),
+);
+const editionTabs = computed<TabItem[]>(() =>
+  editionCats.value.map((item) => ({ id: item.id, name: String(item.name || "").trim() })),
 );
 
-function toCard(
-  node: CategoryNode,
-  gradeName: string,
-  editionName: string,
-  index: number,
-): TextbookItem {
-  const name = String(node.name || "").trim();
+/** id 一律按字符串比较（后端把 Long 序列化成了字符串） */
+function isActive(current: number | string, id: number | string) {
+  return String(current) === String(id);
+}
+
+function toCard(course: CourseVo, index: number): TextbookCard {
+  const categories = Array.isArray(course.categories) ? course.categories : [];
+  // 标签优先用卡片自带的 categories，接口没给就退回当前选中的年级 / 版本
+  const gradeName = nameOfKind(categories, CATEGORY_KIND.GRADE) || tabName(gradeTabs.value, gradeId.value);
+  const editionName =
+    nameOfKind(categories, CATEGORY_KIND.EDITION) || tabName(editionTabs.value, editionId.value);
+  const tags: CardTag[] = [];
+  if (gradeName) tags.push({ name: gradeName, ...gradeTone });
+  if (editionName) tags.push({ name: editionName, ...toneOf(editionName) });
+
+  const courseNum = pickNumber(course.courseNum, 0);
   return {
-    id: node.id ?? `card-${index}`,
-    title: name || [editionName, gradeName].filter(Boolean).join("・"),
-    desc: String(node.description ?? node.describe ?? "").trim(),
-    grade: String(node.grade || gradeName),
-    edition: String(node.edition || node.version || editionName),
-    units: pickNumber(node.courseNum ?? node.course_num ?? node.unitNum ?? node.unit_num, 0),
-    cover: coverOf(node, gradeName, editionName, index),
+    id: course.id ?? `card-${index}`,
+    title: String(course.name || "").trim(),
+    desc: String(course.description ?? course.describe ?? "").trim(),
+    tags,
+    units: courseNum,
+    unitText: `共${courseNum}课`,
+    cover: coverOf(course, index),
   };
 }
 
-/** 卡片封面：接口有图就用接口的，没有就从设计稿封面里按「版本+年级」挑一张，再不行按下标轮着用 */
-function coverOf(
-  node: CategoryNode,
-  gradeName: string,
-  editionName: string,
-  index: number,
-) {
-  const remote = node.cover || node.image || node.icon || node.pic;
-  if (remote) return localAsset(remote);
-  const matched = textbookList.find(
-    (book) => book.title.includes(editionName) && book.title.includes(gradeName),
+function nameOfKind(categories: { kind?: number; name?: string }[], kind: number) {
+  const matched = categories.find(
+    (item) => Number(item.kind) === kind && String(item.name || "").trim(),
   );
-  if (matched) return matched.cover;
-  return textbookList[index % textbookList.length].cover;
+  return matched ? String(matched.name).trim() : "";
+}
+
+/** 当前选中的 Tab 名，用于卡片没有 categories 的情况 */
+function tabName(tabs: TabItem[], id: number | string) {
+  return tabs.find((item) => isActive(id, item.id))?.name ?? "";
+}
+
+/** 卡片封面：接口给了就用；没给就从设计稿封面里按下标轮着用 */
+function coverOf(course: CourseVo, index: number) {
+  const remote = course.cover || course.image;
+  if (remote) return localAsset(String(remote));
+  return `/clone-assets/textbook/cover-${String((index % 10) + 1).padStart(2, "0")}.png`;
 }
 
 function pickNumber(value: unknown, fallback: number) {
@@ -257,63 +219,80 @@ function pickNumber(value: unknown, fallback: number) {
   return Number.isFinite(num) ? num : fallback;
 }
 
-/** 分类名可能带后缀（例如「人教版2024」「三年级上册」），先精确匹配再退化成包含匹配 */
-function nameMatched(target: string, selected: string) {
-  if (!selected) return true;
-  if (target === selected) return true;
-  return selected.includes(target) || target.includes(selected);
-}
-
-/** 简单判别：「…年级 / 高一二三」算年级，用于扁平列表兜底 */
-function isGradeName(name: string) {
-  return /(年级|^高[一二三]$|^初[一二三]$)/.test(name);
-}
-
+/** 版本标签配色：先精确匹配，再包含匹配（接口给的是「人教版PEP」这类名字），最后按名字散列取色 */
 function toneOf(name: string) {
-  return editionTone[name] || gradeTone;
+  const exact = editionTone[name];
+  if (exact) return exact;
+  const key = Object.keys(editionTone).find((item) => name.includes(item) || item.includes(name));
+  if (key) return editionTone[key];
+  return tagPalette[hash(name) % tagPalette.length];
 }
 
-function openBook(book: TextbookItem) {
+const tagPalette = [
+  { bg: "#DAECFF", color: "#0056B5" },
+  { bg: "#DCFFDA", color: "#038C23" },
+  { bg: "#FFE9E9", color: "#8C0303" },
+  { bg: "#F6E9FF", color: "#17038C" },
+];
+
+function hash(text: string) {
+  let value = 0;
+  for (let i = 0; i < text.length; i += 1) value = (value * 31 + text.charCodeAt(i)) % 9973;
+  return value;
+}
+
+function openBook(book: TextbookCard) {
   ElMessage.info(`${book.title}即将上线`);
 }
 
-/** 年级列表就绪（或变了）时，默认选中第一个 */
-watch(
-  gradeNames,
-  (names) => {
-    if (names.length && !names.includes(grade.value)) grade.value = names[0];
-  },
-  { immediate: true },
-);
-
-/** 版本列表就绪（或随年级变化）时，默认选中第一个；原来选的还在就保留 */
-watch(
-  editionNames,
-  (names) => {
-    if (names.length && !names.includes(edition.value)) edition.value = names[0];
-  },
-  { immediate: true },
-);
-
-onMounted(async () => {
+async function loadCategories() {
+  loadingCats.value = true;
   try {
     const raw = await fetchCourseCategories({ type: 1 });
-    categoryTree.value = toTree(raw);
+    const list = Array.isArray(raw) ? raw : [];
+    gradeCats.value = list.filter((item) => Number(item.kind) === CATEGORY_KIND.GRADE);
+    editionCats.value = list.filter((item) => Number(item.kind) === CATEGORY_KIND.EDITION);
   } catch {
-    categoryTree.value = [];
+    gradeCats.value = [];
+    editionCats.value = [];
   } finally {
-    loading.value = false;
+    loadingCats.value = false;
   }
+  if (!gradeTabs.value.some((item) => isActive(gradeId.value, item.id))) {
+    gradeId.value = gradeTabs.value[0]?.id ?? "";
+  }
+  if (!editionTabs.value.some((item) => isActive(editionId.value, item.id))) {
+    editionId.value = editionTabs.value[0]?.id ?? "";
+  }
+}
+
+async function loadBooks() {
+  const seq = ++requestSeq;
+  loadingList.value = true;
+  try {
+    const page = await fetchCourses({
+      type: 1,
+      gradeCategoryId: gradeId.value === "" ? undefined : gradeId.value,
+      versionCategoryId: editionId.value === "" ? undefined : editionId.value,
+      page: 1,
+      limit: 100,
+    });
+    if (seq !== requestSeq) return;
+    books.value = unwrapCoursePage(page).records.map(toCard);
+  } catch {
+    if (seq === requestSeq) books.value = [];
+  } finally {
+    if (seq === requestSeq) loadingList.value = false;
+  }
+}
+
+watch([gradeId, editionId], () => {
+  if (inited) void loadBooks();
 });
 
-/** 接口可能直接返回数组，也可能包一层（例如 { records: [...] }） */
-function toTree(raw: unknown): CategoryNode[] {
-  if (Array.isArray(raw)) return raw as CategoryNode[];
-  if (raw && typeof raw === "object") {
-    for (const value of Object.values(raw as Record<string, unknown>)) {
-      if (Array.isArray(value)) return value as CategoryNode[];
-    }
-  }
-  return [];
-}
+onMounted(async () => {
+  await loadCategories();
+  await loadBooks();
+  inited = true;
+});
 </script>

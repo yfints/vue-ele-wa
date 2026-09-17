@@ -63,7 +63,12 @@ import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
-import { fetchCourses, unwrapCoursePage, type CourseVo } from "@/api/course";
+import {
+  CATEGORY_KIND,
+  fetchCourses,
+  unwrapCoursePage,
+  type CourseVo,
+} from "@/api/course";
 import { localAsset } from "@/data/mall";
 
 interface PhoneticCard {
@@ -134,8 +139,12 @@ function chipsFor(name: string, index: number) {
   return index % 2 === 1 ? FIXED_CHIPS.american : FIXED_CHIPS.british;
 }
 
-/** 卡片左上角的小标签：优先用分类名，没有就把课程名里的「全阶课 / 课程」等后缀去掉 */
+/** 卡片左上角的小标签：优先用接口 categories 里的音标类型（kind=5），没有就退回分类名 / 课程名 */
 function tagOf(course: CourseVo, name: string) {
+  const phonetic = (course.categories || []).find(
+    (item) => Number(item.kind) === CATEGORY_KIND.PHONETIC,
+  );
+  if (phonetic?.name) return String(phonetic.name).trim();
   const category = text(course.categoryName || course.category_name);
   if (category) return category;
   return name.replace(/(全阶课|精品课|系统课|课程|课)$/u, "").trim() || name || "音标";
