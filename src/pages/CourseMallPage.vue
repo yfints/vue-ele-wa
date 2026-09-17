@@ -83,7 +83,7 @@ let requestSeq = 0;
 
 async function loadCategories() {
   try {
-    const list = await fetchCourseCategories();
+    const list = await fetchCourseCategories({type:0});
     lessonCategories.value = Array.isArray(list) ? list : [];
   } catch {
     lessonCategories.value = [];
