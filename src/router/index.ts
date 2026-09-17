@@ -8,6 +8,7 @@ import MyCourseCollectPage from "@/pages/MyCourseCollectPage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import GameLoadPage from "@/pages/GameLoadPage.vue";
 import GamePage from "@/pages/GamePage.vue";
+import TextbookPage from "@/pages/TextbookPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -24,6 +25,12 @@ const router = createRouter({
         { path: "", redirect: "/courseMall" },
         { path: "home", redirect: "/home/index" },
         { path: "home/index", component: HomePage, meta: { title: "首页" } },
+        { path: "textbook", redirect: "/textbook/index", meta: { public: true } },
+        {
+          path: "textbook/index",
+          component: TextbookPage,
+          meta: { public: true, title: "教材学习" },
+        },
         {
           path: "courseMall",
           meta: { public: true, title: "课程广场" },

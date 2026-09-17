@@ -34,6 +34,7 @@ const primary = [
   {
     label: "教材学习",
     icon: "/clone-assets/menu/book.svg",
+    to: "/textbook/index",
   },
   {
     label: "单词库",

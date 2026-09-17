@@ -1,13 +1,13 @@
 <template>
-  <div class="page flex" :class="{ isHome }">
+  <div class="page flex">
     <Sidebar />
     <div
       v-show="isPhone && menuOpen"
       class="mask"
       @click="closeMenu"
     />
-    <div class="container flex1" :class="[menuOpen ? 'onMenuOpen' : 'onMenuClose', { onHome: isHome }]">
-      <TopBar v-if="!isHome" />
+    <div class="container flex1" :class="[menuOpen ? 'onMenuOpen' : 'onMenuClose', { onBare: bareHeader }]">
+      <TopBar v-if="!bareHeader" />
       <RouterView />
     </div>
     <SearchPop />
@@ -24,7 +24,10 @@ import { closeMenu, initLayoutViewport, isPhone, menuOpen } from "@/composables/
 import { fetchMe } from "@/composables/useAuth";
 
 const route = useRoute();
-const isHome = computed(() => route.path.startsWith("/home"));
+/** 首页 / 教材学习自带顶部栏（顶部栏由页面自己渲染），所以隐藏公共 TopBar */
+const bareHeader = computed(
+  () => route.path.startsWith("/home") || route.path.startsWith("/textbook"),
+);
 let stopViewport: (() => void) | undefined;
 
 onMounted(() => {
