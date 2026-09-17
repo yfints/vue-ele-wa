@@ -190,7 +190,7 @@ function toCard(course: CourseVo, index: number): TextbookCard {
     tags,
     units: courseNum,
     unitText: `共${courseNum}单元`,
-    cover: coverOf(course, index),
+    cover: course.cover || coverOf(course, index),
   };
 }
 
