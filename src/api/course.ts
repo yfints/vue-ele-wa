@@ -107,6 +107,17 @@ export interface CourseCategory {
   id: number | string;
   name: string;
   sortOrder?: number;
+  /** 以下字段后端可能会带上，读取时统一做兼容 */
+  cover?: string;
+  image?: string;
+  icon?: string;
+  description?: string;
+  describe?: string;
+  courseNum?: number;
+  course_num?: number;
+  humanNum?: number;
+  human_num?: number;
+  percentage?: number;
 }
 
 export interface CourseVo {
@@ -127,8 +138,12 @@ export interface CoursePage {
   size?: number;
 }
 
-export function fetchCourseCategories() {
-  return get<CourseCategory[]>("/course/categories", undefined, {
+/**
+ * 课程分类。
+ * @param params.type 0=课程广场 1=教材同步 3=音标；不传=全部上线分类（平铺）
+ */
+export function fetchCourseCategories(params?: { type?: number }) {
+  return get<CourseCategory[]>("/course/categories", params, {
     skipAuthRedirect: true,
   });
 }

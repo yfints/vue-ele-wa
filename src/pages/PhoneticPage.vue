@@ -19,13 +19,13 @@
     <div class="phBody flex">
       <article v-for="course in courses" :key="course.id" class="phCard flex col">
         <div class="phHero" :style="{ background: course.fallback }">
-          <img class="phHeroBg" :src="course.hero" alt="" />
+          <img v-if="course.hero" class="phHeroBg" :src="course.hero" alt="" />
           <div class="phHeroInner">
             <div class="phTag">{{ course.tag }}</div>
             <div class="phName">{{ course.title }}</div>
             <div class="phSub">{{ course.subtitle }}</div>
-            <div class="phMeta">{{ course.meta }}</div>
-            <div class="phChips flex ac">
+            <div v-if="course.meta" class="phMeta">{{ course.meta }}</div>
+            <div v-if="course.chips.length" class="phChips flex ac">
               <span
                 v-for="(chip, index) in course.chips"
                 :key="chip"
@@ -54,12 +54,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
+import { fetchCourseCategories, type CourseCategory } from "@/api/course";
 
-interface PhoneticCourse {
-  id: number;
+interface PhoneticCard {
+  id: number | string;
   tag: string;
   title: string;
   subtitle: string;
@@ -79,9 +81,19 @@ const chipTones = [
   { bg: "#ECE2FF", color: "#5C3FC6" },
 ];
 
-const courses: PhoneticCourse[] = [
+const HERO_BRITISH = "/clone-assets/phonetic/hero-british.png";
+const HERO_AMERICAN = "/clone-assets/phonetic/hero-american.png";
+const TONE_BRITISH = "linear-gradient(90deg, #00c26d 0%, #069a81 100%)";
+const TONE_AMERICAN = "linear-gradient(90deg, #44b3df 0%, #1667eb 100%)";
+
+/**
+ * 设计稿里的两张卡。
+ * /course/categories?type=3 只保证给出分类（id/name），像副标题、章节数这些还没接口，
+ * 所以这里按分类名兜底，接口以后补了字段会自动覆盖。
+ */
+const presets: PhoneticCard[] = [
   {
-    id: 1,
+    id: "british",
     tag: "英式音标",
     title: "英式音标全阶课",
     subtitle: "British Pronunciation · 零基础入门",
@@ -89,11 +101,11 @@ const courses: PhoneticCourse[] = [
     chips: ["发音示范", "对比练习", "情景单词", "真人发音"],
     learners: 2141,
     progress: 52,
-    hero: "/clone-assets/phonetic/hero-british.png",
-    fallback: "linear-gradient(90deg, #00c26d 0%, #069a81 100%)",
+    hero: HERO_BRITISH,
+    fallback: TONE_BRITISH,
   },
   {
-    id: 2,
+    id: "american",
     tag: "美式音标",
     title: "美式音标全阶课",
     subtitle: "General American · 地道美式发音",
@@ -101,16 +113,70 @@ const courses: PhoneticCourse[] = [
     chips: ["发音示范", "连续与阅读", "语调与节奏", "施展表达"],
     learners: 2141,
     progress: 52,
-    hero: "/clone-assets/phonetic/hero-american.png",
-    fallback: "linear-gradient(90deg, #44b3df 0%, #1667eb 100%)",
+    hero: HERO_AMERICAN,
+    fallback: TONE_AMERICAN,
   },
 ];
+
+const categories = ref<CourseCategory[]>([]);
+
+/** 有分类数据就按接口渲染，没有（或请求失败）就退回设计稿的两张卡 */
+const courses = computed<PhoneticCard[]>(() =>
+  categories.value.length
+    ? categories.value.map((item, index) => toCard(item, index))
+    : presets,
+);
+
+function toCard(category: CourseCategory, index: number): PhoneticCard {
+  const name = String(category.name || "").trim();
+  const preset = presets.find(
+    (item) => Boolean(name) && (item.tag.includes(name) || name.includes(item.tag)),
+  );
+  const american = preset ? preset.tag.includes("美式") : /美式|american/i.test(name);
+  return {
+    id: category.id ?? `category-${index}`,
+    tag: name || preset?.tag || "音标",
+    title: preset?.title || name || "音标课程",
+    subtitle: text(category.description || category.describe) || preset?.subtitle || "",
+    meta: metaOf(category) || preset?.meta || "",
+    chips: preset?.chips || [],
+    learners: pickNumber(category.humanNum ?? category.human_num, preset?.learners ?? 0),
+    progress: pickNumber(category.percentage, preset?.progress ?? 0),
+    hero: preset?.hero || (american ? HERO_AMERICAN : HERO_BRITISH),
+    fallback: preset?.fallback || (american ? TONE_AMERICAN : TONE_BRITISH),
+  };
+}
+
+function metaOf(category: CourseCategory) {
+  const chapters = pickNumber(category.courseNum ?? category.course_num, 0);
+  return chapters > 0 ? `${chapters}章` : "";
+}
+
+function pickNumber(value: unknown, fallback: number) {
+  if (value === null || value === undefined || value === "") return fallback;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+}
+
+function text(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
 
 function chipTone(index: number) {
   return chipTones[index % chipTones.length];
 }
 
-function startCourse(course: PhoneticCourse) {
+function startCourse(course: PhoneticCard) {
   ElMessage.info(`${course.title}即将上线`);
 }
+
+onMounted(async () => {
+  try {
+    // type=3 音标分类（0=课程广场 1=教材同步 3=音标）
+    const list = await fetchCourseCategories({ type: 3 });
+    categories.value = Array.isArray(list) ? list : [];
+  } catch {
+    categories.value = [];
+  }
+});
 </script>
