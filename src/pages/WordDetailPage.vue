@@ -14,24 +14,26 @@
         <div class="wdhCrumbs flex ac">
           <RouterLink to="/words/index" class="wdhCrumb">单词库</RouterLink>
           <img src="/clone-assets/words/crumb.svg" class="wdhCrumbSep" alt="" />
-          <span class="wdhCrumbCur line1">{{ book?.title || "" }}</span>
+          <span class="wdhCrumbCur line1">{{ detail?.name || "" }}</span>
         </div>
       </div>
       <UserDropdown />
     </header>
 
     <div class="wdhBody">
-      <template v-if="book">
+      <div v-if="loading" v-loading="loading" class="wdhLoading" />
+
+      <template v-else-if="detail">
         <section class="wdhCard wdhSummary flex jb">
           <div class="wdhSummaryLeft flex ac">
             <div class="wdhIconBox" :style="{ background: iconGradient }">
-              <img class="wdhIcon" :src="book.icon" :alt="book.title" />
+              <img class="wdhIcon" :src="icon" :alt="detail.name" />
             </div>
             <div class="wdhInfo">
-              <div class="wdhTitle line1">{{ book.title }}</div>
-              <div class="wdhDesc line1">{{ book.desc }}</div>
+              <div class="wdhTitle line1">{{ detail.name }}</div>
+              <div class="wdhDesc line1">{{ detail.description }}</div>
               <div class="wdhTags flex ac">
-                <span v-for="tag in book.tags" :key="tag" class="wdhTag">{{ tag }}</span>
+                <span v-for="tag in tags" :key="tag" class="wdhTag">{{ tag }}</span>
               </div>
               <div class="wdhProgress flex ac">
                 <div class="wdhBar">
@@ -63,7 +65,7 @@
         <section class="wdhCard wdhList">
           <div class="wdhListTitle">单词列表</div>
 
-          <div class="wdhTableWrap">
+          <div v-loading="loadingWords" class="wdhTableWrap">
             <div class="wdhTable">
               <div class="wdhRow wdhThead">
                 <div class="wdhCell wdhCellIndex">#</div>
@@ -79,7 +81,7 @@
                 class="wdhRow"
                 :class="{ wdhRowActive: playingId === row.id }"
               >
-                <div class="wdhCell wdhCellIndex">{{ row.id }}</div>
+                <div class="wdhCell wdhCellIndex">{{ row.no }}</div>
                 <div class="wdhCell wdhCellMain wdhWord">{{ row.word }}</div>
                 <div class="wdhCell wdhCellMain">{{ row.phonetic }}</div>
                 <div class="wdhCell wdhCellMain">{{ row.meaning }}</div>
@@ -145,58 +147,147 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
-import { wordBooks, wordRows, type WordRow } from "@/data/words";
+import {
+  fetchCollectLessons,
+  toggleCollect as toggleCourseCollect,
+  unwrapCollectPage,
+} from "@/api/course";
+import {
+  fetchWordSetDetail,
+  fetchWordSetWords,
+  unwrapWordPage,
+  type WordItem,
+  type WordSetDetail,
+} from "@/api/words";
+import { getToken } from "@/api/token";
+import { localAsset } from "@/data/mall";
+import { wordIcon, wordTone } from "@/data/words";
+
+/** 表格行：接口数据 + 当前页内的序号 */
+interface WordRow extends WordItem {
+  no: number;
+}
 
 const route = useRoute();
 const router = useRouter();
 
 const PAGE_SIZE = 10;
 const page = ref(1);
-const playingId = ref<number | null>(null);
-const collectedIds = ref<number[]>([]);
+const playingId = ref<string | number | null>(null);
+const detail = ref<WordSetDetail | null>(null);
+const words = ref<WordItem[]>([]);
+const total = ref(0);
+const loading = ref(true);
+const loadingWords = ref(false);
+const collected = ref(false);
 let audioEl: HTMLAudioElement | null = null;
+let wordSeq = 0;
 
 const bookId = computed(() => String(route.params.id || ""));
-const book = computed(() => wordBooks.find((item) => String(item.id) === bookId.value));
-const progress = computed(() => Number(book.value?.learned || 0));
+const tone = computed(() => wordTone(0));
+const icon = computed(() => wordIcon(0));
 const iconGradient = computed(
-  () => `linear-gradient(180deg, ${book.value?.tone || "#E2E3FE"} 0%, #ffffff 100%)`,
+  () => `linear-gradient(180deg, ${tone.value} 0%, #ffffff 100%)`,
 );
-const totalPages = computed(() => Math.max(1, Math.ceil(wordRows.length / PAGE_SIZE)));
-const pageRows = computed(() =>
-  wordRows.slice((page.value - 1) * PAGE_SIZE, page.value * PAGE_SIZE),
-);
-const collected = computed(() => {
-  const id = Number(book.value?.id);
-  return Number.isFinite(id) && collectedIds.value.includes(id);
+const progress = computed(() => {
+  const wordCount = Number(detail.value?.wordCount ?? 0) || 0;
+  const learnedNum = Number(detail.value?.learnedNum ?? 0) || 0;
+  if (!wordCount) return 0;
+  return Math.min(100, Math.round((learnedNum / wordCount) * 100));
 });
+const tags = computed(() => {
+  const list: string[] = [];
+  const categoryName = String(detail.value?.categoryName || "").trim();
+  if (categoryName) list.push(categoryName);
+  const wordCount = Number(detail.value?.wordCount ?? 0) || 0;
+  if (wordCount > 0) list.push(`共${wordCount}词`);
+  return list;
+});
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)));
+const pageRows = computed<WordRow[]>(() =>
+  words.value.map((item, index) => ({ ...item, no: (page.value - 1) * PAGE_SIZE + index + 1 })),
+);
 
 function backToList() {
   void router.push("/words/index");
 }
 
 function startStudy() {
-  ElMessage.info(`${book.value?.title || "该词书"}即将上线`);
+  ElMessage.info(`${detail.value?.name || "该单词集"}的单词练习即将上线`);
 }
 
-function toggleCollect() {
-  const id = Number(book.value?.id);
-  if (!Number.isFinite(id)) return;
-  collectedIds.value = collected.value
-    ? collectedIds.value.filter((item) => item !== id)
-    : [...collectedIds.value, id];
+async function loadCollectState() {
+  if (!getToken()) {
+    collected.value = false;
+    return;
+  }
+  try {
+    const data = await fetchCollectLessons({ type: 1, page: 1, limit: 100 });
+    collected.value = unwrapCollectPage(data).items.some(
+      (item) => String(item.courseId) === bookId.value,
+    );
+  } catch {
+    collected.value = false;
+  }
 }
 
-/** 发音：优先用在线发音（有道词典），失败回退浏览器朗读 */
+async function toggleCollect() {
+  if (!getToken()) {
+    ElMessage.warning("请先登录");
+    return;
+  }
+  try {
+    // 单词收藏夹是 type=1
+    await toggleCourseCollect(bookId.value, 1);
+    collected.value = !collected.value;
+    ElMessage.success(collected.value ? "收藏成功" : "已取消收藏");
+  } catch {
+    /* unwrap 已提示 */
+  }
+}
+
+async function loadDetail() {
+  loading.value = true;
+  try {
+    detail.value = await fetchWordSetDetail(bookId.value);
+  } catch {
+    // 词书不存在 / 未上线时后端返回 400，这里落成空状态
+    detail.value = null;
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function loadWords() {
+  const seq = ++wordSeq;
+  loadingWords.value = true;
+  try {
+    const data = await fetchWordSetWords(bookId.value, { page: page.value, limit: PAGE_SIZE });
+    if (seq !== wordSeq) return;
+    const result = unwrapWordPage(data);
+    words.value = result.records;
+    total.value = result.total ?? result.records.length;
+  } catch {
+    if (seq === wordSeq) {
+      words.value = [];
+      total.value = 0;
+    }
+  } finally {
+    if (seq === wordSeq) loadingWords.value = false;
+  }
+}
+
+/** 发音：接口给了音频就播它，否则用在线发音，再失败回退浏览器朗读 */
 function playWord(row: WordRow) {
   playingId.value = row.id;
   stopAudio();
-  const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(row.word)}&type=2`;
+  const remote = localAsset(row.audio || "");
+  const url = remote || `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(row.word)}&type=2`;
   audioEl = new Audio(url);
   audioEl.onended = () => {
     if (playingId.value === row.id) playingId.value = null;
@@ -205,7 +296,7 @@ function playWord(row: WordRow) {
   void audioEl.play().catch(() => speakFallback(row.word, row.id));
 }
 
-function speakFallback(text: string, rowId: number) {
+function speakFallback(text: string, rowId: string | number) {
   const synth = window.speechSynthesis;
   if (!synth) {
     playingId.value = null;
@@ -234,5 +325,20 @@ function stopAudio() {
 
 onUnmounted(() => {
   stopAudio();
+});
+
+watch(page, () => {
+  void loadWords();
+});
+
+watch(bookId, async () => {
+  page.value = 1;
+  await Promise.all([loadDetail(), loadCollectState()]);
+  await loadWords();
+});
+
+onMounted(async () => {
+  await Promise.all([loadDetail(), loadCollectState()]);
+  await loadWords();
 });
 </script>

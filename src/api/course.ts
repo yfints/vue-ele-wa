@@ -167,6 +167,8 @@ export interface CourseVo {
   human_num?: number;
   courseNum?: number;
   course_num?: number;
+  /** 单词数：单词库的单词集卡片用 */
+  wordCount?: number;
   percentage?: number;
   progress?: number;
   tags?: string[] | string;

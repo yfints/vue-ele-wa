@@ -4897,6 +4897,10 @@ html.dark .tbMenu img {
     padding: 20px;
 }
 
+.wdhLoading {
+    min-height: 320px;
+}
+
 .wdhCard {
     background: #fff;
     border-radius: 12px;
