@@ -5,7 +5,7 @@
  */
 
 export interface TextbookItem {
-  id: number;
+  id: number | string;
   /** 卡片标题，例如「人教版・三年级上册」 */
   title: string;
   /** 一句话简介 */
