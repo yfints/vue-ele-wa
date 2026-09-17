@@ -174,7 +174,7 @@ import { getToken } from "@/api/token";
 import { ensureLogin } from "@/composables/useAuth";
 import { saveGameInfo } from "@/composables/useGame";
 import { localAsset } from "@/data/mall";
-import { wordIcon, wordTone } from "@/data/words";
+import { wordTone } from "@/data/words";
 
 /** 表格行：接口数据 + 当前页内的序号 */
 interface WordRow extends WordItem {
