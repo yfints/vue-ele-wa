@@ -120,6 +120,10 @@ function goMall() {
 }
 
 function openDetail(item: CollectLessonItem) {
+  if(kind.value==="word"){
+    void router.push(`/words/${item.courseId}`);
+    return;
+  }
   void router.push(`/courseMall/${item.courseId}`);
 }
 
