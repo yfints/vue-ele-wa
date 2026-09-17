@@ -20,26 +20,9 @@ export interface TextbookItem {
   cover: string;
 }
 
-export const textbookGrades = [
-  "全部",
-  "三年级",
-  "四年级",
-  "五年级",
-  "六年级",
-  "高一",
-  "高二",
-  "高三",
-];
+export const textbookGrades = [];
 
-export const textbookEditions = [
-  "全部版本",
-  "人教版",
-  "外研版",
-  "北师大版",
-  "苏教版",
-  "沪教版",
-  "冀教版",
-];
+export const textbookEditions = [];
 
 /** 版本标签配色，取自设计稿 */
 export const editionTone: Record<string, { bg: string; color: string }> = {
@@ -54,7 +37,6 @@ export const editionTone: Record<string, { bg: string; color: string }> = {
 export const gradeTone = { bg: "#DAECFF", color: "#0056B5" };
 
 const INTEREST_DESC = "从兴趣出发，打好英语启蒙基础。";
-const CONTEXT_DESC = "在情境中学习，培养英语表达能力。";
 
 export const textbookList: TextbookItem[] = [
   {
@@ -66,85 +48,5 @@ export const textbookList: TextbookItem[] = [
     units: 8,
     cover: "/clone-assets/textbook/cover-01.png",
   },
-  {
-    id: 2,
-    title: "外研版・三年级上册",
-    desc: CONTEXT_DESC,
-    grade: "三年级",
-    edition: "外研版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-02.png",
-  },
-  {
-    id: 3,
-    title: "北师大版・三年级上册",
-    desc: CONTEXT_DESC,
-    grade: "三年级",
-    edition: "北师大版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-03.png",
-  },
-  {
-    id: 4,
-    title: "苏教版・三年级上册",
-    desc: CONTEXT_DESC,
-    grade: "三年级",
-    edition: "苏教版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-04.png",
-  },
-  {
-    id: 5,
-    title: "沪教版・三年级上册",
-    desc: CONTEXT_DESC,
-    grade: "三年级",
-    edition: "沪教版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-05.png",
-  },
-  {
-    id: 6,
-    title: "冀教版・三年级上册",
-    desc: INTEREST_DESC,
-    grade: "三年级",
-    edition: "冀教版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-06.png",
-  },
-  {
-    id: 7,
-    title: "外研版・二年级上册",
-    desc: CONTEXT_DESC,
-    grade: "二年级",
-    edition: "外研版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-07.png",
-  },
-  {
-    id: 8,
-    title: "外研版・一年级上册",
-    desc: CONTEXT_DESC,
-    grade: "一年级",
-    edition: "外研版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-08.png",
-  },
-  {
-    id: 9,
-    title: "苏教版・四年级上册",
-    desc: CONTEXT_DESC,
-    grade: "四年级",
-    edition: "苏教版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-09.png",
-  },
-  {
-    id: 10,
-    title: "沪教版・三年级上册",
-    desc: CONTEXT_DESC,
-    grade: "三年级",
-    edition: "沪教版",
-    units: 8,
-    cover: "/clone-assets/textbook/cover-10.png",
-  },
+
 ];

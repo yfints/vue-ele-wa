@@ -75,12 +75,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
 import { wordBooks, wordCategories, type WordBook } from "@/data/words";
 
 const category = ref("全部");
+const router = useRouter();
 /** 设计稿里「商务英语核心词汇」是已收藏状态，先本地维护，等收藏接口接上再换成接口数据 */
 const favIds = ref<number[]>([3]);
 
@@ -99,6 +100,6 @@ function toggleFav(book: WordBook) {
 }
 
 function openBook(book: WordBook) {
-  ElMessage.info(`${book.title}即将上线`);
+  void router.push(`/words/${book.id}`);
 }
 </script>

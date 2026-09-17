@@ -11,6 +11,7 @@ import GamePage from "@/pages/GamePage.vue";
 import PhoneticPage from "@/pages/PhoneticPage.vue";
 import TextbookPage from "@/pages/TextbookPage.vue";
 import WordsPage from "@/pages/WordsPage.vue";
+import WordDetailPage from "@/pages/WordDetailPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -43,6 +44,11 @@ const router = createRouter({
         {
           path: "words/index",
           component: WordsPage,
+          meta: { public: true, title: "单词库" },
+        },
+        {
+          path: "words/:id",
+          component: WordDetailPage,
           meta: { public: true, title: "单词库" },
         },
         {

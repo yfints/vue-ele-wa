@@ -150,3 +150,75 @@ export const wordBooks: WordBook[] = [
     icon: "/clone-assets/words/icon-12.png",
   },
 ];
+
+/** 详情页的单词行 */
+export interface WordRow {
+  id: number;
+  word: string;
+  phonetic: string;
+  meaning: string;
+}
+
+/**
+ * 单词列表（设计稿里每页 10 条 × 5 页）。
+ * 后端还没有「词书 → 单词」的接口，这里先用占位数据，接口就绪后替换即可。
+ */
+const RAW_WORDS: [string, string, string][] = [
+  ["Apple", "/ˈæpəl/", "n. 苹果"],
+  ["beautiful", "/ˈbjuːtɪfəl/", "adj. 美丽的；漂亮的"],
+  ["computer", "/kəmˈpjuːtə/", "n. 电脑；计算机"],
+  ["dictionary", "/ˈdɪkʃənəri/", "n. 字典；词典"],
+  ["elephant", "/ˈelɪfənt/", "n. 大象"],
+  ["family", "/ˈfæməli/", "n. 家庭；家人"],
+  ["garden", "/ˈgɑːdən/", "n. 花园；庭院"],
+  ["internet", "/ˈɪntənet/", "n. 互联网；因特网"],
+  ["kitchen", "/ˈkɪtʃɪn/", "n. 厨房"],
+  ["journey", "/ˈdʒɜːni/", "n. 旅行；旅程"],
+  ["library", "/ˈlaɪbrəri/", "n. 图书馆"],
+  ["mountain", "/ˈmaʊntɪn/", "n. 山；山脉"],
+  ["notebook", "/ˈnəʊtbʊk/", "n. 笔记本"],
+  ["orange", "/ˈɒrɪndʒ/", "n. 橙子；橙色"],
+  ["pencil", "/ˈpensəl/", "n. 铅笔"],
+  ["question", "/ˈkwestʃən/", "n. 问题"],
+  ["rabbit", "/ˈræbɪt/", "n. 兔子"],
+  ["school", "/skuːl/", "n. 学校"],
+  ["teacher", "/ˈtiːtʃə/", "n. 老师"],
+  ["umbrella", "/ʌmˈbrelə/", "n. 雨伞"],
+  ["village", "/ˈvɪlɪdʒ/", "n. 村庄"],
+  ["window", "/ˈwɪndəʊ/", "n. 窗户"],
+  ["yellow", "/ˈjeləʊ/", "adj. 黄色的"],
+  ["zoo", "/zuː/", "n. 动物园"],
+  ["answer", "/ˈɑːnsə/", "n. 答案；回答"],
+  ["bridge", "/brɪdʒ/", "n. 桥"],
+  ["camera", "/ˈkæmərə/", "n. 照相机"],
+  ["doctor", "/ˈdɒktə/", "n. 医生"],
+  ["evening", "/ˈiːvnɪŋ/", "n. 傍晚；晚上"],
+  ["friend", "/frend/", "n. 朋友"],
+  ["guitar", "/gɪˈtɑː/", "n. 吉他"],
+  ["hospital", "/ˈhɒspɪtəl/", "n. 医院"],
+  ["island", "/ˈaɪlənd/", "n. 岛"],
+  ["jacket", "/ˈdʒækɪt/", "n. 夹克衫"],
+  ["keyboard", "/ˈkiːbɔːd/", "n. 键盘"],
+  ["language", "/ˈlæŋgwɪdʒ/", "n. 语言"],
+  ["machine", "/məˈʃiːn/", "n. 机器"],
+  ["nature", "/ˈneɪtʃə/", "n. 大自然"],
+  ["ocean", "/ˈəʊʃən/", "n. 海洋"],
+  ["picture", "/ˈpɪktʃə/", "n. 图片；照片"],
+  ["quarter", "/ˈkwɔːtə/", "n. 四分之一；一刻钟"],
+  ["river", "/ˈrɪvə/", "n. 河流"],
+  ["station", "/ˈsteɪʃən/", "n. 车站"],
+  ["travel", "/ˈtrævəl/", "v. 旅行"],
+  ["university", "/ˌjuːnɪˈvɜːsəti/", "n. 大学"],
+  ["vacation", "/vəˈkeɪʃən/", "n. 假期"],
+  ["weather", "/ˈweðə/", "n. 天气"],
+  ["exercise", "/ˈeksəsaɪz/", "n. 锻炼；练习"],
+  ["yesterday", "/ˈjestədeɪ/", "adv. 昨天"],
+  ["zebra", "/ˈzebrə/", "n. 斑马"],
+];
+
+export const wordRows: WordRow[] = RAW_WORDS.map(([word, phonetic, meaning], index) => ({
+  id: index + 1,
+  word,
+  phonetic,
+  meaning,
+}));

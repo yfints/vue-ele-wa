@@ -4659,6 +4659,540 @@ html.dark .tbMenu img {
     }
 }
 
+/* 教材学习骨架屏 */
+
+.tbSkeletonTab {
+    flex: 0 0 auto;
+    width: 68px;
+    height: 36px;
+    margin-right: 8px;
+    border-radius: 8px;
+}
+
+.tbSkeletonCard {
+    overflow: hidden;
+}
+
+.tbSkeletonCover {
+    display: block;
+    width: 100%;
+    height: 0;
+    padding-top: 75%;
+    border-radius: 0;
+}
+
+.tbSkeletonLine {
+    display: block;
+    height: 17px;
+    border-radius: 4px;
+}
+
+.tbSkeletonLineTitle {
+    width: 62%;
+    height: 22px;
+}
+
+.tbSkeletonLineDesc {
+    width: 86%;
+    margin-top: 10px;
+}
+
+.tbSkeletonTag {
+    width: 52px;
+    height: 25px;
+    border-radius: 6px;
+}
+
+.tbSkeletonTagWide {
+    width: 60px;
+    height: 25px;
+    border-radius: 6px;
+}
+
+.tbSkeletonBar {
+    display: block;
+    width: 100%;
+    height: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* ===== 单词库详情 ===== */
+
+.wordDetailPage {
+    background: #f7f7f7;
+}
+
+.wdhHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: #fff;
+}
+
+.wdhHeadLeft {
+    flex: 1;
+    min-width: 0;
+}
+
+.wdhMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.wdhCrumbs {
+    min-width: 0;
+}
+
+.wdhCrumb {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.wdhCrumbSep {
+    width: 16px;
+    height: 16px;
+    margin: 0 10px;
+}
+
+.wdhCrumbCur {
+    max-width: 40vw;
+    font-size: 14px;
+    color: #666;
+}
+
+.wdhBody {
+    padding: 20px;
+}
+
+.wdhCard {
+    background: #fff;
+    border-radius: 12px;
+}
+
+.wdhSummary {
+    height: 160px;
+    padding: 20px;
+    align-items: flex-end;
+}
+
+.wdhSummaryLeft {
+    min-width: 0;
+}
+
+.wdhIconBox {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border-radius: 16px;
+}
+
+.wdhIcon {
+    width: 101px;
+    height: 101px;
+}
+
+.wdhInfo {
+    width: 212px;
+    margin-left: 20px;
+}
+
+.wdhTitle {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 31px;
+    color: #333;
+}
+
+.wdhDesc {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 17px;
+    color: #666;
+}
+
+.wdhTags {
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.wdhTag {
+    display: inline-flex;
+    align-items: center;
+    height: 25px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: #daecff;
+    color: #0056b5;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.wdhProgress {
+    margin-top: 10px;
+}
+
+.wdhBar {
+    width: 141px;
+    height: 10px;
+    border-radius: 5px;
+    background: #eaedef;
+    overflow: hidden;
+}
+
+.wdhBarFill {
+    height: 100%;
+    border-radius: 5px;
+    background: #00c26d;
+}
+
+.wdhLearned {
+    margin-left: 20px;
+    font-size: 12px;
+    color: #666;
+}
+
+.wdhActions {
+    flex: 0 0 auto;
+    gap: 10px;
+}
+
+.wdhStart {
+    min-width: 140px;
+    height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 12px;
+    background: #0056b5;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.wdhStart:hover {
+    background: #004b9e;
+}
+
+.wdhCollect {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 140px;
+    height: 40px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 12px;
+    background: #e9f4ff;
+    color: #0056b5;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.wdhCollectAct {
+    background: #daecff;
+}
+
+.wdhHeart {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+}
+
+.wdhCollectAct .wdhHeart {
+    fill: currentColor;
+}
+
+.wdhList {
+    margin-top: 10px;
+    padding: 20px 20px 40px;
+}
+
+.wdhListTitle {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 25px;
+    color: #333;
+}
+
+.wdhTableWrap {
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.wdhTable {
+    min-width: 760px;
+}
+
+.wdhRow {
+    display: flex;
+    align-items: center;
+    height: 51px;
+    border-bottom: 1px solid #eaedef;
+}
+
+.wdhThead {
+    height: 40px;
+    border-bottom: none;
+    background: #f5f8fe;
+}
+
+.wdhRowActive {
+    background: rgba(245, 248, 254, 0.5);
+}
+
+.wdhCell {
+    min-width: 0;
+    padding-left: 10px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #666;
+}
+
+.wdhCellIndex {
+    flex: 0 0 60px;
+    width: 60px;
+}
+
+.wdhCellMain {
+    flex: 1 1 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wdhThead .wdhCell {
+    font-weight: 600;
+    color: #666;
+}
+
+.wdhRow:not(.wdhThead) .wdhCellMain {
+    font-weight: 600;
+    color: #333;
+}
+
+.wdhSpeak {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: #daebff;
+    color: #0056b5;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.wdhSpeakAct {
+    background: #0056b5;
+    color: #fff;
+}
+
+.wdhSpeaker {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.wdhSpeakerWave {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+}
+
+.wdhPager {
+    gap: 5px;
+    margin-top: 40px;
+}
+
+.wdhPageBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #e4e7ed;
+    border-radius: 6px;
+    background: #fff;
+    color: #999;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wdhPageBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.wdhPageAct {
+    border-color: #0056b5;
+    color: #0056b5;
+}
+
+.wdhPageArrow {
+    width: 16px;
+    height: 16px;
+}
+
+.wdhEmpty {
+    padding: 80px 0;
+}
+
+.wdhEmptyImg {
+    width: 220px;
+    max-width: 60%;
+    opacity: 0.9;
+}
+
+.wdhEmptyText {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #999;
+}
+
+html.dark .wordDetailPage {
+    background: var(--bg-container);
+}
+
+html.dark .wdhHead,
+html.dark .wdhCard {
+    background: var(--bg-card);
+}
+
+html.dark .wdhCrumb,
+html.dark .wdhTitle,
+html.dark .wdhListTitle {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .wdhCrumbCur,
+html.dark .wdhDesc,
+html.dark .wdhLearned {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .wdhThead {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+html.dark .wdhRow {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .wdhRowActive {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+html.dark .wdhCell,
+html.dark .wdhThead .wdhCell {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .wdhRow:not(.wdhThead) .wdhCellMain {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .wdhSpeak {
+    background: rgba(64, 128, 255, 0.24);
+    color: #9dc3ff;
+}
+
+html.dark .wdhSpeakAct {
+    background: #0056b5;
+    color: #fff;
+}
+
+html.dark .wdhCollect {
+    background: rgba(64, 128, 255, 0.16);
+    color: #9dc3ff;
+}
+
+html.dark .wdhCollectAct {
+    background: rgba(64, 128, 255, 0.3);
+}
+
+html.dark .wdhPageBtn {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.16);
+    color: var(--el-text-color-secondary);
+}
+
+html.dark .wdhPageAct {
+    border-color: #7eb6ff;
+    color: #7eb6ff;
+}
+
+html.dark .wdhPageArrow,
+html.dark .wdhCrumbSep,
+html.dark .wdhMenu img {
+    filter: invert(1);
+}
+
+@media (max-width: 900px) {
+    .wdhSummary {
+        height: auto;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .wdhActions {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 575px) {
+    .wdhHead {
+        padding: 0 12px;
+    }
+
+    .wdhBody {
+        padding: 12px;
+    }
+
+    .wdhIconBox {
+        width: 88px;
+        height: 88px;
+        border-radius: 12px;
+    }
+
+    .wdhIcon {
+        width: 74px;
+        height: 74px;
+    }
+
+    .wdhInfo {
+        flex: 1;
+        width: auto;
+        margin-left: 12px;
+    }
+
+    .wdhTitle {
+        font-size: 18px;
+        line-height: 26px;
+    }
+
+    .wdhList {
+        padding: 12px 12px 24px;
+    }
+}
+
 /* ===== 顶部栏用户下拉（教材学习 / 音标练习共用） ===== */
 
 .userDrop {

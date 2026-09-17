@@ -11,7 +11,12 @@
         >
           <img src="/clone-assets/menu.png" class="img32" alt="" />
         </button>
-        <div class="tbGrades flex ac">
+        <el-skeleton v-if="loading" class="tbGrades flex ac" animated>
+          <template #template>
+            <el-skeleton-item v-for="n in 6" :key="n" variant="button" class="tbSkeletonTab" />
+          </template>
+        </el-skeleton>
+        <div v-else class="tbGrades flex ac">
           <button
             v-for="item in gradeTabs"
             :key="item"
@@ -28,7 +33,12 @@
       <UserDropdown />
     </header>
 
-    <div class="tbEditions flex ac" v-if="editionTabs.length">
+    <el-skeleton v-if="loading" class="tbEditions flex ac" animated>
+      <template #template>
+        <el-skeleton-item v-for="n in 6" :key="n" variant="button" class="tbSkeletonTab" />
+      </template>
+    </el-skeleton>
+    <div v-else-if="editionTabs.length" class="tbEditions flex ac">
       <button
         v-for="item in editionTabs"
         :key="item"
@@ -43,7 +53,26 @@
     </div>
 
     <div class="tbBody">
-      <div v-if="visibleList.length" class="tbGrid">
+      <el-skeleton v-if="loading" animated>
+        <template #template>
+          <div class="tbGrid">
+            <div v-for="n in 10" :key="n" class="tbCard tbSkeletonCard">
+              <el-skeleton-item variant="image" class="tbSkeletonCover" />
+              <div class="tbInfo">
+                <el-skeleton-item variant="text" class="tbSkeletonLine tbSkeletonLineTitle" />
+                <el-skeleton-item variant="text" class="tbSkeletonLine tbSkeletonLineDesc" />
+                <div class="tbTags flex ac">
+                  <el-skeleton-item variant="button" class="tbSkeletonTag" />
+                  <el-skeleton-item variant="button" class="tbSkeletonTag" />
+                  <el-skeleton-item variant="button" class="tbSkeletonTagWide" />
+                </div>
+                <el-skeleton-item variant="text" class="tbSkeletonBar" />
+              </div>
+            </div>
+          </div>
+        </template>
+      </el-skeleton>
+      <div v-else-if="visibleList.length" class="tbGrid">
         <article
           v-for="book in visibleList"
           :key="book.id"
@@ -113,6 +142,8 @@ interface CategoryNode extends CourseCategory {
 const grade = ref("");
 const edition = ref("");
 const categoryTree = ref<CategoryNode[]>([]);
+/** 分类接口返回前显示骨架屏，避免先闪一帧本地占位数据 */
+const loading = ref(true);
 
 /** 年级行：顶层分类名 */
 const gradeNames = computed(() => {
@@ -270,6 +301,8 @@ onMounted(async () => {
     categoryTree.value = toTree(raw);
   } catch {
     categoryTree.value = [];
+  } finally {
+    loading.value = false;
   }
 });
 
