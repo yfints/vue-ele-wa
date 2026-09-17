@@ -8,7 +8,9 @@ import MyCourseCollectPage from "@/pages/MyCourseCollectPage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import GameLoadPage from "@/pages/GameLoadPage.vue";
 import GamePage from "@/pages/GamePage.vue";
+import PhoneticPage from "@/pages/PhoneticPage.vue";
 import TextbookPage from "@/pages/TextbookPage.vue";
+import WordsPage from "@/pages/WordsPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -30,6 +32,18 @@ const router = createRouter({
           path: "textbook/index",
           component: TextbookPage,
           meta: { public: true, title: "教材学习" },
+        },
+        { path: "phonetic", redirect: "/phonetic/index", meta: { public: true } },
+        {
+          path: "phonetic/index",
+          component: PhoneticPage,
+          meta: { public: true, title: "音标练习" },
+        },
+        { path: "words", redirect: "/words/index", meta: { public: true } },
+        {
+          path: "words/index",
+          component: WordsPage,
+          meta: { public: true, title: "单词库" },
         },
         {
           path: "courseMall",

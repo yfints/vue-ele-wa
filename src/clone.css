@@ -4658,3 +4658,524 @@ html.dark .tbMenu img {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* ===== 顶部栏用户下拉（教材学习 / 音标练习共用） ===== */
+
+.userDrop {
+    border: none;
+    background: transparent;
+    color: #333;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.userDropAvatar {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.userDropName {
+    line-height: 17px;
+}
+
+.userDropArrow {
+    margin-left: 4px;
+    font-size: 12px;
+    opacity: 0.65;
+}
+
+html.dark .userDrop {
+    color: var(--el-text-color-primary);
+}
+
+/* ===== 音标练习 ===== */
+
+.phoneticPage {
+    background: #f7f7f7;
+}
+
+.phHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: #fff;
+}
+
+.phHeadLeft {
+    min-width: 0;
+}
+
+.phMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.phPageTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.phBody {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px;
+}
+
+.phCard {
+    flex: 0 1 406px;
+    width: 406px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.phHero {
+    position: relative;
+    flex: 0 0 auto;
+    height: 196px;
+}
+
+.phHeroBg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.phHeroInner {
+    position: relative;
+    z-index: 1;
+    padding: 19px 20px 20px;
+}
+
+.phTag {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    height: 25px;
+    padding: 0 8px;
+    border-radius: 12.5px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 12px;
+}
+
+.phName {
+    margin-top: 10px;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 34px;
+    color: #fff;
+}
+
+.phSub {
+    margin-top: 4px;
+    font-size: 16px;
+    line-height: 22px;
+    color: #fff;
+}
+
+.phMeta {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 17px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.phChips {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.phChip {
+    display: inline-flex;
+    align-items: center;
+    height: 25px;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.phFoot {
+    flex: 0 0 auto;
+    height: 80px;
+    padding: 0 20px;
+}
+
+.phLearnIcon {
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+}
+
+.phLearnText {
+    font-size: 12px;
+    color: #666;
+}
+
+.phBar {
+    width: 109px;
+    height: 11px;
+    margin-left: 10px;
+    border-radius: 5.5px;
+    background: #eaedef;
+    overflow: hidden;
+}
+
+.phBarFill {
+    height: 100%;
+    border-radius: 5.5px;
+    background: #00c26d;
+    transition: width 0.3s;
+}
+
+.phStart {
+    flex: 0 0 auto;
+    height: 40px;
+    min-width: 96px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 12px;
+    background: #0056b5;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.phStart:hover {
+    background: #004b9e;
+}
+
+html.dark .phoneticPage {
+    background: var(--bg-container);
+}
+
+html.dark .phHead,
+html.dark .phCard {
+    background: var(--bg-card);
+}
+
+html.dark .phPageTitle {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .phLearnText {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .phBar {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+html.dark .phMenu img {
+    filter: invert(1);
+}
+
+@media (max-width: 900px) {
+    .phBody {
+        flex-direction: column;
+    }
+
+    .phCard {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 575px) {
+    .phHead {
+        padding: 0 12px;
+    }
+
+    .phBody {
+        padding: 12px;
+    }
+
+    .phFoot {
+        padding: 0 12px;
+    }
+
+    .userDropName {
+        display: none;
+    }
+}
+
+/* ===== 单词库 ===== */
+
+.wordsPage {
+    background: #f7f7f7;
+}
+
+.wdHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: #fff;
+}
+
+.wdHeadLeft {
+    flex: 1;
+    min-width: 0;
+}
+
+.wdMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.wdTabs {
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.wdTabs::-webkit-scrollbar {
+    display: none;
+}
+
+.wdTab {
+    flex: 0 0 auto;
+    height: 36px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(51, 51, 51, 0.7);
+    font-size: 14px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.wdTabAct {
+    background: #0056b5;
+    color: #fff;
+    font-weight: 600;
+}
+
+.wdBody {
+    padding: 20px;
+}
+
+.wdGrid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.wdCard {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.wdCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.wdCover {
+    position: relative;
+    height: 120px;
+    background: linear-gradient(180deg, var(--wd-tone) 0%, #ffffff 100%);
+}
+
+.wdIcon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 101px;
+    height: 101px;
+    transform: translate(-50%, -50%);
+}
+
+.wdFav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.wdFav img {
+    display: block;
+    width: 32px;
+    height: 32px;
+}
+
+.wdInfo {
+    padding: 12px 12px 8px;
+}
+
+.wdTitle {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+    color: #333;
+}
+
+.wdDesc {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 17px;
+    color: #666;
+}
+
+.wdTags {
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.wdTag {
+    display: inline-flex;
+    align-items: center;
+    height: 25px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: #daecff;
+    color: #0056b5;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.wdProgress {
+    margin-top: 10px;
+}
+
+.wdBar {
+    width: 141px;
+    max-width: 70%;
+    height: 10px;
+    border-radius: 5px;
+    background: #eaedef;
+    overflow: hidden;
+}
+
+.wdBarFill {
+    height: 100%;
+    border-radius: 5px;
+    background: #00c26d;
+    transition: width 0.3s;
+}
+
+.wdLearned {
+    margin-left: 20px;
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+}
+
+.wdEmpty {
+    padding: 80px 0;
+}
+
+.wdEmptyImg {
+    width: 220px;
+    max-width: 60%;
+    opacity: 0.9;
+}
+
+.wdEmptyText {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #999;
+}
+
+html.dark .wordsPage {
+    background: var(--bg-container);
+}
+
+html.dark .wdHead,
+html.dark .wdCard {
+    background: var(--bg-card);
+}
+
+html.dark .wdCover {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--wd-tone) 30%, var(--bg-card)) 0%,
+        var(--bg-card) 100%
+    );
+}
+
+html.dark .wdTab {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+html.dark .wdTabAct {
+    color: #fff;
+}
+
+html.dark .wdTitle {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .wdDesc,
+html.dark .wdLearned {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .wdBar {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+html.dark .wdMenu img {
+    filter: invert(1);
+}
+
+@media (max-width: 1400px) {
+    .wdGrid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1150px) {
+    .wdGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    .wdGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575px) {
+    .wdHead {
+        padding: 0 12px;
+    }
+
+    .wdTab {
+        padding: 0 12px;
+    }
+
+    .wdBody {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 460px) {
+    .wdGrid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

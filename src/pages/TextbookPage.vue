@@ -25,21 +25,7 @@
         </div>
       </div>
 
-      <el-dropdown trigger="click">
-        <button type="button" class="tbUser flex ac">
-          <el-image class="tbUserAvatar" :src="avatarUrl" fit="cover" />
-          <span class="tbUserName">{{ displayName }}</span>
-          <el-icon class="tbUserArrow"><ArrowDown /></el-icon>
-        </button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="toggleTheme">
-              {{ isDark ? "白天模式" : "夜间模式" }}
-            </el-dropdown-item>
-            <el-dropdown-item @click="onLogout">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <UserDropdown />
     </header>
 
     <div class="tbEditions flex ac">
@@ -94,12 +80,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import { ArrowDown } from "@element-plus/icons-vue";
-import { avatarUrl, displayName, logout } from "@/composables/useAuth";
-import { isDark, toggleTheme } from "@/composables/useTheme";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
+import UserDropdown from "@/components/UserDropdown.vue";
 import {
   editionTone,
   gradeTone,
@@ -109,7 +92,6 @@ import {
   type TextbookItem,
 } from "@/data/textbook";
 
-const router = useRouter();
 const grade = ref("全部");
 const edition = ref("全部版本");
 
@@ -129,8 +111,4 @@ function openBook(book: TextbookItem) {
   ElMessage.info(`${book.title}即将上线`);
 }
 
-function onLogout() {
-  logout();
-  void router.push("/login/index");
-}
 </script>

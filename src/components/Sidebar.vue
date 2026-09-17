@@ -39,10 +39,12 @@ const primary = [
   {
     label: "单词库",
     icon: "/clone-assets/menu/word.svg",
+    to: "/words/index",
   },
   {
     label: "音标练习",
     icon: "/clone-assets/menu/phonetic.svg",
+    to: "/phonetic/index",
   },
   {
     label: "学习计划",
