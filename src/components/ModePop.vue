@@ -1,52 +1,40 @@
 <template>
   <Teleport to="body">
-    <div v-if="visible" class="searchLayer">
-      <div class="van-overlay vanPopupMask" />
-      <div class="van-popup van-popup--center" role="dialog">
-        <div class="galssPop popL">
-          <div class="galssHead flex jb ac">
-            <div class="size30 white">选择练习模式</div>
-            <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="close">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
-                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-              </svg>
-            </button>
-          </div>
-          <div class="pt40 pr40 pb40 pl40 white">
-            <el-carousel
-              ref="carouselRef"
-              type="card"
-              height="230px"
-              :autoplay="false"
-              arrow="never"
-              indicator-position="none"
-              @change="onChange"
-            >
-              <el-carousel-item v-for="(item, index) in modes" :key="item.gameMode">
-                <div
-                  class="modeCard flex col je ac"
-                  :class="active === index ? 'hoverCard' : 'defCard'"
-                  :style="{ backgroundImage: `url(${item.bg})` }"
-                  @click="select(index)"
-                >
-                  <div class="mask" />
-                  <div class="tag">{{ item.tag }}</div>
-                  <div class="size28 bold6 rel mb10">{{ item.title }}</div>
-                  <div class="size-18 tc rel pl10 pr10 desc">{{ item.desc }}</div>
-                </div>
-              </el-carousel-item>
-            </el-carousel>
-          </div>
-          <div class="flex ast galssBot">
-            <div class="flex1 pl40 pb40 pt20 pr20">
-              <div class="flex jc ac hand cancelBtn" @click="close">取消</div>
-            </div>
-            <div class="galssLine" />
-            <div class="flex1 pr40 pb40 pt20 pl20">
-              <div class="flex jc ac hand confirmBtn" @click="confirm">开始练习</div>
-            </div>
-          </div>
+    <div v-if="visible" class="modePopLayer">
+      <div class="modePopMask" @click="close" />
+
+      <div class="modePop" role="dialog" aria-label="选择练习模式">
+        <span class="modeGlow modeGlowBlue" aria-hidden="true" />
+        <span class="modeGlow modeGlowGreen" aria-hidden="true" />
+
+        <button type="button" class="modePopClose" aria-label="关闭" @click="close">
+          <img src="/clone-assets/mode2/close.png" alt="" />
+        </button>
+
+        <div class="modePopHead">
+          <div class="modePopTitle">选择练习模式</div>
+          <div v-if="subtitle" class="modePopSub">{{ subtitle }}</div>
+        </div>
+
+        <div class="modePopCards flex jc ac">
+          <button
+            v-for="(item, index) in modes"
+            :key="item.gameMode"
+            type="button"
+            class="modeCard flex col ac"
+            :class="{ modeCardAct: active === index }"
+            @click="select(index)"
+          >
+            <img class="modeCardIcon" :src="item.icon" :alt="item.title" />
+            <div class="modeCardTitle">{{ item.title }}</div>
+            <div class="modeCardDesc">{{ item.desc }}</div>
+            <img
+              class="modeCardArrow"
+              :src="item.arrow"
+              alt=""
+              @click.stop="start(index)"
+            />
+          </button>
         </div>
       </div>
     </div>
@@ -54,16 +42,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import type { CarouselInstance } from "element-plus";
 import { gameSession, saveGameInfo, type GameMode } from "@/composables/useGame";
 
 interface ModeItem {
   title: string;
-  tag: string;
   desc: string;
-  bg: string;
+  icon: string;
+  arrow: string;
   gameMode: GameMode;
   practiceMode: 0 | 1 | 2 | 3;
 }
@@ -71,74 +58,70 @@ interface ModeItem {
 const router = useRouter();
 const visible = ref(false);
 const active = ref(0);
-const carouselRef = ref<CarouselInstance>();
 
-const modes = computed<ModeItem[]>(() => [
-  {
-    title: "中译英模式",
-    tag: "新手推荐",
-    desc: "看到中文提示，尝试用英文表达。练习运用所学词汇和语法",
-    bg: "/clone-assets/mode/translate.png",
-    gameMode: "SentenceTranslate",
-    practiceMode: 3,
-  },
-  {
-    title: "听力模式",
-    tag: "泛听神器",
-    desc: "播放英语音频，让你沉浸在语言环境中。培养语感，熟悉发音",
-    bg: "/clone-assets/mode/listen.png",
-    gameMode: "SentenceListen",
-    practiceMode: 0,
-  },
+const modes: ModeItem[] = [
   {
     title: "打字练习",
-    tag: "输入强化",
-    desc: "在练题过程中提升打字速度与拼写准确率",
-    bg: "/clone-assets/mode/typing.png",
+    desc: "根据中文提示\n输入英语单词",
+    icon: "/clone-assets/mode2/icon-typing.png",
+    arrow: "/clone-assets/mode2/arrow-typing.png",
     gameMode: "SentenceTypeing",
     practiceMode: 1,
   },
   {
     title: "口语练习",
-    tag: "口语矫正",
-    desc: "跟读句子并练习发音，让口语表达更自然流畅",
-    bg: "/clone-assets/mode/oral.png",
+    desc: "跟读发音\nAI智能识别",
+    icon: "/clone-assets/mode2/icon-oral.png",
+    arrow: "/clone-assets/mode2/arrow-oral.png",
     gameMode: "SentenceOral",
     practiceMode: 2,
   },
-]);
+  {
+    title: "中译英",
+    desc: "根据中文提示\n输入英语单词",
+    icon: "/clone-assets/mode2/icon-translate.png",
+    arrow: "/clone-assets/mode2/arrow-translate.png",
+    gameMode: "SentenceTranslate",
+    practiceMode: 3,
+  },
+  {
+    title: "听力模式",
+    desc: "听英文发音\n选择正确单词",
+    icon: "/clone-assets/mode2/icon-listen.png",
+    arrow: "/clone-assets/mode2/arrow-listen.png",
+    gameMode: "SentenceListen",
+    practiceMode: 0,
+  },
+];
 
-async function open() {
+/** 副标题显示当前课程 / 词书名称 */
+const subtitle = computed(
+  () => gameSession.value?.courseName || gameSession.value?.gameTitle || "",
+);
+
+function open() {
   visible.value = true;
   const current = gameSession.value?.gameMode;
-  const index = Math.max(
-    0,
-    modes.value.findIndex((item) => item.gameMode === current),
-  );
-  active.value = index;
-  await nextTick();
-  if (index > 0) carouselRef.value?.setActiveItem(index);
+  const index = modes.findIndex((item) => item.gameMode === current);
+  active.value = index >= 0 ? index : 0;
 }
 
 function close() {
   visible.value = false;
 }
 
-function onChange(index: number) {
+function select(index: number) {
   active.value = index;
 }
 
-function select(index: number) {
-  if (index === active.value) {
-    confirm();
-    return;
-  }
+/** 点卡片右下角的箭头：选中该模式并直接开始 */
+function start(index: number) {
   active.value = index;
-  carouselRef.value?.setActiveItem(index);
+  confirm();
 }
 
 function confirm() {
-  const item = modes.value[active.value];
+  const item = modes[active.value];
   if (!item) return;
   saveGameInfo({ gameMode: item.gameMode, practiceMode: item.practiceMode });
   visible.value = false;
