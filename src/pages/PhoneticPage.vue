@@ -43,7 +43,7 @@
             <img class="phLearnIcon" src="/clone-assets/phonetic/people.png" alt="" />
             <span class="phLearnText">已有{{ course.learners }}人学习</span>
             <div class="phBar">
-              <div class="phBarFill" :style="{ width: `${course.progress}%` }" />
+              <div class="phBarFill" :style="{ width: `${course.learners}%` }" />
             </div>
           </div>
           <button type="button" class="phStart" @click="startCourse(course)">开始学习</button>
