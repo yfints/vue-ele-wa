@@ -5499,6 +5499,23 @@ html.dark .userDrop {
     background: #004b9e;
 }
 
+.phEmpty {
+    flex: 1 0 100%;
+    padding: 80px 0;
+}
+
+.phEmptyImg {
+    width: 220px;
+    max-width: 60%;
+    opacity: 0.9;
+}
+
+.phEmptyText {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #999;
+}
+
 html.dark .phoneticPage {
     background: var(--bg-container);
 }

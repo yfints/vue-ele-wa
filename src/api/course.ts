@@ -123,11 +123,23 @@ export interface CourseCategory {
 export interface CourseVo {
   id: number | string;
   categoryId?: number | string;
+  categoryName?: string;
+  category_name?: string;
   name?: string;
   cover?: string;
+  image?: string;
   description?: string;
+  describe?: string;
   courseType?: number;
   sortOrder?: number;
+  heat?: number;
+  humanNum?: number;
+  human_num?: number;
+  courseNum?: number;
+  course_num?: number;
+  percentage?: number;
+  progress?: number;
+  tags?: string[] | string;
   access?: { allowed?: boolean; reason?: string };
 }
 
@@ -150,12 +162,35 @@ export function fetchCourseCategories(params?: { type?: number }) {
 
 export function fetchCourses(params?: {
   categoryId?: number | string;
-  courseType?: number;
+  courseType?: number | string;
+  /** 课程类型筛选：0=课程广场 1=教材同步 3=音标 */
+  type?: number | string;
   keyword?: string;
+  page?: number;
+  limit?: number;
   current?: number;
   size?: number;
 }) {
   return get<CoursePage>("/courses", params, { skipAuthRedirect: true });
+}
+
+/** 分页结构兼容：records / list / rows，或者直接返回数组 */
+export function unwrapCoursePage(data: unknown): CoursePage {
+  const obj = asRecord(data);
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(obj?.records)
+      ? obj?.records
+      : Array.isArray(obj?.list)
+        ? obj?.list
+        : Array.isArray(obj?.rows)
+          ? obj?.rows
+          : [];
+  const total = obj?.total ?? obj?.count;
+  return {
+    records: list as CourseVo[],
+    total: total == null ? undefined : Number(total),
+  };
 }
 
 export function studyPlanLesson(courseId: string | number) {
