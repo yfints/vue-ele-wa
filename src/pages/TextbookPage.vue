@@ -92,7 +92,7 @@
               >
                 {{ tag.name }}
               </span>
-              <span v-if="book.units > 0" class="tbTag tbTagUnit">{{ book.unitText }}</span>
+
             </div>
           </div>
         </article>
@@ -144,7 +144,6 @@ interface TextbookCard {
   desc: string;
   tags: CardTag[];
   units: number;
-  unitText: string;
   cover: string;
 }
 
@@ -189,7 +188,6 @@ function toCard(course: CourseVo, index: number): TextbookCard {
     desc: String(course.description ?? course.describe ?? "").trim(),
     tags,
     units: courseNum,
-    unitText: `共${courseNum}单元`,
     cover: course.cover || coverOf(course, index),
   };
 }
