@@ -27,11 +27,11 @@
         <section class="wdhCard wdhSummary flex jb">
           <div class="wdhSummaryLeft flex ac">
             <div class="wdhIconBox" :style="{ background: iconGradient }">
-              <img class="wdhIcon" :src="icon" :alt="detail.name" />
+              <img class="wdhIcon" :src="detail?.cover || ''" :alt="detail?.name || ''" />
             </div>
             <div class="wdhInfo">
-              <div class="wdhTitle line1">{{ detail.name }}</div>
-              <div class="wdhDesc line1">{{ detail.description }}</div>
+              <div class="wdhTitle line1">{{ detail?.name || "" }}</div>
+              <div class="wdhDesc line1">{{ detail?.description || "" }}</div>
               <div class="wdhTags flex ac">
                 <span v-for="tag in tags" :key="tag" class="wdhTag">{{ tag }}</span>
               </div>
@@ -204,7 +204,6 @@ let wordSeq = 0;
 
 const bookId = computed(() => String(route.params.id || ""));
 const tone = computed(() => wordTone(0));
-const icon = computed(() => wordIcon(0));
 const iconGradient = computed(
   () => `linear-gradient(180deg, ${tone.value} 0%, #ffffff 100%)`,
 );
