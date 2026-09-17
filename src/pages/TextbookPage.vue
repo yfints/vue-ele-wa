@@ -189,7 +189,7 @@ function toCard(course: CourseVo, index: number): TextbookCard {
     desc: String(course.description ?? course.describe ?? "").trim(),
     tags,
     units: courseNum,
-    unitText: `共${courseNum}课`,
+    unitText: `共${courseNum}单元`,
     cover: coverOf(course, index),
   };
 }
