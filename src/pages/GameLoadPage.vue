@@ -51,10 +51,15 @@ async function loadRemote() {
     return false;
   }
   const cursor = Number(payload.meta?.progressIndex || 0);
-  const start = list.findIndex((item) => Number(item.index) >= cursor);
+  // 从单词表点中某一词进来的，优先定位到那个词；否则接着上次的进度
+  const startItemId = session.startItemId;
+  const picked = startItemId
+    ? list.findIndex((item) => String(item.itemId) === String(startItemId))
+    : -1;
+  const start = picked >= 0 ? picked : list.findIndex((item) => Number(item.index) >= cursor);
   gameList.value = list;
   gameIndex.value = start >= 0 ? start : 0;
-  saveGameInfo({ practiceMode: mode });
+  saveGameInfo({ practiceMode: mode, startItemId: undefined });
   return true;
 }
 

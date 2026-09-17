@@ -5085,6 +5085,18 @@ html.dark .tbMenu img {
     background: rgba(245, 248, 254, 0.5);
 }
 
+/* 点整行进入练习模式选择 */
+.wdhRowClickable {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+@media (hover: hover) {
+    .wdhRowClickable:hover {
+        background: #f5f8fe;
+    }
+}
+
 .wdhCell {
     min-width: 0;
     padding-left: 10px;
@@ -5230,6 +5242,12 @@ html.dark .wdhRow {
 
 html.dark .wdhRowActive {
     background: rgba(255, 255, 255, 0.05);
+}
+
+@media (hover: hover) {
+    html.dark .wdhRowClickable:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
 }
 
 html.dark .wdhCell,

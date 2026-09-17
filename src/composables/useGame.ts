@@ -31,6 +31,8 @@ export interface GameSession {
   gameMode: GameMode;
   practiceMode: PracticeMode;
   userLessonId: string;
+  /** 从单词表点进来时记住点中的那个单词，加载页据此定位起始题 */
+  startItemId?: string;
 }
 
 export interface PracticeSettings {
@@ -153,6 +155,8 @@ function persistList() {
 }
 
 export function gameBackPath(session = gameSession.value) {
+  // 单词库进来的练习，退出后回词书详情而不是课程详情
+  if (session?.gameType === "Word" && session.courseId) return `/words/${session.courseId}`;
   if (session?.courseId) return `/courseMall/${session.courseId}`;
   return "/courseMall/index";
 }

@@ -78,8 +78,10 @@
               <div
                 v-for="row in pageRows"
                 :key="row.id"
-                class="wdhRow"
+                class="wdhRow wdhRowClickable"
                 :class="{ wdhRowActive: playingId === row.id }"
+                :title="`练习「${row.word}」`"
+                @click="startPractice(row)"
               >
                 <div class="wdhCell wdhCellIndex">{{ row.no }}</div>
                 <div class="wdhCell wdhCellMain wdhWord">{{ row.word }}</div>
@@ -91,7 +93,7 @@
                     class="wdhSpeak"
                     :class="{ wdhSpeakAct: playingId === row.id }"
                     :aria-label="`播放 ${row.word}`"
-                    @click="playWord(row)"
+                    @click.stop="playWord(row)"
                   >
                     <svg class="wdhSpeaker" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M11 5.2 6.8 8.4H3.6v7.2h3.2L11 18.8z" />
@@ -143,6 +145,8 @@
         <button type="button" class="wdhStart mt20" @click="backToList">返回单词库</button>
       </div>
     </div>
+
+    <ModePop ref="modeRef" />
   </div>
 </template>
 
@@ -152,7 +156,9 @@ import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
+import ModePop from "@/components/ModePop.vue";
 import {
+  fetchLessonDetails,
   fetchCollectLessons,
   toggleCollect as toggleCourseCollect,
   unwrapCollectPage,
@@ -165,6 +171,8 @@ import {
   type WordSetDetail,
 } from "@/api/words";
 import { getToken } from "@/api/token";
+import { ensureLogin } from "@/composables/useAuth";
+import { saveGameInfo } from "@/composables/useGame";
 import { localAsset } from "@/data/mall";
 import { wordIcon, wordTone } from "@/data/words";
 
@@ -185,6 +193,12 @@ const total = ref(0);
 const loading = ref(true);
 const loadingWords = ref(false);
 const collected = ref(false);
+/** 词书里的课时 id：练习的 lessonId 用的是它，不是词书（course）id */
+const lesson = ref<{ id: string; name: string } | null>(null);
+/** 会员判定，false 时不允许进入练习 */
+const access = ref<{ allowed?: boolean; reason?: string } | null>(null);
+const modeRef = ref<{ open: () => void } | null>(null);
+let starting = false;
 let audioEl: HTMLAudioElement | null = null;
 let wordSeq = 0;
 
@@ -218,7 +232,58 @@ function backToList() {
 }
 
 function startStudy() {
-  ElMessage.info(`${detail.value?.name || "该单词集"}的单词练习即将上线`);
+  void startPractice();
+}
+
+/**
+ * 点表格某一行（或「开始学习」）进入练习：
+ * 先存好本词书的课时信息，再弹出 ModePop 选模式，选完由它跳 /gameLoad。
+ */
+async function startPractice(row?: WordRow) {
+  if (starting) return;
+  const current = detail.value;
+  if (!current) return;
+  if (!getToken()) {
+    await ensureLogin();
+    return;
+  }
+  if (!lesson.value) {
+    ElMessage.info("该词书暂无可用课时");
+    return;
+  }
+  if (access.value?.allowed === false) {
+    ElMessage.info(access.value.reason === "NEED_MEMBER" ? "该词书为会员内容，暂无法学习" : "暂无法学习该词书");
+    return;
+  }
+  starting = true;
+  try {
+    saveGameInfo({
+      courseId: bookId.value,
+      chapterId: String(lesson.value.id),
+      gameTitle: lesson.value.name,
+      courseName: String(current.name || ""),
+      gameType: "Word",
+      gameMode: "SentenceTranslate",
+      userLessonId: "",
+      startItemId: row ? String(row.id) : undefined,
+    });
+    modeRef.value?.open();
+  } finally {
+    starting = false;
+  }
+}
+
+/** 词书的课时与会员判定（课程详情接口下发），练习要用课时的 id */
+async function loadCourseExtra() {
+  try {
+    const data = await fetchLessonDetails(bookId.value);
+    const first = (data?.lessons || [])[0];
+    lesson.value = first ? { id: String(first.id), name: String(first.name || "") } : null;
+    access.value = data?.access ?? null;
+  } catch {
+    lesson.value = null;
+    access.value = null;
+  }
 }
 
 async function loadCollectState() {
@@ -333,12 +398,12 @@ watch(page, () => {
 
 watch(bookId, async () => {
   page.value = 1;
-  await Promise.all([loadDetail(), loadCollectState()]);
+  await Promise.all([loadDetail(), loadCourseExtra(), loadCollectState()]);
   await loadWords();
 });
 
 onMounted(async () => {
-  await Promise.all([loadDetail(), loadCollectState()]);
+  await Promise.all([loadDetail(), loadCourseExtra(), loadCollectState()]);
   await loadWords();
 });
 </script>
