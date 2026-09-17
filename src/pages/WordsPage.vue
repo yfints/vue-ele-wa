@@ -144,9 +144,7 @@ function toCard(course: CourseVo, index: number): WordSetCard {
   const tagNames = categories
     .map((item) => String(item.name || "").trim())
     .filter(Boolean);
-  const wordCount = Number(course.wordCount ?? 0) || 0;
   const tags = tagNames.slice(0, 1);
-  if (wordCount > 0) tags.push(`共${wordCount}词`);
   return {
     id: String(course.id),
     title: String(course.name || "").trim(),
@@ -154,7 +152,7 @@ function toCard(course: CourseVo, index: number): WordSetCard {
     tags,
     learned: progressMap.value[String(course.id)] ?? 0,
     tone: wordTone(index),
-    icon: wordIcon(index),
+    icon: course.cover || wordIcon(index),
   };
 }
 
