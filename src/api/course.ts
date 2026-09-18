@@ -97,6 +97,8 @@ export interface CourseDetailVo {
   units?: CourseUnitVo[];
   /** 教材单元数（非教材课为 0） */
   unitCount?: number;
+  /** 音标课的读音分组（对应 C 端音标详情页的卡片数据） */
+  phoneticGroups?: CoursePhoneticGroupVo[];
   progress?: CourseProgressVo;
   timeSeconds?: number;
   lastLessonId?: number | string | null;
@@ -135,6 +137,44 @@ export interface CourseCategory {
   humanNum?: number;
   human_num?: number;
   percentage?: number;
+}
+
+/**
+ * 音标课读音分组。后端字段名可能与前端约定不完全一致，
+ * 页面侧做了兼容解析（见 PhoneticDetailPage 的 normalizeGroups）。
+ */
+export interface CoursePhoneticGroupVo {
+  id?: number | string;
+  name?: string;
+  title?: string;
+  label?: string;
+  groupName?: string;
+  group_name?: string;
+  tone?: string;
+  color?: string;
+  items?: CoursePhoneticItemVo[];
+  [key: string]: unknown;
+}
+
+export interface CoursePhoneticItemVo {
+  id?: number | string;
+  ipa?: string;
+  symbol?: string;
+  phonetic?: string;
+  text?: string;
+  content?: string;
+  type?: string;
+  typeLabel?: string;
+  type_label?: string;
+  label?: string;
+  description?: string;
+  tips?: unknown[];
+  points?: unknown[];
+  sentences?: unknown[];
+  examples?: unknown[];
+  words?: unknown[];
+  samples?: unknown[];
+  [key: string]: unknown;
 }
 
 /** 教材单元：名称字段后端可能用 unitName / name / title，前端做兼容 */
