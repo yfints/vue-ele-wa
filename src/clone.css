@@ -4643,7 +4643,7 @@ html:not(.dark) .listPop .galssPop {
     display: block;
     width: 100%;
     aspect-ratio: 4 / 3;
-    object-fit: cover;
+    background: #f7f9fc;
 }
 
 .tbInfo {
