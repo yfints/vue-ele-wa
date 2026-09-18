@@ -6029,6 +6029,7 @@ html.dark .wdMenu img {
     background: transparent;
     color: #0056b5;
     cursor: pointer;
+    top:-10px;
 }
 
 .practiceSpeedIcon {
