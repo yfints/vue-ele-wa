@@ -6,6 +6,8 @@ import "element-plus/theme-chalk/dark/css-vars.css";
 import App from "./App.vue";
 import router from "./router";
 import { initTheme } from "./composables/useTheme";
+import { fetchMe } from "./composables/useAuth";
+import { getToken } from "./api/token";
 import "./index.css";
 import "./clone.css";
 
@@ -15,6 +17,12 @@ const app = createApp(App);
 app.use(router);
 app.use(ElementPlus, { locale: zhCn });
 app.mount("#root");
+
+/**
+ * 全局先拉一次用户资料：/game、/gameLoad 这些不经过 AppLayout 的页面
+ * 也要能显示昵称和头像（否则刷新后只能回退成「学员」+ 默认头像）。
+ */
+if (getToken()) void fetchMe();
 
 /**
  * 手机真机调试用的 vConsole：
