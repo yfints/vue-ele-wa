@@ -180,9 +180,16 @@ function groupsFromUnits(units: CourseUnitVo[]): LessonGroup[] {
     .filter((group) => group.lessons.length > 0);
 }
 
-/** 单元名优先取接口的 unitLabel，其次 unitName / unit_name / name / title，都没有就用「Unit N」 */
+/** 单元名优先取接口的 unitTitle，其余字段 / 「Unit N」只是兜底 */
 function unitTitle(unit: CourseUnitVo, index: number) {
-  const name = [unit.unitLabel, unit.unitName, unit.unit_name, unit.name, unit.title]
+  const name = [
+    unit.unitTitle,
+    unit.unitLabel,
+    unit.unitName,
+    unit.unit_name,
+    unit.name,
+    unit.title,
+  ]
     .map((value) => String(value || "").trim())
     .find(Boolean);
   if (name) return name;

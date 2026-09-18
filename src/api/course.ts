@@ -133,6 +133,8 @@ export interface CourseUnitVo {
   id?: number | string;
   unitNo?: number | string;
   /** 单元展示名（接口字段） */
+  unitTitle?: string;
+  /** 兼容字段：部分接口用过 unitLabel */
   unitLabel?: string;
   unitName?: string;
   unit_name?: string;
