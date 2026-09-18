@@ -107,7 +107,7 @@ import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
-import { avatarUrl, fetchMe, logout, user } from "@/composables/useAuth";
+import { DEFAULT_AVATAR, avatarUrl, fetchMe, logout, user } from "@/composables/useAuth";
 import { getToken } from "@/api/token";
 import { cancelMyAccount, updateMyProfile, uploadFile } from "@/api/user";
 import { localAsset } from "@/data/mall";
@@ -125,7 +125,7 @@ const form = reactive({ nickname: "", signature: "", wechatId: "" });
 const userId = computed(() => String(user.value?.userId ?? ""));
 const phone = computed(() => String(user.value?.phone ?? ""));
 const shownAvatar = computed(() => avatarPreview.value || avatarUrl.value);
-const avatarSrc = computed(() => (avatarFailed.value ? "/clone-assets/ico.jpg" : shownAvatar.value));
+const avatarSrc = computed(() => (avatarFailed.value ? DEFAULT_AVATAR : shownAvatar.value));
 
 watch(shownAvatar, () => {
   avatarFailed.value = false;
@@ -173,7 +173,7 @@ async function saveProfile(extra: { headImg?: string } = {}) {
     wechatId: form.wechatId.trim() || null,
     ...extra,
   });
-  return true;
+  return true; 
 }
 
 function pickAvatar() {
@@ -207,7 +207,7 @@ async function onAvatarChange(event: Event) {
     const saved = String(user.value?.headImg || "").includes(path);
     avatarPreview.value = "";
     if (saved) ElMessage.success("头像已更新");
-    else ElMessage.warning("头像已上传，但接口未保存该字段（/user/profile 需支持 headImg）");
+    else ElMessage.warning("头像保存失败，请重试");
   } catch {
     avatarPreview.value = "";
     /* http 层已提示 */

@@ -19,7 +19,11 @@
           fit="cover"
           alt="个人信息"
           @click.stop="openProfile"
-        />
+        >
+          <template #error>
+            <img class="dashUserAvatar hand" :src="DEFAULT_AVATAR" alt="个人信息" />
+          </template>
+        </el-image>
         <el-dropdown trigger="click">
           <button type="button" class="dashUser">
           <span class="dashUserName">{{ displayName }}</span>
@@ -213,7 +217,7 @@ import {
   type StudyCount,
   type StudyNum,
 } from "@/api/home";
-import { avatarUrl, displayName, logout } from "@/composables/useAuth";
+import { DEFAULT_AVATAR, avatarUrl, displayName, logout } from "@/composables/useAuth";
 import { currentYearMonth, formatDurationParts } from "@/lib/time";
 
 const studyTabs = [

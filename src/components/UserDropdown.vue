@@ -6,7 +6,11 @@
       fit="cover"
       alt="个人信息"
       @click.stop="openProfile"
-    />
+    >
+      <template #error>
+        <img class="userDropAvatar hand" :src="DEFAULT_AVATAR" alt="个人信息" />
+      </template>
+    </el-image>
     <el-dropdown trigger="click">
       <button type="button" class="userDrop flex ac">
         <span class="userDropName">{{ displayName }}</span>
@@ -28,7 +32,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { ArrowDown } from "@element-plus/icons-vue";
-import { avatarUrl, displayName, logout } from "@/composables/useAuth";
+import { DEFAULT_AVATAR, avatarUrl, displayName, logout } from "@/composables/useAuth";
 
 const router = useRouter();
 

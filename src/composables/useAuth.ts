@@ -9,6 +9,9 @@ import { localAsset } from "@/data/mall";
 /** 当前登录用户资料，个人信息页需要直接读写 */
 export const user = ref<UserProfile | null>(null);
 
+/** 默认头像：接口 headImg 为 null、或头像地址失效时都用它 */
+export const DEFAULT_AVATAR = "/clone-assets/ico.jpg";
+
 export const isLoggedIn = computed(() => Boolean(getToken()));
 
 export const displayName = computed(
@@ -20,7 +23,7 @@ export const avatarUrl = computed(
     localAsset(
       user.value?.headImg || user.value?.avatar || user.value?.headimg || user.value?.head_img || "",
     ) ||
-    "/clone-assets/ico.jpg",
+    DEFAULT_AVATAR,
 );
 
 export const vipId = computed(() => user.value?.active_vips?.vip_id || 0);
