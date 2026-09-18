@@ -71,11 +71,8 @@
               type="button"
               class="practiceMic"
               :class="{ 'is-recording': recording, 'is-eval': evaluating }"
-              aria-label="按住麦克风开始录音"
-              @pointerdown="onMicDown"
-              @pointerup="onMicUp"
-              @pointercancel="onMicUp"
-              @pointerleave="onMicUp"
+              :aria-label="recording ? '结束录音' : '开始录音'"
+              @click="onMicClick"
               @contextmenu.prevent
             >
               <img src="/clone-assets/practice/mic.png" alt="" />
@@ -264,9 +261,9 @@ const speedText = computed(() => formatSpeed(props.speed || 1));
 
 const micHint = computed(() => {
   if (props.evaluating) return "评测中…";
-  if (props.recording) return "松手结束录音";
+  if (props.recording) return "录音中，点击结束";
   if (props.result) return props.result;
-  return props.hint || "按住麦克风开始录音";
+  return props.hint || "点击麦克风开始录音";
 });
 
 const hintTone = computed(() => {
@@ -299,45 +296,17 @@ function onSpeed(value: number | string) {
 }
 
 /**
- * 口语按住录音：按下开录、松手结束并评测。
- * 快速点一下（< 250ms）时改成「点一下开始、再点一下结束」，避免误触录到空音频。
+ * 口语录音：点一次开始，一直录；再点一次结束并送评测。
+ * 录音状态由父级（GamePage）维护，这里只发事件，避免两边状态打架。
  */
-let pressAt = 0;
-let holding = false;
-let latched = false;
-
-function onMicDown() {
+function onMicClick() {
   if (props.evaluating) return;
-  if (latched) {
-    latched = false;
+  if (props.recording) {
     emit("recordStop");
     return;
   }
-  if (holding || props.recording) return;
-  holding = true;
-  pressAt = Date.now();
   emit("recordStart");
 }
-
-function onMicUp() {
-  if (!holding) return;
-  holding = false;
-  if (Date.now() - pressAt < 250) {
-    latched = true;
-    return;
-  }
-  emit("recordStop");
-}
-
-watch(
-  () => props.recording,
-  (value) => {
-    if (!value) {
-      holding = false;
-      latched = false;
-    }
-  },
-);
 
 defineExpose({ focusInput });
 </script>
