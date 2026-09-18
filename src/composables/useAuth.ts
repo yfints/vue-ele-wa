@@ -6,7 +6,8 @@ import { clearAuth, getToken, setAccount, setToken } from "@/api/token";
 import type { LoginResult } from "@/api/auth";
 import { localAsset } from "@/data/mall";
 
-const user = ref<UserProfile | null>(null);
+/** 当前登录用户资料，个人信息页需要直接读写 */
+export const user = ref<UserProfile | null>(null);
 
 export const isLoggedIn = computed(() => Boolean(getToken()));
 
@@ -16,7 +17,9 @@ export const displayName = computed(
 
 export const avatarUrl = computed(
   () =>
-    localAsset(user.value?.avatar || user.value?.headimg || user.value?.head_img || "") ||
+    localAsset(
+      user.value?.headImg || user.value?.avatar || user.value?.headimg || user.value?.head_img || "",
+    ) ||
     "/clone-assets/ico.png",
 );
 

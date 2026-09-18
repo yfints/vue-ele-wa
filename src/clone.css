@@ -7061,3 +7061,242 @@ html.dark .practiceHead .userDrop {
         font-size: 15px;
     }
 }
+
+
+/* ===== 个人信息 ===== */
+
+.profilePage {
+    background: #f7f7f7;
+}
+
+.pfHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: #fff;
+}
+
+.pfHeadLeft {
+    flex: 1;
+    min-width: 0;
+}
+
+.pfMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.pfPageTitle {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pfBody {
+    padding: 20px;
+}
+
+.pfCard {
+    min-height: calc(100vh - 100px);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.pfBlock {
+    width: 800px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 38px 0 30px;
+}
+
+.pfBlock:last-child {
+    padding-top: 0;
+    padding-bottom: 40px;
+}
+
+.pfBlockTitle {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+}
+
+.pfDivider {
+    height: 1px;
+    margin-top: 4px;
+    background: #f6f6f6;
+}
+
+.pfRow {
+    display: flex;
+    align-items: center;
+    margin-top: 11px;
+}
+
+.pfDivider + .pfRow {
+    margin-top: 21px;
+}
+
+.pfLabel {
+    flex: 0 0 90px;
+    color: #666;
+    font-size: 14px;
+}
+
+.pfField {
+    width: 400px;
+    max-width: 100%;
+}
+
+.pfInput {
+    width: 100%;
+    height: 43px;
+    padding: 0 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fbfbfb;
+    color: #333;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pfInput::placeholder {
+    color: #999;
+}
+
+.pfInput.is-readonly {
+    color: #999;
+    cursor: default;
+}
+
+.pfInput:focus {
+    border-color: #0056b5;
+    box-shadow: 0 0 0 3px rgba(0, 86, 181, 0.1);
+}
+
+.pfAvatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.pfSubmit {
+    display: block;
+    width: 200px;
+    height: 43px;
+    margin-top: 21px;
+    margin-left: 90px;
+    border: none;
+    border-radius: 8px;
+    background: #0056b5;
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pfSubmit:hover:not(:disabled) {
+    background: #004b9e;
+}
+
+.pfSubmit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.pfLinkRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 55px;
+    margin-top: 18px;
+}
+
+.pfLinkRow + .pfLinkRow {
+    margin-top: 0;
+}
+
+.pfLinkRow .pfLabel {
+    flex: 0 0 auto;
+}
+
+.pfLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #0056b5;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.pfLinkDanger {
+    color: #ee2626;
+}
+
+.pfLinkArrow {
+    width: 14px;
+    height: 14px;
+}
+
+.userDropWrap {
+    flex: 0 0 auto;
+}
+
+.userDropAvatar.hand {
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .pfBody {
+        padding: 12px;
+    }
+
+    .pfCard {
+        min-height: calc(100vh - 84px);
+    }
+
+    .pfBlock {
+        padding: 20px 16px 20px;
+    }
+
+    .pfLabel {
+        flex: 0 0 68px;
+        font-size: 13px;
+    }
+
+    .pfField {
+        flex: 1;
+        width: auto;
+    }
+
+    .pfInput {
+        height: 40px;
+        padding: 0 12px;
+        font-size: 13px;
+    }
+
+    .pfAvatar {
+        width: 56px;
+        height: 56px;
+    }
+
+    .pfSubmit {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .pfLinkRow {
+        height: 48px;
+        margin-top: 8px;
+    }
+}

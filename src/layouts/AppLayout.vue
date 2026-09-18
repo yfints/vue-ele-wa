@@ -24,13 +24,14 @@ import { closeMenu, initLayoutViewport, isPhone, menuOpen } from "@/composables/
 import { fetchMe } from "@/composables/useAuth";
 
 const route = useRoute();
-/** 首页 / 教材学习 / 音标练习 / 单词库自带顶部栏（顶部栏由页面自己渲染），所以隐藏公共 TopBar */
+/** 首页 / 教材学习 / 音标练习 / 单词库 / 个人信息自带顶部栏（顶部栏由页面自己渲染），所以隐藏公共 TopBar */
 const bareHeader = computed(
   () =>
     route.path.startsWith("/home") ||
     route.path.startsWith("/textbook") ||
     route.path.startsWith("/phonetic") ||
-    route.path.startsWith("/words"),
+    route.path.startsWith("/words") ||
+    route.path.startsWith("/user"),
 );
 let stopViewport: (() => void) | undefined;
 
