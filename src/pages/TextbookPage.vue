@@ -104,29 +104,22 @@
       </div>
     </div>
 
-    <ModePop ref="modeRef" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
-import ModePop from "@/components/ModePop.vue";
 import {
   CATEGORY_KIND,
   fetchCourseCategories,
   fetchCourses,
-  fetchLessonDetails,
   unwrapCoursePage,
   type CourseCategory,
-  type CourseLessonVo,
   type CourseVo,
 } from "@/api/course";
-import { getToken } from "@/api/token";
-import { ensureLogin } from "@/composables/useAuth";
-import { saveGameInfo } from "@/composables/useGame";
 import { localAsset } from "@/data/mall";
 import { editionTone, gradeTone } from "@/data/textbook";
 
@@ -166,9 +159,7 @@ const loadingList = ref(true);
 /** 首屏（分类 + 第一份列表）加载完成前不响应 watch，避免重复请求 */
 let inited = false;
 let requestSeq = 0;
-/** 点卡片进练习时取课时，防止连点重复请求 */
-let starting = false;
-const modeRef = ref<{ open: () => void } | null>(null);
+const router = useRouter();
 
 const gradeTabs = computed<TabItem[]>(() =>
   gradeCats.value.map((item) => ({ id: item.id, name: String(item.name || "").trim() })),
@@ -251,57 +242,12 @@ function hash(text: string) {
 }
 
 /**
- * 点教材卡片 → 弹 ModePop 选练习模式。
- * 教材是多单元的课程包，练习要的是「课时 id」，所以先取一次课程详情；
- * 起始课时沿用课程详情页「继续学习」的规则：上次学过的 → lastLessonId → 第一个单元。
+ * 点教材卡片 → 进教材详情页（单元 / 课时列表）。
+ * 之前是直接弹模式选择进练习，现在中间多一层详情页，
+ * 练哪个课时由详情页决定，入口逻辑保持在 TextbookDetailPage 里。
  */
 async function openBook(book: TextbookCard) {
-  if (starting) return;
-  if (!getToken()) {
-    await ensureLogin();
-    return;
-  }
-  starting = true;
-  try {
-    const detail = await fetchLessonDetails(book.id);
-    const lessons = detail?.lessons || [];
-    const lesson = pickLesson(detail?.lastLessonId, lessons);
-    if (!lesson) {
-      ElMessage.info(`${book.title}暂无可用课时`);
-      return;
-    }
-    if (detail?.access?.allowed === false) {
-      ElMessage.info(
-        detail.access.reason === "NEED_MEMBER" ? "该教材为会员内容，暂无法学习" : "暂无法学习该教材",
-      );
-      return;
-    }
-    saveGameInfo({
-      courseId: String(detail?.id ?? book.id),
-      chapterId: String(lesson.id),
-      gameTitle: String(lesson.name || ""),
-      courseName: String(detail?.name || book.title || ""),
-      gameType: "Sentence",
-      gameMode: "SentenceTranslate",
-      userLessonId: detail?.userLessonId ? String(detail.userLessonId) : "",
-      // 清掉从单词库带过来的定位，避免在教材练习里找不到那个 itemId
-      startItemId: undefined,
-    });
-    modeRef.value?.open();
-  } catch {
-    ElMessage.info(`${book.title}暂无可用课时`);
-  } finally {
-    starting = false;
-  }
-}
-
-function pickLesson(lastLessonId: number | string | null | undefined, lessons: CourseLessonVo[]) {
-  const lastId = lastLessonId == null ? "" : String(lastLessonId);
-  return (
-    lessons.find((item) => item.lastTime) ||
-    (lastId ? lessons.find((item) => String(item.id) === lastId) : undefined) ||
-    lessons[0]
-  );
+  await router.push(`/textbook/${book.id}`);
 }
 
 async function loadCategories() {

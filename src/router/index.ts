@@ -10,6 +10,7 @@ import GameLoadPage from "@/pages/GameLoadPage.vue";
 import GamePage from "@/pages/GamePage.vue";
 import PhoneticPage from "@/pages/PhoneticPage.vue";
 import TextbookPage from "@/pages/TextbookPage.vue";
+import TextbookDetailPage from "@/pages/TextbookDetailPage.vue";
 import WordsPage from "@/pages/WordsPage.vue";
 import WordDetailPage from "@/pages/WordDetailPage.vue";
 
@@ -33,6 +34,11 @@ const router = createRouter({
           path: "textbook/index",
           component: TextbookPage,
           meta: { public: true, title: "教材学习" },
+        },
+        {
+          path: "textbook/:id",
+          component: TextbookDetailPage,
+          meta: { public: true, title: "课程详情" },
         },
         { path: "phonetic", redirect: "/phonetic/index", meta: { public: true } },
         {

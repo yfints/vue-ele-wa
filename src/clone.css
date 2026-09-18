@@ -6687,3 +6687,377 @@ html.dark .practiceHead .userDrop {
         width: 100%;
     }
 }
+
+
+/* ===== 教材详情（教材学习 → 课程详情）===== */
+
+.textbookDetailPage {
+    background: #f7f7f7;
+}
+
+.tbdHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: #fff;
+}
+
+.tbdHeadLeft {
+    flex: 1;
+    min-width: 0;
+}
+
+.tbdMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.tbdCrumbs {
+    min-width: 0;
+}
+
+.tbdCrumb {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.tbdCrumbSep {
+    width: 16px;
+    height: 16px;
+    margin: 0 11px;
+}
+
+.tbdCrumbCur {
+    color: #666;
+    font-size: 14px;
+}
+
+.tbdBody {
+    padding: 20px;
+}
+
+.tbdHero {
+    position: relative;
+    height: 160px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.tbdCover {
+    flex: 0 0 auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 16px;
+    background: #f3fbf6;
+    object-fit: cover;
+}
+
+.tbdInfo {
+    position: relative;
+    z-index: 1;
+    align-self: flex-start;
+    min-width: 0;
+    margin-left: 21px;
+    padding-top: 1px;
+}
+
+.tbdTitle {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
+}
+
+.tbdDesc {
+    margin-top: 8px;
+    color: #666;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.tbdTags {
+    gap: 12px;
+    margin-top: 7px;
+}
+
+.tbdTag {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.tbdDeco {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 430px;
+    height: 139px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    user-select: none;
+}
+
+.tbdStart {
+    position: absolute;
+    right: 21px;
+    bottom: 21px;
+    z-index: 1;
+    width: 140px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: #0056b5;
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.tbdStart:hover {
+    background: #004b9e;
+}
+
+.tbdUnit {
+    position: relative;
+    margin-top: 10px;
+    padding-bottom: 20px;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.tbdHero + .tbdUnit {
+    margin-top: 15px;
+}
+
+.tbdUnitHead {
+    position: relative;
+    padding: 24px 21px 21px;
+}
+
+.tbdUnitHead::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 35px;
+    background: linear-gradient(180deg, #dcedff 0%, rgba(220, 237, 255, 0) 100%);
+    content: "";
+}
+
+.tbdUnitTitle {
+    position: relative;
+    color: #333;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 28px;
+}
+
+.tbdLessons {
+    padding: 0 13px 0 20px;
+}
+
+.tbdLesson {
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+}
+
+.tbdLesson + .tbdLesson {
+    margin-top: 11px;
+}
+
+.tbdBadge {
+    flex: 0 0 auto;
+    width: 29px;
+    height: 29px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: #daebff;
+    color: #0056b5;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tbdLessonBody {
+    flex: 1;
+    min-width: 0;
+    height: 50px;
+    padding: 0 28px 0 12px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tbdLesson:hover .tbdLessonBody {
+    border-color: #bcd6f5;
+    box-shadow: 0 6px 16px rgba(0, 86, 181, 0.08);
+}
+
+.tbdLessonName {
+    color: #333;
+    font-size: 16px;
+}
+
+.tbdLessonTime {
+    flex: 0 0 auto;
+    margin-left: 16px;
+    color: #999;
+    font-size: 14px;
+}
+
+.tbdEmpty {
+    min-height: 320px;
+}
+
+.tbdEmptyImg {
+    width: 180px;
+}
+
+.tbdEmptyText {
+    margin-top: 12px;
+    color: #999;
+    font-size: 14px;
+}
+
+.tbdSkeletonHero {
+    margin-bottom: 15px;
+}
+
+.tbdSkeletonCover {
+    width: 120px;
+    height: 120px;
+    border-radius: 16px;
+}
+
+.tbdSkeletonTitle {
+    width: 260px;
+    height: 26px;
+}
+
+.tbdSkeletonDesc {
+    width: 320px;
+    height: 16px;
+    margin-top: 12px;
+}
+
+.tbdSkeletonTag {
+    width: 72px;
+    height: 28px;
+    border-radius: 8px;
+}
+
+.tbdSkeletonUnit {
+    padding: 24px 21px 20px;
+}
+
+.tbdSkeletonUnitTitle {
+    width: 200px;
+    height: 20px;
+}
+
+.tbdSkeletonBadge {
+    width: 29px;
+    height: 29px;
+}
+
+.tbdSkeletonLesson {
+    height: 18px;
+    margin-left: 20px;
+}
+
+@media (max-width: 900px) {
+    .tbdBody {
+        padding: 12px;
+    }
+
+    .tbdHero {
+        height: auto;
+        padding: 16px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .tbdCover {
+        width: 92px;
+        height: 92px;
+        border-radius: 12px;
+    }
+
+    .tbdInfo {
+        flex: 1;
+        margin-left: 14px;
+    }
+
+    .tbdTitle {
+        font-size: 18px;
+        line-height: 26px;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .tbdDesc {
+        margin-top: 6px;
+        font-size: 12px;
+    }
+
+    .tbdTags {
+        gap: 8px;
+        margin-top: 6px;
+    }
+
+    .tbdTag {
+        height: 24px;
+        padding: 0 10px;
+        font-size: 12px;
+    }
+
+    .tbdDeco {
+        display: none;
+    }
+
+    .tbdStart {
+        position: static;
+        flex: 0 0 100%;
+        width: 100%;
+        height: 40px;
+        margin-top: 16px;
+    }
+
+    .tbdUnitHead {
+        padding: 18px 14px 16px;
+    }
+
+    .tbdUnitTitle {
+        font-size: 18px;
+    }
+
+    .tbdLessons {
+        padding: 0 12px 0 14px;
+    }
+
+    .tbdLessonBody {
+        padding: 0 14px 0 12px;
+    }
+
+    .tbdLessonName {
+        font-size: 15px;
+    }
+}
