@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
@@ -117,13 +117,13 @@ import UserDropdown from "@/components/UserDropdown.vue";
 import { DEFAULT_AVATAR, avatarUrl, fetchMe, logout, user } from "@/composables/useAuth";
 import { getToken } from "@/api/token";
 import { cancelMyAccount, updateMyProfile, uploadFile } from "@/api/user";
-import { localAsset } from "@/data/mall";
 
 const router = useRouter();
 const saving = ref(false);
 const uploading = ref(false);
 const fileInputRef = ref<HTMLInputElement>();
-/** 上传后的本地预览，拉完最新资料就清掉，最终以服务端为准 */
+/** 选好待提交的头像文件 + 本地预览（点「提交」才上传） */
+const pendingAvatar = ref<File | null>(null);
 const avatarPreview = ref("");
 /** 头像地址失效时退回默认图，别显示成裂图 */
 const avatarFailed = ref(false);
@@ -151,10 +151,39 @@ watch(
 
 async function submit() {
   if (saving.value) return;
+  const nickname = form.nickname.trim();
+  if (!nickname) {
+    ElMessage.warning("用户名称不能为空");
+    return;
+  }
   saving.value = true;
   try {
-    if (!(await saveProfile())) return;
+    // 头像：提交时才真正上传（选图阶段只做本地预览）
+    const extra: { headImg?: string } = {};
+    if (pendingAvatar.value) {
+      uploading.value = true;
+      try {
+        const path = String((await uploadFile(pendingAvatar.value, 512)) || "");
+        if (!path) throw new Error("上传失败");
+        extra.headImg = path;
+      } finally {
+        uploading.value = false;
+      }
+    }
+    await updateMyProfile({
+      nickname,
+      // 接口约定：签名 / 微信号传 null 表示清空
+      signature: form.signature.trim() || null,
+      wechatId: form.wechatId.trim() || null,
+      ...extra,
+    });
     await fetchMe();
+    if (extra.headImg && !String(user.value?.headImg || "").includes(extra.headImg)) {
+      // 拉完最新资料再确认头像有没有真的落库，避免「看着成功了、刷新就没了」
+      ElMessage.warning("头像保存失败，请重试");
+      return;
+    }
+    clearPendingAvatar();
     ElMessage.success("保存成功");
   } catch {
     /* http 层已提示 */
@@ -163,33 +192,13 @@ async function submit() {
   }
 }
 
-/**
- * 保存资料：昵称 / 签名 / 微信号是必带项，头像作为可选项一起提交。
- * 返回昵称校验是否通过（头像是否落库由调用方拉完最新资料后判断）。
- */
-async function saveProfile(extra: { headImg?: string } = {}) {
-  const nickname = form.nickname.trim();
-  if (!nickname) {
-    ElMessage.warning("用户名称不能为空");
-    return false;
-  }
-  await updateMyProfile({
-    nickname,
-    // 接口约定：签名 / 微信号传 null 表示清空
-    signature: form.signature.trim() || null,
-    wechatId: form.wechatId.trim() || null,
-    ...extra,
-  });
-  return true; 
-}
-
 function pickAvatar() {
-  if (uploading.value) return;
+  if (uploading.value || saving.value) return;
   fileInputRef.value?.click();
 }
 
-/** 选图 → /upload（最长边 512）→ 随资料一起提交头像地址 */
-async function onAvatarChange(event: Event) {
+/** 选图只做本地预览，不传服务端；点「提交」时才上传并保存 */
+function onAvatarChange(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   // 清空 value，保证同一张图再选一次还能触发 change
@@ -203,24 +212,20 @@ async function onAvatarChange(event: Event) {
     ElMessage.warning("图片请控制在 5MB 以内");
     return;
   }
-  uploading.value = true;
-  try {
-    const path = String((await uploadFile(file, 512)) || "");
-    if (!path) throw new Error("上传失败");
-    avatarPreview.value = localAsset(path);
-    await saveProfile({ headImg: path });
-    await fetchMe();
-    // 拉完最新资料再判断头像有没有真的落库，避免"看着成功了、刷新就没了"
-    const saved = String(user.value?.headImg || "").includes(path);
-    avatarPreview.value = "";
-    if (saved) ElMessage.success("头像已更新");
-    else ElMessage.warning("头像保存失败，请重试");
-  } catch {
-    avatarPreview.value = "";
-    /* http 层已提示 */
-  } finally {
-    uploading.value = false;
-  }
+  releasePreview();
+  pendingAvatar.value = file;
+  avatarPreview.value = URL.createObjectURL(file);
+}
+
+/** 清掉待提交的图片与本地预览（提交成功 / 离开页面时调用） */
+function clearPendingAvatar() {
+  pendingAvatar.value = null;
+  releasePreview();
+}
+
+function releasePreview() {
+  if (avatarPreview.value.startsWith("blob:")) URL.revokeObjectURL(avatarPreview.value);
+  avatarPreview.value = "";
 }
 function changePassword() {
   // 当前账号是短信验证码登录，后端没有单独的改密接口
@@ -254,4 +259,6 @@ async function cancelAccount() {
 onMounted(() => {
   if (getToken()) void fetchMe();
 });
+
+onUnmounted(releasePreview);
 </script>
