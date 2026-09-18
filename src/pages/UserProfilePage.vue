@@ -255,5 +255,10 @@ async function cancelAccount() {
     /* http 层已提示 */
   }
 }
+
+onMounted(() => {
+  if (getToken()) void fetchMe();
+});
+
 onUnmounted(releasePreview);
 </script>
