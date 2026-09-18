@@ -112,6 +112,7 @@ import {
   fetchLessonDetails,
   type CourseDetailVo,
   type CourseLessonVo,
+  type CourseUnitVo,
 } from "@/api/course";
 import { localAsset } from "@/data/mall";
 import { editionTone, gradeTone } from "@/data/textbook";
@@ -154,7 +155,45 @@ const tags = computed<CardTag[]>(() => {
   return list;
 });
 
-const groups = computed<LessonGroup[]>(() => groupLessons(detail.value?.lessons || []));
+/**
+ * 单元列表：接口给了 units 就直接用（后端已经分好组），
+ * 老数据没有 units 时退回「按 lessons 自己分组」，两边都能渲染。
+ */
+const groups = computed<LessonGroup[]>(() => {
+  const units = detail.value?.units;
+  if (Array.isArray(units) && units.length) return groupsFromUnits(units);
+  return groupLessons(detail.value?.lessons || []);
+});
+
+/** 详情页里用到的全部课时（开始学习 / 按 lastLessonId 找续学课时都基于它） */
+const allLessons = computed<CourseLessonVo[]>(() =>
+  groups.value.flatMap((group) => group.lessons),
+);
+
+function groupsFromUnits(units: CourseUnitVo[]): LessonGroup[] {
+  return [...units]
+    .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
+    .map((unit, index) => ({
+      title: unitTitle(unit, index),
+      lessons: lessonsOfUnit(unit),
+    }))
+    .filter((group) => group.lessons.length > 0);
+}
+
+/** 单元名优先取接口的 unitLabel，其次 unitName / unit_name / name / title，都没有就用「Unit N」 */
+function unitTitle(unit: CourseUnitVo, index: number) {
+  const name = [unit.unitLabel, unit.unitName, unit.unit_name, unit.name, unit.title]
+    .map((value) => String(value || "").trim())
+    .find(Boolean);
+  if (name) return name;
+  const no = String(unit.unitNo ?? index + 1).trim();
+  return `Unit ${no}`;
+}
+
+function lessonsOfUnit(unit: CourseUnitVo) {
+  const list = unit.lessons || unit.lessonList || unit.lesson_list || [];
+  return Array.isArray(list) ? list : [];
+}
 
 function nameOfKind(categories: { kind?: number; name?: string }[], kind: number) {
   const matched = categories.find((item) => Number(item.kind) === kind && String(item.name || "").trim());
@@ -230,7 +269,8 @@ async function startFrom(lesson: CourseLessonVo | null) {
   if (starting) return;
   const current = detail.value;
   if (!current) return;
-  const lessons = current.lessons || [];
+  // 课时来自 units（新接口）或 lessons（老接口），统一用 allLessons
+  const lessons = allLessons.value.length ? allLessons.value : current.lessons || [];
   const picked = lesson || pickLesson(current.lastLessonId, lessons);
   if (!picked) {
     ElMessage.info(`${title.value || "该教材"}暂无可用课时`);

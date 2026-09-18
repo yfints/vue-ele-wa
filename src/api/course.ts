@@ -86,6 +86,8 @@ export interface CourseDetailVo {
   isCollect?: boolean;
   access?: { allowed?: boolean; reason?: string };
   lessons?: CourseLessonVo[];
+  /** 教材按「单元」下发的课时分组（新接口字段，优先用它渲染详情页） */
+  units?: CourseUnitVo[];
   progress?: CourseProgressVo;
   timeSeconds?: number;
   lastLessonId?: number | string | null;
@@ -124,6 +126,22 @@ export interface CourseCategory {
   humanNum?: number;
   human_num?: number;
   percentage?: number;
+}
+
+/** 教材单元：名称字段后端可能用 unitName / name / title，前端做兼容 */
+export interface CourseUnitVo {
+  id?: number | string;
+  unitNo?: number | string;
+  /** 单元展示名（接口字段） */
+  unitLabel?: string;
+  unitName?: string;
+  unit_name?: string;
+  name?: string;
+  title?: string;
+  sortOrder?: number;
+  lessons?: CourseLessonVo[];
+  lessonList?: CourseLessonVo[];
+  lesson_list?: CourseLessonVo[];
 }
 
 /** 分类类型（对应接口的 kind 字段） */
