@@ -25,6 +25,27 @@ function apiMessage(payload: unknown, fallback = "请求失败") {
 
 let unauthorizedNotified = false;
 
+/**
+ * 401（HTTP 状态或业务 code）：清登录态并回登录页。
+ * 不论请求是否标记 skipAuthRedirect，只要 token 失效就统一走这里 ——
+ * 「登录失效」不该让用户停在半死不活的页面上。
+ */
+function handleUnauthorized() {
+  clearAuth();
+  const route = router.currentRoute.value;
+  const onLogin = route.path.startsWith("/login");
+  if (!onLogin && !unauthorizedNotified) {
+    unauthorizedNotified = true;
+    ElMessage.error("登录已失效，请重新登录");
+  }
+  if (onLogin) return;
+  const redirect = route.fullPath && route.fullPath !== "/" ? route.fullPath : "";
+  void router.push({
+    path: "/login/index",
+    query: redirect ? { redirect } : undefined,
+  });
+}
+
 function notifyApiError(payload: unknown, code?: number, fallback = "请求失败") {
   if (code === 401) {
     if (unauthorizedNotified) return;
@@ -91,17 +112,16 @@ http.interceptors.response.use(
           ? 401
           : undefined;
 
+    if (status === 401 || code === 401) {
+      // 登录失效：清登录态 + 提示一次 + 跳登录页（带 redirect 回跳地址）
+      handleUnauthorized();
+      return Promise.reject(error);
+    }
+
     if (code != null && code !== 200) {
       notifyApiError(payload, code);
     } else if (axios.isAxiosError(error) && !config?.skipAuthRedirect) {
       notifyApiError(payload, undefined, error.message || "网络异常，请稍后重试");
-    }
-
-    if (status === 401 || code === 401) {
-      clearAuth();
-      if (!config?.skipAuthRedirect && !router.currentRoute.value.path.startsWith("/login")) {
-        void router.push("/login/index");
-      }
     }
     return Promise.reject(error);
   },
@@ -111,6 +131,11 @@ function unwrap<T>(payload: ApiResult<T> | T): T {
   if (payload && typeof payload === "object" && "code" in payload) {
     const result = payload as ApiResult<T>;
     if (result.code !== 200) {
+      // 业务码 401（HTTP 仍返回 200）也要回登录页
+      if (result.code === 401) {
+        handleUnauthorized();
+        throw new Error(apiMessage(result, "登录已失效，请重新登录"));
+      }
       notifyApiError(result, result.code);
       throw new Error(apiMessage(result));
     }
