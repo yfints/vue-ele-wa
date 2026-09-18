@@ -20,7 +20,7 @@ export const avatarUrl = computed(
     localAsset(
       user.value?.headImg || user.value?.avatar || user.value?.headimg || user.value?.head_img || "",
     ) ||
-    "/clone-assets/ico.png",
+    "/clone-assets/ico.jpg",
 );
 
 export const vipId = computed(() => user.value?.active_vips?.vip_id || 0);

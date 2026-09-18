@@ -125,7 +125,7 @@ const form = reactive({ nickname: "", signature: "", wechatId: "" });
 const userId = computed(() => String(user.value?.userId ?? ""));
 const phone = computed(() => String(user.value?.phone ?? ""));
 const shownAvatar = computed(() => avatarPreview.value || avatarUrl.value);
-const avatarSrc = computed(() => (avatarFailed.value ? "/clone-assets/ico.png" : shownAvatar.value));
+const avatarSrc = computed(() => (avatarFailed.value ? "/clone-assets/ico.jpg" : shownAvatar.value));
 
 watch(shownAvatar, () => {
   avatarFailed.value = false;
