@@ -345,6 +345,7 @@ async function startPractice(row?: WordRow) {
       gameType: "Word",
       gameMode: "SentenceTranslate",
       userLessonId: "",
+      source: "word",
       startItemId: row ? String(row.id) : undefined,
     });
     modeRef.value?.open();

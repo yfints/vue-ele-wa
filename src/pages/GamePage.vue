@@ -3,7 +3,7 @@
     v-if="isPracticePage"
     :mode="isListenMode ? 'listen' : isTranslateInput ? 'translate' : 'oral'"
     :title="practiceTitle"
-    crumb="课程详情"
+    :crumb="practiceCrumb"
     :clock="clock"
     :speed="speakRate"
     :index="gameIndex"
@@ -451,6 +451,8 @@ const practiceTitle = computed(() => {
 });
 /** 播放倍速：存在 gameSetting（localStorage），练习页改完后续所有朗读都按它播 */
 const speakRate = computed(() => Number(gameSetting.value.speak_rate) || 1);
+/** 练习页顶部面包屑：从词书进来的显示「单词库」，其余是「课程详情」 */
+const practiceCrumb = computed(() => (isWordSession() ? "单词库" : "课程详情"));
 const finishDuration = computed(() => formatDuration(elapsed.value));
 const oralFeedback = computed(() => {
   if (mode.value !== "SentenceOral" || answering.value) return "";

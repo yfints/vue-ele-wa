@@ -313,6 +313,7 @@ async function startFrom(lesson: CourseLessonVo | null) {
       gameType: "Sentence",
       gameMode: "SentenceTranslate",
       userLessonId: current.userLessonId ? String(current.userLessonId) : "",
+      source: "textbook",
       startItemId: undefined,
     });
     modeRef.value?.open();

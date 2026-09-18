@@ -308,6 +308,7 @@ function startPractice(course?: CourseLessonVo) {
     gameType: "Sentence",
     gameMode: "SentenceTranslate",
     userLessonId: current.userLessonId ? String(current.userLessonId) : "",
+    source: "course",
   });
   modeRef.value?.open();
 }

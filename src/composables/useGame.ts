@@ -31,6 +31,8 @@ export interface GameSession {
   gameMode: GameMode;
   practiceMode: PracticeMode;
   userLessonId: string;
+  /** 入口来源：决定退出练习后回哪个详情页（课程广场 / 教材详情 / 词书详情） */
+  source?: "course" | "textbook" | "word";
   /** 从单词表点进来时记住点中的那个单词，加载页据此定位起始题 */
   startItemId?: string;
 }
@@ -158,9 +160,14 @@ function persistList() {
 }
 
 export function gameBackPath(session = gameSession.value) {
-  // 单词库进来的练习，退出后回词书详情而不是课程详情
-  if (session?.gameType === "Word" && session.courseId) return `/words/${session.courseId}`;
-  if (session?.courseId) return `/courseMall/${session.courseId}`;
+  const courseId = session?.courseId;
+  // 教材详情进来的，退回教材详情页（教材课 id 与课程广场不是同一套路由）
+  if (session?.source === "textbook" && courseId) return `/textbook/${courseId}`;
+  // 单词库进来的练习，退出后回词书详情
+  if ((session?.source === "word" || session?.gameType === "Word") && courseId) {
+    return `/words/${courseId}`;
+  }
+  if (courseId) return `/courseMall/${courseId}`;
   return "/courseMall/index";
 }
 
