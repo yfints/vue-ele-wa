@@ -18,21 +18,20 @@
 
         <div class="modePopCards flex jc ac">
           <button
-            v-for="(item, index) in modes"
-            :key="item.gameMode"
-            type="button"
-            class="modeCard flex col ac"
-            :class="{ modeCardAct: active === index }"
-            @click="select(index)"
+              v-for="(item, index) in modes"
+              :key="item.gameMode"
+              type="button"
+              class="modeCard flex col ac"
+              @click="start(index)"
           >
             <img class="modeCardIcon" :src="item.icon" :alt="item.title" />
             <div class="modeCardTitle">{{ item.title }}</div>
             <div class="modeCardDesc">{{ item.desc }}</div>
             <img
-              class="modeCardArrow"
-              :src="item.arrow"
-              alt=""
-              @click.stop="start(index)"
+                class="modeCardArrow"
+                :src="item.arrow"
+                alt=""
+                @click.stop="start(index)"
             />
           </button>
         </div>
@@ -96,7 +95,7 @@ const modes: ModeItem[] = [
 
 /** 副标题显示当前课程 / 词书名称 */
 const subtitle = computed(
-  () => gameSession.value?.courseName || gameSession.value?.gameTitle || "",
+    () => gameSession.value?.courseName || gameSession.value?.gameTitle || "",
 );
 
 function open() {
@@ -110,11 +109,7 @@ function close() {
   visible.value = false;
 }
 
-function select(index: number) {
-  active.value = index;
-}
-
-/** 点卡片右下角的箭头：选中该模式并直接开始 */
+/** 点击卡片或右下角箭头：选中该模式并直接开始 */
 function start(index: number) {
   active.value = index;
   confirm();
