@@ -1,14 +1,14 @@
 <template>
-  <div class="oralFinishLayer">
-    <div class="oralFinishMask" @click="emit('close')" />
-    <div class="oralFinish flex col ac" role="dialog" aria-label="练习完成">
-      <button type="button" class="oralFinishClose hand" aria-label="关闭" @click="emit('close')">
+  <div class="practiceFinishLayer">
+    <div class="practiceFinishMask" @click="emit('close')" />
+    <div class="practiceFinish flex col ac" role="dialog" aria-label="练习完成">
+      <button type="button" class="practiceFinishClose hand" aria-label="关闭" @click="emit('close')">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none" />
         </svg>
       </button>
 
-      <svg class="oralFinishArt" viewBox="0 0 200 200" aria-hidden="true">
+      <svg class="practiceFinishArt" viewBox="0 0 200 200" aria-hidden="true">
         <g transform="translate(0 6)">
           <circle cx="100" cy="100" r="64" fill="#EAF3FE" />
           <circle cx="100" cy="100" r="47" fill="#3891F2" />
@@ -31,31 +31,31 @@
         </g>
       </svg>
 
-      <div class="oralFinishTitle">太棒了！</div>
-      <div class="oralFinishSub">坚持练习，遇见更好的自己</div>
+      <div class="practiceFinishTitle">太棒了！</div>
+      <div class="practiceFinishSub">坚持练习，遇见更好的自己</div>
 
-      <div class="oralFinishStats flex ac">
-        <div class="oralFinishStat oralFinishStatTime flex ac">
-          <img class="oralFinishStatIcon" src="/clone-assets/oral/finish-clock.png" alt="" />
-          <div class="oralFinishStatInfo flex col">
-            <span class="oralFinishStatLabel">今日练习时长</span>
-            <span class="oralFinishStatValue">{{ duration }}</span>
+      <div class="practiceFinishStats flex ac">
+        <div class="practiceFinishStat practiceFinishStatTime flex ac">
+          <img class="practiceFinishStatIcon" src="/clone-assets/practice/finish-clock.png" alt="" />
+          <div class="practiceFinishStatInfo flex col">
+            <span class="practiceFinishStatLabel">今日练习时长</span>
+            <span class="practiceFinishStatValue">{{ duration }}</span>
           </div>
         </div>
-        <div class="oralFinishStat oralFinishStatCount flex ac">
-          <img class="oralFinishStatIcon" src="/clone-assets/oral/finish-list.png" alt="" />
-          <div class="oralFinishStatInfo flex col">
-            <span class="oralFinishStatLabel">此章题目数量</span>
-            <span class="oralFinishStatValue">{{ count }}道</span>
+        <div class="practiceFinishStat practiceFinishStatCount flex ac">
+          <img class="practiceFinishStatIcon" src="/clone-assets/practice/finish-list.png" alt="" />
+          <div class="practiceFinishStatInfo flex col">
+            <span class="practiceFinishStatLabel">此章题目数量</span>
+            <span class="practiceFinishStatValue">{{ count }}道</span>
           </div>
         </div>
       </div>
 
-      <div class="oralFinishActions flex ac">
-        <button type="button" class="oralFinishBtn oralFinishBtnPrimary hand" @click="emit('continue')">
+      <div class="practiceFinishActions flex ac">
+        <button type="button" class="practiceFinishBtn practiceFinishBtnPrimary hand" @click="emit('continue')">
           继续练习（空格）
         </button>
-        <button type="button" class="oralFinishBtn oralFinishBtnGreen hand" @click="emit('next')">
+        <button type="button" class="practiceFinishBtn practiceFinishBtnGreen hand" @click="emit('next')">
           下一章（回车）
         </button>
       </div>

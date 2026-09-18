@@ -1,10 +1,11 @@
 <template>
-  <OralPracticeView
-    v-if="isOralMode"
-    :title="oralTitle"
+  <PracticeView
+    v-if="isPracticePage"
+    :mode="isListenMode ? 'listen' : 'oral'"
+    :title="practiceTitle"
     crumb="课程详情"
     :clock="clock"
-    :speed="oralSpeed"
+    :speed="practiceSpeed"
     :index="gameIndex"
     :total="gameList.length"
     :english="current?.english || ''"
@@ -13,16 +14,23 @@
     :playing="playing"
     :recording="recording"
     :evaluating="evaluating"
+    :submitting="submitting"
     :hint="oralHint"
     :result="oralFeedback"
     :result-tone="oralFeedbackTone"
+    :answer="listenAnswer"
+    :answer-error="listenWrong"
+    :answer-ok="listenAnswerOk"
+    :listen-hint="listenFeedback"
+    :listen-hint-tone="listenFeedbackTone"
     :can-prev="gameIndex > 0"
     :finish-visible="finishOpen"
     :finish-duration="finishDuration"
     :finish-count="gameList.length"
+    @update:answer="listenAnswer = $event"
     @prev="prev"
     @next="next"
-    @submit="onOralSubmit"
+    @submit="onPracticeSubmit"
     @speak="speak"
     @exit="openLeave"
     @speed="onSpeedChange"
@@ -331,7 +339,7 @@ import GameSuccess from "@/components/GameSuccess.vue";
 import GameBotbar from "@/components/GameBotbar.vue";
 import GameOral from "@/components/GameOral.vue";
 import ModePop from "@/components/ModePop.vue";
-import OralPracticeView from "@/components/oral/OralPracticeView.vue";
+import PracticeView from "@/components/practice/PracticeView.vue";
 import {
   evaluateSpeech,
   sendStudyHeartbeat,
@@ -422,17 +430,20 @@ const learnPercent = computed(() => {
 });
 const clock = computed(() => formatClock(elapsed.value));
 
-/** 口语模式走新版设计稿页面，其余模式仍是游戏态页面 */
-const isOralMode = computed(() => hasGame.value && mode.value === "SentenceOral");
-const oralSpeed = ref(1);
+/** 口语 / 听力走新版设计稿练习页，其余模式仍是游戏态页面 */
+const isListenMode = computed(() => mode.value === "SentenceListen");
+const isPracticePage = computed(
+  () => hasGame.value && (mode.value === "SentenceOral" || mode.value === "SentenceListen"),
+);
+const practiceSpeed = ref(1);
 const finishOpen = ref(false);
-const oralTitle = computed(() => {
+const practiceTitle = computed(() => {
   const course = String(session.value?.courseName || "").trim();
   const lesson = String(session.value?.gameTitle || "").trim();
   if (course && lesson && !course.includes(lesson)) return `${course}-${lesson}`;
   return lesson || course || "练习";
 });
-const speakRate = computed(() => (mode.value === "SentenceOral" ? oralSpeed.value : 1));
+const speakRate = computed(() => (isPracticePage.value ? practiceSpeed.value : 1));
 const finishDuration = computed(() => formatDuration(elapsed.value));
 const oralFeedback = computed(() => {
   if (mode.value !== "SentenceOral" || answering.value) return "";
@@ -444,6 +455,41 @@ const oralFeedbackTone = computed<"" | "ok" | "bad">(() => {
   if (mode.value !== "SentenceOral" || answering.value) return "";
   return isWrongResult(lastResult.value) ? "bad" : "ok";
 });
+
+/** 听力模式：听音默写的输入与反馈 */
+const listenAnswer = ref("");
+const listenWrong = ref(false);
+let listenWrongTimer: number | undefined;
+const listenAnswerOk = computed(
+  () => isListenMode.value && !answering.value && !isWrongResult(lastResult.value),
+);
+const listenFeedback = computed(() => {
+  if (!isListenMode.value) return "";
+  if (listenWrong.value) return "没听对，再听一遍试试～";
+  if (answering.value) return "";
+  if (isWrongResult(lastResult.value)) return "再听一遍，重新输入";
+  return "很棒！听写正确";
+});
+const listenFeedbackTone = computed<"" | "ok" | "bad">(() => {
+  if (!isListenMode.value) return "";
+  if (listenWrong.value) return "bad";
+  if (answering.value) return "";
+  return isWrongResult(lastResult.value) ? "bad" : "ok";
+});
+
+/** 听力答错：闪红并清空输入，让用户重听重填 */
+function flashListenWrong() {
+  if (!isPracticePage.value) {
+    listenRef.value?.markWrong();
+    return;
+  }
+  listenWrong.value = true;
+  if (listenWrongTimer) window.clearTimeout(listenWrongTimer);
+  listenWrongTimer = window.setTimeout(() => {
+    listenWrong.value = false;
+    listenAnswer.value = "";
+  }, 700);
+}
 
 function formatDuration(total: number) {
   const value = Math.max(0, Math.floor(total || 0));
@@ -764,6 +810,10 @@ function onBarSubmit() {
     next();
     return;
   }
+  if (isPracticePage.value) {
+    onPracticeSubmit();
+    return;
+  }
   if (mode.value === "SentenceTranslate" && translateType.value !== 1) {
     wordsRef.value?.submit();
     return;
@@ -817,7 +867,7 @@ function isWrongResult(result?: string) {
 
 async function applyResult(res: { result?: string; expected?: string; nextIndex?: number; finished?: boolean }, currentIndexValue: number) {
   if (isWrongResult(res.result) && isRetryInputMode()) {
-    listenRef.value?.markWrong();
+    flashListenWrong();
     return;
   }
   lastResult.value = res.result || "";
@@ -828,7 +878,7 @@ async function applyResult(res: { result?: string; expected?: string; nextIndex?
   if (res.finished) {
     await reportProgress(currentIndexValue, 1);
     await flushHeartbeat();
-    if (mode.value === "SentenceOral") {
+    if (isPracticePage.value) {
       finishOpen.value = true;
       paused.value = true;
       return;
@@ -864,7 +914,7 @@ async function onAnswerSubmit(answer: string) {
   if (!item || !id) return;
   if (isRetryInputMode()) {
     if (!sameSentence(text, item.english, gameSetting.value.ignore_case)) {
-      listenRef.value?.markWrong();
+      flashListenWrong();
       return;
     }
   } else if (!text) {
@@ -1016,7 +1066,25 @@ function onOralSubmit() {
 }
 
 function onSpeedChange(value: number) {
-  oralSpeed.value = Number(value) || 1;
+  practiceSpeed.value = Number(value) || 1;
+}
+
+/** 设计稿练习页的「提交」：听力=提交默写，口语=停录评测/下一题 */
+function onPracticeSubmit() {
+  if (isListenMode.value) {
+    onListenSubmit();
+    return;
+  }
+  onOralSubmit();
+}
+
+function onListenSubmit() {
+  if (!answering.value) {
+    next();
+    return;
+  }
+  if (submitting.value) return;
+  onAnswerSubmit(listenAnswer.value);
 }
 
 function onFinishContinue() {
@@ -1191,7 +1259,13 @@ function resetItem() {
     clearTimeout(autoNextTimer);
     autoNextTimer = undefined;
   }
+  if (listenWrongTimer) {
+    clearTimeout(listenWrongTimer);
+    listenWrongTimer = undefined;
+  }
   answering.value = true;
+  listenAnswer.value = "";
+  listenWrong.value = false;
   oralTranscript.value = "";
   oralHint.value = "";
   oralScore.value = null;
@@ -1265,7 +1339,7 @@ function resetProgress() {
 }
 
 async function finish() {
-  if (mode.value === "SentenceOral") {
+  if (isPracticePage.value) {
     await flushHeartbeat();
     finishOpen.value = true;
     paused.value = true;
@@ -1327,6 +1401,25 @@ function onShortcut(event: KeyboardEvent) {
   const key = event.key;
   const currentMode = mode.value;
 
+  // 完成弹窗：空格=继续练习、回车=下一章、Esc=关闭（口语 / 听力共用）
+  if (finishOpen.value) {
+    if (key === " " || event.code === "Space") {
+      event.preventDefault();
+      onFinishContinue();
+      return;
+    }
+    if (key === "Enter") {
+      event.preventDefault();
+      onFinishNext();
+      return;
+    }
+    if (key === "Escape") {
+      event.preventDefault();
+      onFinishClose();
+    }
+    return;
+  }
+
   if (event.shiftKey && (key === "ArrowLeft" || key === "ArrowRight")) {
     event.preventDefault();
     if (key === "ArrowLeft") prev();
@@ -1372,23 +1465,6 @@ function onShortcut(event: KeyboardEvent) {
   }
 
   if (currentMode === "SentenceOral") {
-    if (finishOpen.value) {
-      if (key === " " || event.code === "Space") {
-        event.preventDefault();
-        onFinishContinue();
-        return;
-      }
-      if (key === "Enter") {
-        event.preventDefault();
-        onFinishNext();
-        return;
-      }
-      if (key === "Escape") {
-        event.preventDefault();
-        onFinishClose();
-      }
-      return;
-    }
     if (key === " " || event.code === "Space") {
       event.preventDefault();
       toggleRecord();
