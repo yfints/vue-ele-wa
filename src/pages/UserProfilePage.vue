@@ -32,7 +32,7 @@
                 :aria-label="uploading ? '头像上传中' : '更换头像'"
                 @click="pickAvatar"
               >
-                <img class="pfAvatar" :src="shownAvatar" alt="头像" />
+                <img class="pfAvatar" :src="avatarSrc" alt="头像" @error="avatarFailed = true" />
                 <span class="pfAvatarMask">{{ uploading ? "上传中…" : "更换头像" }}</span>
               </button>
               <input
@@ -118,11 +118,18 @@ const uploading = ref(false);
 const fileInputRef = ref<HTMLInputElement>();
 /** 上传后的本地预览，拉完最新资料就清掉，最终以服务端为准 */
 const avatarPreview = ref("");
+/** 头像地址失效时退回默认图，别显示成裂图 */
+const avatarFailed = ref(false);
 const form = reactive({ nickname: "", signature: "", wechatId: "" });
 
 const userId = computed(() => String(user.value?.userId ?? ""));
 const phone = computed(() => String(user.value?.phone ?? ""));
 const shownAvatar = computed(() => avatarPreview.value || avatarUrl.value);
+const avatarSrc = computed(() => (avatarFailed.value ? "/clone-assets/ico.png" : shownAvatar.value));
+
+watch(shownAvatar, () => {
+  avatarFailed.value = false;
+});
 
 watch(
   user,
