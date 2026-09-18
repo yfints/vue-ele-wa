@@ -44,6 +44,7 @@
   <div v-else class="gamePage gamePageFixed">
     <template v-if="hasGame">
     <GameHeader
+      :crumb="practiceCrumb"
       :title="session?.gameTitle || '练习'"
       :course-name="session?.courseName || ''"
       :index="gameIndex"
@@ -61,8 +62,10 @@
       @reset="resetOpen = true"
       @feedback="feedbackOpen = true"
       @toggle-immersive="isImmersiveMode = !isImmersiveMode"
-      @fullscreen="toggleFullscreen"
-    />
+    @fullscreen="toggleFullscreen"
+  />
+
+    <div v-if="hasGame" class="gameLessonLine line1">{{ practiceTitle }}</div>
 
     <div class="gameBody flex col ac jc">
       <GamePic v-if="showPic" :pic="current?.pic" />

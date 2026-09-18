@@ -3820,7 +3820,8 @@ html.dark .gameLearnProgress .progress__value {
 }
 
 .headbarWrap {
-    --headbar-height: 3.57143rem;
+    /* 与口语练习页顶栏统一：64px 白底 + logo + 面包屑 + 用户 */
+    --headbar-height: 64px;
     flex-shrink: 0;
     width: 100%;
     position: relative;
@@ -3835,9 +3836,87 @@ html.dark .gameLearnProgress .progress__value {
     box-sizing: border-box;
     width: 100vw;
     height: var(--headbar-height);
-    padding: 0 1.07143rem;
+    padding: 0 17px 5px 15px;
     border-bottom: 1px solid var(--theme-border);
     background-color: var(--game-page-bg);
+}
+
+.headbarLeft {
+    min-width: 0;
+}
+
+.headbarLogo {
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.headbarLogo img {
+    display: block;
+    width: auto;
+    height: 45px;
+}
+
+.headbarCrumbs {
+    margin-left: 46px;
+}
+
+.headbarCrumb {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.headbarCrumbSep {
+    width: 16px;
+    height: 16px;
+    margin: 0 11px;
+}
+
+.headbarCrumbCur {
+    max-width: 40vw;
+    color: #666;
+    font-size: 14px;
+}
+
+/* 课程标题：从顶栏挪到内容区顶部，样式对齐口语练习页 */
+.gameLessonLine {
+    flex: 0 0 auto;
+    padding: 14px 20px 0;
+    color: #6b6d6f;
+    font-size: 16px;
+    line-height: 22px;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .headbar {
+        padding: 0 12px 5px 12px;
+    }
+
+    .headbarLogo img {
+        height: 34px;
+    }
+
+    .headbarCrumbs {
+        margin-left: 16px;
+    }
+
+    .headbarCrumb {
+        font-size: 14px;
+    }
+
+    .headbarCrumbSep {
+        margin: 0 6px;
+    }
+
+    .gameLessonLine {
+        padding: 10px 12px 0;
+        font-size: 14px;
+        line-height: 20px;
+    }
 }
 
 .headbarPlaceholder {

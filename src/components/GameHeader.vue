@@ -1,17 +1,21 @@
 <template>
   <div class="headbarWrap">
-    <div class="headbar flex jb ac">
-      <div class="flex ac mr30 minw0">
-        <img src="/clone-assets/game/logo.png" class="img30 hand" alt="" @click="emit('exit')" />
-        <div class="ml15 minw0">
-          <div class="size24 bold flex ac linearTitle line1">
-            {{ title }}({{ index + 1 }}/{{ total || 1 }})
-          </div>
-          <div class="size-20 bold flex ac opc5 line1">{{ courseName }}</div>
-        </div>
+    <header class="headbar flex jb ac">
+      <!-- 左：logo + 面包屑，和口语练习页保持一致 -->
+      <div class="headbarLeft flex ac minw0">
+        <button type="button" class="headbarLogo hand" aria-label="退出练习" @click="emit('exit')">
+          <img src="/clone-assets/home/logo-englishgo.png" alt="Englishgo" />
+        </button>
+        <nav class="headbarCrumbs flex ac minw0" aria-label="面包屑">
+          <RouterLink to="/home/index" class="headbarCrumb">首页</RouterLink>
+          <img class="headbarCrumbSep" src="/clone-assets/practice/icon-next.png" alt="" />
+          <span class="headbarCrumbCur line1 hand" @click="emit('exit')">{{ crumb }}</span>
+        </nav>
       </div>
 
-      <div class="flex ac">
+      <UserDropdown />
+
+<!--      <div class="flex ac">
         <template v-if="!immersive">
           <div class="flex ac largeScreen animate__animated animate__fadeInRight ani5">
             <div class="headerItem noBr" @click="emit('setting')">
@@ -120,16 +124,19 @@
           />
           <div class="ml10">{{ clock }}</div>
         </div>
-      </div>
-    </div>
+      </div>-->
+    </header>
     <div class="headbarPlaceholder" aria-hidden="true" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Hide, MoreFilled, View } from "@element-plus/icons-vue";
+import { RouterLink } from "vue-router";
+import UserDropdown from "@/components/UserDropdown.vue";
 
 defineProps<{
+  /** 面包屑最后一段（课程详情 / 单词库），点它等同退出练习 */
+  crumb: string;
   title: string;
   courseName: string;
   index: number;
