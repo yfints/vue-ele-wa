@@ -9,6 +9,7 @@ import LoginPage from "@/pages/LoginPage.vue";
 import GameLoadPage from "@/pages/GameLoadPage.vue";
 import GamePage from "@/pages/GamePage.vue";
 import PhoneticPage from "@/pages/PhoneticPage.vue";
+import PhoneticDetailPage from "@/pages/PhoneticDetailPage.vue";
 import TextbookPage from "@/pages/TextbookPage.vue";
 import TextbookDetailPage from "@/pages/TextbookDetailPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
@@ -46,6 +47,11 @@ const router = createRouter({
           path: "phonetic/index",
           component: PhoneticPage,
           meta: { public: true, title: "音标练习" },
+        },
+        {
+          path: "phonetic/:id",
+          component: PhoneticDetailPage,
+          meta: { public: true, title: "音标学习" },
         },
         { path: "words", redirect: "/words/index", meta: { public: true } },
         { path: "user/profile", component: UserProfilePage, meta: { title: "个人信息" } },

@@ -17,7 +17,12 @@
     </header>
 
     <div class="phBody flex">
-      <article v-for="course in courses" :key="course.id" class="phCard flex col">
+      <article
+        v-for="course in courses"
+        :key="course.id"
+        class="phCard flex col hand"
+        @click="startCourse(course)"
+      >
         <div class="phHero" :style="{ background: course.fallback }">
           <img v-if="course.hero" class="phHeroBg" :src="course.hero" alt="" />
           <div class="phHeroInner">
@@ -46,7 +51,7 @@
               <div class="phBarFill" :style="{ width: `${course.learners}%` }" />
             </div>
           </div>
-          <button type="button" class="phStart" @click="startCourse(course)">开始学习</button>
+          <button type="button" class="phStart" @click.stop="startCourse(course)">开始学习</button>
         </div>
       </article>
 
@@ -60,7 +65,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
 import {
@@ -107,6 +112,7 @@ const FIXED_CHIPS = {
 };
 
 /** 音标课程列表，数据来自 /courses?type=3 */
+const router = useRouter();
 const courseList = ref<CourseVo[]>([]);
 const loading = ref(true);
 
@@ -170,7 +176,7 @@ function chipTone(index: number) {
 }
 
 function startCourse(course: PhoneticCard) {
-  ElMessage.info(`${course.title}即将上线`);
+  void router.push(`/phonetic/${course.id}`);
 }
 
 onMounted(async () => {
