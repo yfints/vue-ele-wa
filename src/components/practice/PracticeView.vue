@@ -23,11 +23,7 @@
       <section class="practiceCard flex col ac">
         <div class="practiceStrip flex ac jc">
           <div class="practiceMode flex ac">
-            <img
-              class="practiceModeIcon"
-              :src="isListen ? '/clone-assets/practice/icon-listen.png' : '/clone-assets/practice/icon-oral.png'"
-              alt=""
-            />
+            <img class="practiceModeIcon" :src="modeIcon" alt="" />
             <span class="practiceModeText">{{ modeLabel }}</span>
           </div>
           <div class="practiceTimer">{{ clock }}</div>
@@ -60,7 +56,7 @@
         </div>
 
         <!-- 口语模式：句子 + 播放 + 麦克风 -->
-        <template v-if="!isListen">
+        <template v-if="!isInput">
           <div class="practiceAsk">{{ oralAsk }}</div>
           <div class="practiceSentence">{{ english }}</div>
           <div v-if="showChinese && chinese" class="practiceChinese">{{ chinese }}</div>
@@ -93,10 +89,12 @@
           </div>
         </template>
 
-        <!-- 听力模式：喇叭 + 输入框 -->
+        <!-- 听力 / 中译英：题目 + 输入框 -->
         <template v-else>
-          <div class="practiceAsk listenAsk">{{ listenAsk }}</div>
+          <div class="practiceAsk inputAsk">{{ inputAsk }}</div>
+          <div v-if="isTranslate" class="practiceTranslate">{{ chinese }}</div>
           <button
+            v-else
             type="button"
             class="practiceSpeaker hand"
             :class="{ 'is-playing': playing }"
@@ -108,10 +106,16 @@
           <input
             ref="inputRef"
             class="listenInput"
-            :class="{ 'is-error': answerError, 'is-ok': answerOk, 'animate__animated': true, 'animate__headShake': answerError }"
+            :class="{
+              translateInput: isTranslate,
+              'is-error': answerError,
+              'is-ok': answerOk,
+              'animate__animated': true,
+              'animate__headShake': answerError,
+            }"
             :value="answer"
             type="text"
-            placeholder="Type what you hear..."
+            :placeholder="inputPlaceholder"
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
@@ -172,8 +176,8 @@ import UserDropdown from "@/components/UserDropdown.vue";
 import PracticeFinishDialog from "@/components/practice/PracticeFinishDialog.vue";
 
 const props = defineProps<{
-  /** oral=口语练习（朗读+录音），listen=听力练习（听音+默写） */
-  mode?: "oral" | "listen";
+  /** oral=口语练习（朗读+录音），listen=听力练习（听音+默写），translate=中译英（看中文+写英文） */
+  mode?: "oral" | "listen" | "translate";
   title: string;
   crumb: string;
   clock: string;
@@ -227,9 +231,23 @@ const SPEED_TEXT: Record<string, string> = {
 };
 
 const isListen = computed(() => props.mode === "listen");
-const modeLabel = computed(() => (isListen.value ? "听力练习" : "口语练习"));
+const isTranslate = computed(() => props.mode === "translate");
+const isInput = computed(() => isListen.value || isTranslate.value);
+const modeLabel = computed(() => (isTranslate.value ? "中译英" : isListen.value ? "听力练习" : "口语练习"));
+const modeIcon = computed(() =>
+  isTranslate.value
+    ? "/clone-assets/practice/icon-translate.png"
+    : isListen.value
+      ? "/clone-assets/practice/icon-listen.png"
+      : "/clone-assets/practice/icon-oral.png",
+);
 const oralAsk = "请大声朗读以下英语句子";
 const listenAsk = "听力模式一听音频，写出你听到的英文：";
+const translateAsk = "中译英练习——看中文，写出英文：";
+const inputAsk = computed(() => (isTranslate.value ? translateAsk : listenAsk));
+const inputPlaceholder = computed(() =>
+  isTranslate.value ? "Write the English translation..." : "Type what you hear...",
+);
 
 const inputRef = ref<HTMLInputElement>();
 const percent = computed(() => {
@@ -264,12 +282,12 @@ function focusInput() {
 watch(
   () => [props.index, props.english, props.mode],
   () => {
-    if (isListen.value) focusInput();
+    if (isInput.value) focusInput();
   },
 );
 
 onMounted(() => {
-  if (isListen.value) focusInput();
+  if (isInput.value) focusInput();
 });
 
 function onInput(event: Event) {

@@ -1,7 +1,7 @@
 <template>
   <PracticeView
     v-if="isPracticePage"
-    :mode="isListenMode ? 'listen' : 'oral'"
+    :mode="isListenMode ? 'listen' : isTranslateInput ? 'translate' : 'oral'"
     :title="practiceTitle"
     crumb="课程详情"
     :clock="clock"
@@ -430,10 +430,15 @@ const learnPercent = computed(() => {
 });
 const clock = computed(() => formatClock(elapsed.value));
 
-/** 口语 / 听力走新版设计稿练习页，其余模式仍是游戏态页面 */
+/** 口语 / 听力 / 中译英（整句）走新版设计稿练习页，其余模式仍是游戏态页面 */
 const isListenMode = computed(() => mode.value === "SentenceListen");
+/** 中译英：translateType=1 是整句默写（设计稿），2 是逐词拼句（仍是老页面） */
+const isTranslateInput = computed(
+  () => mode.value === "SentenceTranslate" && (current.value?.settings?.translateType ?? 1) === 1,
+);
+const isInputMode = computed(() => isListenMode.value || isTranslateInput.value);
 const isPracticePage = computed(
-  () => hasGame.value && (mode.value === "SentenceOral" || mode.value === "SentenceListen"),
+  () => hasGame.value && (mode.value === "SentenceOral" || isInputMode.value),
 );
 const practiceSpeed = ref(1);
 const finishOpen = ref(false);
@@ -456,22 +461,23 @@ const oralFeedbackTone = computed<"" | "ok" | "bad">(() => {
   return isWrongResult(lastResult.value) ? "bad" : "ok";
 });
 
-/** 听力模式：听音默写的输入与反馈 */
+/** 听力 / 中译英：输入与反馈 */
 const listenAnswer = ref("");
 const listenWrong = ref(false);
 let listenWrongTimer: number | undefined;
 const listenAnswerOk = computed(
-  () => isListenMode.value && !answering.value && !isWrongResult(lastResult.value),
+  () => isInputMode.value && !answering.value && !isWrongResult(lastResult.value),
 );
 const listenFeedback = computed(() => {
-  if (!isListenMode.value) return "";
-  if (listenWrong.value) return "没听对，再听一遍试试～";
+  if (!isInputMode.value) return "";
+  const translate = isTranslateInput.value;
+  if (listenWrong.value) return translate ? "没翻译对，再改改试试～" : "没听对，再听一遍试试～";
   if (answering.value) return "";
-  if (isWrongResult(lastResult.value)) return "再听一遍，重新输入";
-  return "很棒！听写正确";
+  if (isWrongResult(lastResult.value)) return translate ? "再想想，重新输入" : "再听一遍，重新输入";
+  return translate ? "很棒！翻译正确" : "很棒！听写正确";
 });
 const listenFeedbackTone = computed<"" | "ok" | "bad">(() => {
-  if (!isListenMode.value) return "";
+  if (!isInputMode.value) return "";
   if (listenWrong.value) return "bad";
   if (answering.value) return "";
   return isWrongResult(lastResult.value) ? "bad" : "ok";
@@ -1069,16 +1075,16 @@ function onSpeedChange(value: number) {
   practiceSpeed.value = Number(value) || 1;
 }
 
-/** 设计稿练习页的「提交」：听力=提交默写，口语=停录评测/下一题 */
+/** 设计稿练习页的「提交」：听力/中译英=提交写的答案，口语=停录评测/下一题 */
 function onPracticeSubmit() {
-  if (isListenMode.value) {
-    onListenSubmit();
+  if (isInputMode.value) {
+    onInputSubmit();
     return;
   }
   onOralSubmit();
 }
 
-function onListenSubmit() {
+function onInputSubmit() {
   if (!answering.value) {
     next();
     return;
@@ -1480,6 +1486,8 @@ function onShortcut(event: KeyboardEvent) {
 function shouldAutoSpeak() {
   if (mode.value === "SentenceListen") return current.value?.settings?.autoPlay !== false;
   if (mode.value === "SentenceOral") return true;
+  // 中译英（整句默写）不能自动念英文，否则直接把答案说出来了
+  if (isTranslateInput.value) return false;
   return gameSetting.value.speaker_read_auto;
 }
 
