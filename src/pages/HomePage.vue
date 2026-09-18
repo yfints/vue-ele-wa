@@ -12,9 +12,9 @@
           {{ tab.name }}
         </el-button>
       </div>
-      <div class="dashUserWrap flex ac">
+      <div class=" flex ac">
         <el-image
-          class="dashUserAvatar hand"
+          class="dashUserAvatar hand userDropAvatar"
           :src="avatarUrl"
           fit="cover"
           alt="个人信息"
@@ -26,8 +26,8 @@
         </el-image>
         <el-dropdown trigger="click">
           <button type="button" class="dashUser">
-          <span class="dashUserName">{{ displayName }}</span>
-          <el-icon><ArrowDown /></el-icon>
+          <span class="dashUserName userDrop">{{ displayName }}</span>
+            <el-icon class="userDropArrow"><ArrowDown /></el-icon>
           </button>
           <template #dropdown>
             <el-dropdown-menu>
