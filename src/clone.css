@@ -7193,6 +7193,46 @@ html.dark .practiceHead .userDrop {
     object-fit: cover;
 }
 
+.pfAvatarBtn {
+    position: relative;
+    display: block;
+    width: 68px;
+    height: 68px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.pfAvatarBtn:disabled {
+    cursor: default;
+}
+
+.pfAvatarMask {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.pfAvatarBtn:hover .pfAvatarMask,
+.pfAvatarBtn:disabled .pfAvatarMask {
+    opacity: 1;
+}
+
+.pfFileInput {
+    display: none;
+}
+
 .pfSubmit {
     display: block;
     width: 200px;
@@ -7296,6 +7336,15 @@ html.dark .practiceHead .userDrop {
     .pfAvatar {
         width: 56px;
         height: 56px;
+    }
+
+    .pfAvatarBtn {
+        width: 56px;
+        height: 56px;
+    }
+
+    .pfAvatarMask {
+        font-size: 11px;
     }
 
     .pfSubmit {

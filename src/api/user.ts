@@ -40,10 +40,26 @@ export interface UserProfileUpdate {
   nickname: string;
   signature: string | null;
   wechatId: string | null;
+  /**
+   * 头像地址（/upload 返回的相对路径）。
+   * 注意：接口文档里 /user/profile 目前只写了昵称/签名/微信号三个字段，
+   * 后端补上 headImg 之前，这一项不会落库。
+   */
+  headImg?: string;
 }
 
 export function updateMyProfile(payload: UserProfileUpdate) {
   return post("/user/profile", payload);
+}
+
+/**
+ * 上传文件（multipart，字段名 file），返回 /uploads 相对路径。
+ * 头像场景用默认 maxSide=512，封面这类需要更清晰的显式传大一点的值。
+ */
+export function uploadFile(file: File, maxSide = 512) {
+  const form = new FormData();
+  form.append("file", file);
+  return post<string>(`/upload?maxSide=${maxSide}`, form);
 }
 
 /** 注销账号：逻辑删除，注销后手机号不可再注册 */
