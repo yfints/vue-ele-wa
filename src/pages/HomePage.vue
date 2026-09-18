@@ -12,21 +12,30 @@
           {{ tab.name }}
         </el-button>
       </div>
-      <el-dropdown trigger="click">
-        <button type="button" class="dashUser">
-          <el-image class="dashUserAvatar" :src="avatarUrl" fit="cover" />
+      <div class="dashUserWrap flex ac">
+        <el-image
+          class="dashUserAvatar hand"
+          :src="avatarUrl"
+          fit="cover"
+          alt="个人信息"
+          @click.stop="openProfile"
+        />
+        <el-dropdown trigger="click">
+          <button type="button" class="dashUser">
           <span class="dashUserName">{{ displayName }}</span>
           <el-icon><ArrowDown /></el-icon>
-        </button>
-        <template #dropdown>
-          <el-dropdown-menu>
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="openProfile">个人信息</el-dropdown-item>
 <!--            <el-dropdown-item @click="toggleTheme">
-              {{ isDark ? "白天模式" : "夜间模式" }}
-            </el-dropdown-item>-->
-            <el-dropdown-item @click="onLogout">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+                {{ isDark ? "白天模式" : "夜间模式" }}
+              </el-dropdown-item>-->
+              <el-dropdown-item @click="onLogout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
     </header>
 
     <div style="padding-top: 16px;padding-left: 24px;padding-right: 24px;">
@@ -205,7 +214,6 @@ import {
   type StudyNum,
 } from "@/api/home";
 import { avatarUrl, displayName, logout } from "@/composables/useAuth";
-import { isDark, toggleTheme } from "@/composables/useTheme";
 import { currentYearMonth, formatDurationParts } from "@/lib/time";
 
 const studyTabs = [
@@ -301,6 +309,11 @@ function pad2(n: number) {
 function onLogout() {
   logout();
   void router.push("/login/index");
+}
+
+/** 点头像进个人信息页 */
+function openProfile() {
+  void router.push("/user/profile");
 }
 
 async function changeStudyTab(value: number) {

@@ -2633,10 +2633,18 @@ html.dark .colLine {
     font-size: 14px;
 }
 
+.dashUserWrap {
+    gap: 8px;
+}
+
 .dashUserAvatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
+}
+
+.dashUserAvatar.hand {
+    cursor: pointer;
 }
 
 .dashCards {

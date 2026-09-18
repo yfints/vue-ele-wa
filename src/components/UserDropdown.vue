@@ -29,7 +29,6 @@
 import { useRouter } from "vue-router";
 import { ArrowDown } from "@element-plus/icons-vue";
 import { avatarUrl, displayName, logout } from "@/composables/useAuth";
-import { isDark, toggleTheme } from "@/composables/useTheme";
 
 const router = useRouter();
 
