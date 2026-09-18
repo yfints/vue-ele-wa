@@ -17,7 +17,24 @@
     </header>
 
     <div class="phBody flex">
-      <article
+      <el-skeleton v-if="loading" animated>
+        <template #template>
+          <article v-for="n in 2" :key="n" class="phCard flex col">
+            <el-skeleton-item variant="image" class="phSkeletonHero" />
+            <div class="phFoot flex jb ac">
+              <div class="phLearn flex ac">
+                <el-skeleton-item variant="circle" class="phSkeletonDot" />
+                <el-skeleton-item variant="text" class="phSkeletonLearned" />
+                <div class="phSkeletonBar" />
+              </div>
+              <el-skeleton-item variant="button" class="phSkeletonStart" />
+            </div>
+          </article>
+        </template>
+      </el-skeleton>
+
+      <template v-else>
+        <article
         v-for="course in courses"
         :key="course.id"
         class="phCard flex col hand"
@@ -53,7 +70,8 @@
           </div>
           <button type="button" class="phStart" @click.stop="startCourse(course)">开始学习</button>
         </div>
-      </article>
+        </article>
+      </template>
 
       <div v-if="!loading && !courses.length" class="phEmpty flex col ac jc">
         <img src="/clone-assets/nodata.png" class="phEmptyImg" alt="" />

@@ -21,7 +21,63 @@
     </header>
 
     <div class="wdhBody">
-      <div v-if="loading" v-loading="loading" class="wdhLoading" />
+      <el-skeleton v-if="loading" animated>
+        <template #template>
+          <section class="wdhCard wdhSummary flex jb">
+            <div class="wdhSummaryLeft flex ac">
+              <el-skeleton-item variant="image" class="wdhSkeletonIcon" />
+              <div class="wdhInfo">
+                <el-skeleton-item variant="text" class="wdhSkeletonTitle" />
+                <el-skeleton-item variant="text" class="wdhSkeletonDesc" />
+                <div class="wdhTags flex ac">
+                  <el-skeleton-item variant="button" class="wdhSkeletonTag" />
+                  <el-skeleton-item variant="button" class="wdhSkeletonTag" />
+                </div>
+                <div class="wdhProgress flex ac">
+                  <el-skeleton-item variant="text" class="wdhSkeletonBar" />
+                  <el-skeleton-item variant="text" class="wdhSkeletonLearned" />
+                </div>
+              </div>
+            </div>
+            <div class="wdhActions flex ac">
+              <el-skeleton-item variant="button" class="wdhSkeletonBtn" />
+              <el-skeleton-item variant="button" class="wdhSkeletonBtn wdhSkeletonBtnWide" />
+            </div>
+          </section>
+
+          <section class="wdhCard wdhList">
+            <el-skeleton-item variant="text" class="wdhSkeletonListTitle" />
+            <div class="wdhTableWrap">
+              <div class="wdhTable">
+                <div class="wdhRow wdhThead">
+                  <div class="wdhCell wdhCellIndex">#</div>
+                  <div class="wdhCell wdhCellMain">单词</div>
+                  <div class="wdhCell wdhCellMain">音标</div>
+                  <div class="wdhCell wdhCellMain">释意</div>
+                  <div class="wdhCell wdhCellMain">发音</div>
+                </div>
+                <div v-for="n in 6" :key="n" class="wdhRow">
+                  <div class="wdhCell wdhCellIndex">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell wdhSkeletonCellSm" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell wdhSkeletonCellSm" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </template>
+      </el-skeleton>
 
       <template v-else-if="detail">
         <section class="wdhCard wdhSummary flex jb">
@@ -65,7 +121,7 @@
         <section class="wdhCard wdhList">
           <div class="wdhListTitle">单词列表</div>
 
-          <div v-loading="loadingWords" class="wdhTableWrap">
+          <div class="wdhTableWrap">
             <div class="wdhTable">
               <div class="wdhRow wdhThead">
                 <div class="wdhCell wdhCellIndex">#</div>
@@ -75,7 +131,28 @@
                 <div class="wdhCell wdhCellMain">发音</div>
               </div>
 
-              <div
+              <template v-if="loadingWords">
+                <div v-for="n in 5" :key="`s${n}`" class="wdhRow">
+                  <div class="wdhCell wdhCellIndex">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell wdhSkeletonCellSm" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell" />
+                  </div>
+                  <div class="wdhCell wdhCellMain">
+                    <el-skeleton-item variant="text" class="wdhSkeletonCell wdhSkeletonCellSm" />
+                  </div>
+                </div>
+              </template>
+
+              <template v-else>
+                <div
                 v-for="row in pageRows"
                 :key="row.id"
                 class="wdhRow wdhRowClickable"
@@ -104,7 +181,8 @@
                     </svg>
                   </button>
                 </div>
-              </div>
+                </div>
+              </template>
             </div>
           </div>
 

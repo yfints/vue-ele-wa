@@ -4905,6 +4905,66 @@ html.dark .tbMenu img {
     padding: 20px;
 }
 
+/* 单词集详情骨架屏：对齐「课程卡 + 单词表」结构 */
+.wdhSkeletonIcon {
+    width: 120px;
+    height: 120px;
+    border-radius: 16px;
+}
+
+.wdhSkeletonTitle {
+    width: 180px;
+    height: 22px;
+}
+
+.wdhSkeletonDesc {
+    width: 212px;
+    height: 12px;
+    margin-top: 10px;
+}
+
+.wdhSkeletonTag {
+    width: 56px;
+    height: 25px;
+    border-radius: 6px;
+}
+
+.wdhSkeletonBar {
+    width: 141px;
+    height: 10px;
+    border-radius: 5px;
+}
+
+.wdhSkeletonLearned {
+    width: 48px;
+    height: 12px;
+    margin-left: 20px;
+}
+
+.wdhSkeletonBtn {
+    width: 100px;
+    height: 40px;
+    border-radius: 12px;
+}
+
+.wdhSkeletonBtnWide {
+    width: 140px;
+}
+
+.wdhSkeletonListTitle {
+    width: 96px;
+    height: 18px;
+}
+
+.wdhSkeletonCell {
+    width: 80%;
+    height: 14px;
+}
+
+.wdhSkeletonCellSm {
+    width: 40%;
+}
+
 .wdhLoading {
     min-height: 320px;
 }
@@ -5419,6 +5479,48 @@ html.dark .userDrop {
     padding: 20px;
 }
 
+/* 音标列表骨架屏：卡片尺寸与真实卡片一致（406 宽、封面 196、底部 80） */
+.phBody > .el-skeleton {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+.phSkeletonHero {
+    display: block;
+    width: 100%;
+    height: 196px;
+    border-radius: 0;
+}
+
+.phSkeletonDot {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+}
+
+.phSkeletonLearned {
+    width: 88px;
+    height: 14px;
+    margin-left: 6px;
+}
+
+.phSkeletonBar {
+    width: 141px;
+    height: 10px;
+    margin-left: 12px;
+    border-radius: 5px;
+    background: #eaedef;
+}
+
+.phSkeletonStart {
+    flex: 0 0 auto;
+    width: 96px;
+    height: 40px;
+    border-radius: 12px;
+}
+
 .phCard {
     flex: 0 1 406px;
     width: 406px;
@@ -5792,6 +5894,38 @@ html.dark .phMenu img {
     font-size: 12px;
     color: #666;
     white-space: nowrap;
+}
+
+/* 单词库列表骨架屏：对齐卡片结构（封面 120 + 标题 / 描述 / 标签 / 进度条） */
+.wdSkeletonCover {
+    display: block;
+    width: 100%;
+    height: 120px;
+    border-radius: 0;
+}
+
+.wdSkeletonTitle {
+    width: 70%;
+    height: 16px;
+}
+
+.wdSkeletonDesc {
+    width: 90%;
+    height: 12px;
+    margin-top: 10px;
+}
+
+.wdSkeletonTag {
+    width: 56px;
+    height: 25px;
+    border-radius: 6px;
+}
+
+.wdSkeletonBar {
+    width: 141px;
+    max-width: 70%;
+    height: 10px;
+    border-radius: 5px;
 }
 
 .wdEmpty {

@@ -27,8 +27,29 @@
       <UserDropdown />
     </header>
 
-    <div v-loading="loading" class="wdBody">
-      <div v-if="cards.length" class="wdGrid">
+    <div class="wdBody">
+      <el-skeleton v-if="loading" animated>
+        <template #template>
+          <div class="wdGrid">
+            <div v-for="n in 10" :key="n" class="wdCard">
+              <el-skeleton-item variant="image" class="wdSkeletonCover" />
+              <div class="wdInfo">
+                <el-skeleton-item variant="text" class="wdSkeletonTitle" />
+                <el-skeleton-item variant="text" class="wdSkeletonDesc" />
+                <div class="wdTags flex ac">
+                  <el-skeleton-item variant="button" class="wdSkeletonTag" />
+                  <el-skeleton-item variant="button" class="wdSkeletonTag" />
+                </div>
+                <div class="wdProgress flex ac jb">
+                  <el-skeleton-item variant="text" class="wdSkeletonBar" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </el-skeleton>
+
+      <div v-else-if="cards.length" class="wdGrid">
         <article
           v-for="book in cards"
           :key="book.id"
@@ -65,7 +86,7 @@
         </article>
       </div>
 
-      <div v-else-if="!loading" class="wdEmpty flex col ac jc">
+      <div v-else class="wdEmpty flex col ac jc">
         <img src="/clone-assets/nodata.png" class="wdEmptyImg" alt="" />
         <div class="wdEmptyText">该分类下暂无词库</div>
       </div>
