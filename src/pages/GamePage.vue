@@ -1,5 +1,39 @@
 <template>
-  <div class="gamePage gamePageFixed">
+  <OralPracticeView
+    v-if="isOralMode"
+    :title="oralTitle"
+    crumb="课程详情"
+    :clock="clock"
+    :speed="oralSpeed"
+    :index="gameIndex"
+    :total="gameList.length"
+    :english="current?.english || ''"
+    :chinese="current?.chinese || ''"
+    :show-chinese="showChinese"
+    :playing="playing"
+    :recording="recording"
+    :evaluating="evaluating"
+    :hint="oralHint"
+    :result="oralFeedback"
+    :result-tone="oralFeedbackTone"
+    :can-prev="gameIndex > 0"
+    :finish-visible="finishOpen"
+    :finish-duration="finishDuration"
+    :finish-count="gameList.length"
+    @prev="prev"
+    @next="next"
+    @submit="onOralSubmit"
+    @speak="speak"
+    @exit="openLeave"
+    @speed="onSpeedChange"
+    @record-start="onOralRecordStart"
+    @record-stop="onOralRecordStop"
+    @finish-continue="onFinishContinue"
+    @finish-next="onFinishNext"
+    @finish-close="onFinishClose"
+  />
+
+  <div v-else class="gamePage gamePageFixed">
     <template v-if="hasGame">
     <GameHeader
       :title="session?.gameTitle || '练习'"
@@ -131,156 +165,156 @@
       </div>
     </Teleport>
 
-    <ModePop ref="modeRef" />
+      <ModePop ref="modeRef" />
     </template>
-
-    <Teleport to="body">
-      <div v-if="pauseOpen" class="searchLayer">
-        <div class="van-overlay vanPopupMask" />
-        <div class="van-popup van-popup--center" role="dialog">
-          <div class="galssPop popXS">
-            <div class="galssHead flex jb ac">
-              <div class="size30 white">练习已暂停</div>
-              <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="resume">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
-                  <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-                </svg>
-              </button>
-            </div>
-            <div class="size26 pl40 pr40 mt60 white">
-              <div>您的学习进度已锁定～</div>
-              <div class="mt30">中场休息，补充能量后再一起并肩作战吧！</div>
-            </div>
-            <div class="flex je mt60 pr40">
-              <div class="smallConfirm" @click="resume">继续练习</div>
-            </div>
-            <div class="gap40" />
-          </div>
-        </div>
-      </div>
-
-      <div v-if="leaveOpen" class="searchLayer">
-        <div class="van-overlay vanPopupMask" />
-        <div class="van-popup van-popup--center" role="dialog">
-          <div class="galssPop popXS">
-            <div class="galssHead flex jb ac">
-              <div class="size30 white">退出练习</div>
-              <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="resume">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
-                  <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-                </svg>
-              </button>
-            </div>
-            <div class="size26 pl40 pr40 mt60 white">
-              <div>确定退出本次练习吗？</div>
-              <div class="mt30">学习进度会保存在当前课程里。</div>
-            </div>
-            <div class="flex je mt60 pr40 pb40">
-              <div class="smallCancel mr20" @click="resume">继续练习</div>
-              <div class="smallConfirm" @click="leave">返回课程</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="resetOpen" class="searchLayer">
-        <div class="van-overlay vanPopupMask" />
-        <div class="van-popup van-popup--center" role="dialog">
-          <div class="galssPop popXS">
-            <div class="galssHead flex jb ac">
-              <div class="size30 white">重置进度</div>
-              <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="resetOpen = false">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
-                  <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-                </svg>
-              </button>
-            </div>
-            <div class="size26 pl40 pr40 mt60 white">
-              <div>请注意！重置会重新开始练习～</div>
-              <div class="mt30">确定要开启全新的征程吗？</div>
-            </div>
-            <div class="flex je mt60 pr40 pb40">
-              <div class="smallCancel mr20" @click="resetOpen = false">取消</div>
-              <div class="smallConfirm" @click="resetProgress">确认</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="listOpen" class="searchLayer">
-        <div class="van-overlay vanPopupMask" />
-        <div class="van-popup van-popup--center listPop" role="dialog" aria-label="学习内容">
-          <div class="galssPop popL">
-            <div class="galssHead flex jb ac mb30">
-              <div class="size30 white">学习内容</div>
-              <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="closeList">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
-                  <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-                </svg>
-              </button>
-            </div>
-            <el-scrollbar ref="listScrollbarRef" height="70vh">
-              <div class="pl40 pr40">
-                <div
-                  v-for="(item, index) in gameList"
-                  :key="item.id"
-                  :ref="(el) => setListCell(el, index)"
-                  class="listCell flex jb hand"
-                  :class="{ listAct: index === gameIndex }"
-                  @click="jumpTo(index)"
-                >
-                  <div class="minw0">
-                    <div class="size26 lh40 bold6">{{ item.english }}</div>
-                    <div class="size-22 opc6 mt20">{{ item.chinese }}</div>
-                  </div>
-                  <div class="size26 lh40 bold ml30 flex0 linearTxt"># {{ index + 1 }}</div>
-                </div>
-              </div>
-            </el-scrollbar>
-            <div class="gap40" />
-          </div>
-        </div>
-      </div>
-    </Teleport>
-
-    <el-drawer v-if="hasGame" v-model="settingOpen" title="设置" size="20rem">
-      <el-form label-position="left" label-width="8rem">
-        <el-form-item label="显示翻译">
-          <el-switch v-model="gameSetting.show_translate" @change="persistSetting" />
-        </el-form-item>
-        <el-form-item label="忽略大小写">
-          <el-switch v-model="gameSetting.ignore_case" @change="persistSetting" />
-        </el-form-item>
-        <el-form-item label="答对自动下一题">
-          <el-switch v-model="gameSetting.success_auto_next" @change="persistSetting" />
-        </el-form-item>
-        <el-form-item label="自动朗读">
-          <el-switch v-model="gameSetting.speaker_read_auto" @change="persistSetting" />
-        </el-form-item>
-        <el-form-item label="打字显示字母">
-          <el-switch v-model="gameSetting.typeing_show" @change="persistSetting" />
-        </el-form-item>
-        <el-form-item label="显示图片">
-          <el-switch v-model="gameSetting.show_sentence_pic" @change="onTogglePic" />
-        </el-form-item>
-        <el-form-item label="错几次后显示答案">
-          <el-input-number v-model="gameSetting.answer_auto_show_error_times" :min="0" :max="9" @change="persistSetting" />
-        </el-form-item>
-      </el-form>
-    </el-drawer>
-
-    <el-dialog v-if="hasGame" v-model="feedbackOpen" title="报告错误" width="28rem">
-      <el-input v-model="feedbackText" type="textarea" :rows="4" placeholder="请输入错误描述" />
-      <template #footer>
-        <el-button @click="feedbackOpen = false">取消</el-button>
-        <el-button type="primary" @click="submitFeedback">提交</el-button>
-      </template>
-    </el-dialog>
   </div>
+
+<Teleport to="body">
+    <div v-if="pauseOpen" class="searchLayer">
+      <div class="van-overlay vanPopupMask" />
+      <div class="van-popup van-popup--center" role="dialog">
+        <div class="galssPop popXS">
+          <div class="galssHead flex jb ac">
+            <div class="size30 white">练习已暂停</div>
+            <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="resume">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
+                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="size26 pl40 pr40 mt60 white">
+            <div>您的学习进度已锁定～</div>
+            <div class="mt30">中场休息，补充能量后再一起并肩作战吧！</div>
+          </div>
+          <div class="flex je mt60 pr40">
+            <div class="smallConfirm" @click="resume">继续练习</div>
+          </div>
+          <div class="gap40" />
+        </div>
+      </div>
+    </div>
+
+    <div v-if="leaveOpen" class="searchLayer">
+      <div class="van-overlay vanPopupMask" />
+      <div class="van-popup van-popup--center" role="dialog">
+        <div class="galssPop popXS">
+          <div class="galssHead flex jb ac">
+            <div class="size30 white">退出练习</div>
+            <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="resume">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
+                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="size26 pl40 pr40 mt60 white">
+            <div>确定退出本次练习吗？</div>
+            <div class="mt30">学习进度会保存在当前课程里。</div>
+          </div>
+          <div class="flex je mt60 pr40 pb40">
+            <div class="smallCancel mr20" @click="resume">继续练习</div>
+            <div class="smallConfirm" @click="leave">返回课程</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="resetOpen" class="searchLayer">
+      <div class="van-overlay vanPopupMask" />
+      <div class="van-popup van-popup--center" role="dialog">
+        <div class="galssPop popXS">
+          <div class="galssHead flex jb ac">
+            <div class="size30 white">重置进度</div>
+            <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="resetOpen = false">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
+                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="size26 pl40 pr40 mt60 white">
+            <div>请注意！重置会重新开始练习～</div>
+            <div class="mt30">确定要开启全新的征程吗？</div>
+          </div>
+          <div class="flex je mt60 pr40 pb40">
+            <div class="smallCancel mr20" @click="resetOpen = false">取消</div>
+            <div class="smallConfirm" @click="resetProgress">确认</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="listOpen" class="searchLayer">
+      <div class="van-overlay vanPopupMask" />
+      <div class="van-popup van-popup--center listPop" role="dialog" aria-label="学习内容">
+        <div class="galssPop popL">
+          <div class="galssHead flex jb ac mb30">
+            <div class="size30 white">学习内容</div>
+            <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="closeList">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
+                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+          <el-scrollbar ref="listScrollbarRef" height="70vh">
+            <div class="pl40 pr40">
+              <div
+                v-for="(item, index) in gameList"
+                :key="item.id"
+                :ref="(el) => setListCell(el, index)"
+                class="listCell flex jb hand"
+                :class="{ listAct: index === gameIndex }"
+                @click="jumpTo(index)"
+              >
+                <div class="minw0">
+                  <div class="size26 lh40 bold6">{{ item.english }}</div>
+                  <div class="size-22 opc6 mt20">{{ item.chinese }}</div>
+                </div>
+                <div class="size26 lh40 bold ml30 flex0 linearTxt"># {{ index + 1 }}</div>
+              </div>
+            </div>
+          </el-scrollbar>
+          <div class="gap40" />
+        </div>
+      </div>
+    </div>
+  </Teleport>
+
+  <el-drawer v-if="hasGame" v-model="settingOpen" title="设置" size="20rem">
+    <el-form label-position="left" label-width="8rem">
+      <el-form-item label="显示翻译">
+        <el-switch v-model="gameSetting.show_translate" @change="persistSetting" />
+      </el-form-item>
+      <el-form-item label="忽略大小写">
+        <el-switch v-model="gameSetting.ignore_case" @change="persistSetting" />
+      </el-form-item>
+      <el-form-item label="答对自动下一题">
+        <el-switch v-model="gameSetting.success_auto_next" @change="persistSetting" />
+      </el-form-item>
+      <el-form-item label="自动朗读">
+        <el-switch v-model="gameSetting.speaker_read_auto" @change="persistSetting" />
+      </el-form-item>
+      <el-form-item label="打字显示字母">
+        <el-switch v-model="gameSetting.typeing_show" @change="persistSetting" />
+      </el-form-item>
+      <el-form-item label="显示图片">
+        <el-switch v-model="gameSetting.show_sentence_pic" @change="onTogglePic" />
+      </el-form-item>
+      <el-form-item label="错几次后显示答案">
+        <el-input-number v-model="gameSetting.answer_auto_show_error_times" :min="0" :max="9" @change="persistSetting" />
+      </el-form-item>
+    </el-form>
+  </el-drawer>
+
+  <el-dialog v-if="hasGame" v-model="feedbackOpen" title="报告错误" width="28rem">
+    <el-input v-model="feedbackText" type="textarea" :rows="4" placeholder="请输入错误描述" />
+    <template #footer>
+      <el-button @click="feedbackOpen = false">取消</el-button>
+      <el-button type="primary" @click="submitFeedback">提交</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -297,6 +331,7 @@ import GameSuccess from "@/components/GameSuccess.vue";
 import GameBotbar from "@/components/GameBotbar.vue";
 import GameOral from "@/components/GameOral.vue";
 import ModePop from "@/components/ModePop.vue";
+import OralPracticeView from "@/components/oral/OralPracticeView.vue";
 import {
   evaluateSpeech,
   sendStudyHeartbeat,
@@ -386,6 +421,37 @@ const learnPercent = computed(() => {
   return Math.floor(Math.min(1, (gameIndex.value + 1) / total) * 10000) / 100;
 });
 const clock = computed(() => formatClock(elapsed.value));
+
+/** 口语模式走新版设计稿页面，其余模式仍是游戏态页面 */
+const isOralMode = computed(() => hasGame.value && mode.value === "SentenceOral");
+const oralSpeed = ref(1);
+const finishOpen = ref(false);
+const oralTitle = computed(() => {
+  const course = String(session.value?.courseName || "").trim();
+  const lesson = String(session.value?.gameTitle || "").trim();
+  if (course && lesson && !course.includes(lesson)) return `${course}-${lesson}`;
+  return lesson || course || "练习";
+});
+const speakRate = computed(() => (mode.value === "SentenceOral" ? oralSpeed.value : 1));
+const finishDuration = computed(() => formatDuration(elapsed.value));
+const oralFeedback = computed(() => {
+  if (mode.value !== "SentenceOral" || answering.value) return "";
+  if (isWrongResult(lastResult.value)) return "再试一次吧，可以重新录音";
+  const score = Number(oralScore.value?.score ?? NaN);
+  return Number.isFinite(score) ? `很棒！得分 ${Math.round(score)}` : "很棒！";
+});
+const oralFeedbackTone = computed<"" | "ok" | "bad">(() => {
+  if (mode.value !== "SentenceOral" || answering.value) return "";
+  return isWrongResult(lastResult.value) ? "bad" : "ok";
+});
+
+function formatDuration(total: number) {
+  const value = Math.max(0, Math.floor(total || 0));
+  const minutes = Math.floor(value / 60);
+  const seconds = value % 60;
+  return minutes > 0 ? `${minutes}分${seconds}秒` : `${seconds}秒`;
+}
+
 const practiceMode = computed(
   () => session.value?.practiceMode ?? MODE_TO_PRACTICE[mode.value] ?? 3,
 );
@@ -559,6 +625,7 @@ function playAudioUrl(sources: string[], fallback?: () => void) {
   function start() {
     const url = list[index];
     el.muted = false;
+    el.playbackRate = speakRate.value;
     el.onplay = () => {
       playUsed.value += 1;
       markPlaying(true);
@@ -612,7 +679,7 @@ function speakFallback(text: string, allowOnline = true) {
 
   const utter = new SpeechSynthesisUtterance(value);
   utter.lang = "en-US";
-  utter.rate = 0.85;
+  utter.rate = Math.min(2, 0.85 * speakRate.value);
   const voice = synth.getVoices().find((item) => /^en/i.test(item.lang));
   if (voice) utter.voice = voice;
   utter.onstart = () => {
@@ -761,6 +828,11 @@ async function applyResult(res: { result?: string; expected?: string; nextIndex?
   if (res.finished) {
     await reportProgress(currentIndexValue, 1);
     await flushHeartbeat();
+    if (mode.value === "SentenceOral") {
+      finishOpen.value = true;
+      paused.value = true;
+      return;
+    }
     ElMessage.success("本轮练习已完成");
     await leave();
     return;
@@ -883,20 +955,87 @@ function toggleRecord() {
   // 评测中不允许重新开录，避免一次答题推多份音频
   if (evaluating.value) return;
   if (recording.value) {
-    stopRecord();
-    evaluating.value = true;
-    window.setTimeout(() => {
-      const blob = oralAudioBlob.value;
-      if (!blob) {
-        evaluating.value = false;
-        oralHint.value = "没有录到声音，请再录一次";
-        return;
-      }
-      void submitOralAudio(blob);
-    }, 250);
+    stopRecordAndEvaluate();
     return;
   }
   startRecord();
+}
+
+/** 停录并送评（松开麦克风、点「提交」、按空格都走这里） */
+function stopRecordAndEvaluate() {
+  stopRecord();
+  evaluating.value = true;
+  window.setTimeout(() => {
+    const blob = oralAudioBlob.value;
+    if (!blob) {
+      evaluating.value = false;
+      oralHint.value = "没有录到声音，请再录一次";
+      return;
+    }
+    void submitOralAudio(blob);
+  }, 250);
+}
+
+/** 设计稿：按住麦克风开始录音 */
+function onOralRecordStart() {
+  if (evaluating.value) return;
+  if (!answering.value) {
+    if (!oralRetryable.value) {
+      ElMessage.info("本题已作答，点击「下一题」继续");
+      return;
+    }
+    resetItem();
+    startRecord();
+    return;
+  }
+  if (!recording.value) startRecord();
+}
+
+/** 设计稿：松手结束录音并评测 */
+function onOralRecordStop() {
+  if (!recording.value) return;
+  stopRecordAndEvaluate();
+}
+
+/** 设计稿：底部「提交」——录音中先停录，已判分则进入下一题 */
+function onOralSubmit() {
+  if (evaluating.value) return;
+  if (recording.value) {
+    stopRecordAndEvaluate();
+    return;
+  }
+  if (!answering.value) {
+    next();
+    return;
+  }
+  if (oralAudioBlob.value) {
+    void submitOralAudio(oralAudioBlob.value);
+    return;
+  }
+  ElMessage.info("请先按住麦克风朗读句子");
+}
+
+function onSpeedChange(value: number) {
+  oralSpeed.value = Number(value) || 1;
+}
+
+function onFinishContinue() {
+  finishOpen.value = false;
+  paused.value = false;
+  gameIndex.value = 0;
+  resetItem();
+}
+
+function onFinishNext() {
+  finishOpen.value = false;
+  paused.value = false;
+  void leave();
+}
+
+function onFinishClose() {
+  finishOpen.value = false;
+  paused.value = false;
+  void leave();
 }
 
 function startRecord() {
@@ -1126,6 +1265,12 @@ function resetProgress() {
 }
 
 async function finish() {
+  if (mode.value === "SentenceOral") {
+    await flushHeartbeat();
+    finishOpen.value = true;
+    paused.value = true;
+    return;
+  }
   ElMessage.success("本轮练习已完成");
   await leave();
 }
@@ -1227,6 +1372,23 @@ function onShortcut(event: KeyboardEvent) {
   }
 
   if (currentMode === "SentenceOral") {
+    if (finishOpen.value) {
+      if (key === " " || event.code === "Space") {
+        event.preventDefault();
+        onFinishContinue();
+        return;
+      }
+      if (key === "Enter") {
+        event.preventDefault();
+        onFinishNext();
+        return;
+      }
+      if (key === "Escape") {
+        event.preventDefault();
+        onFinishClose();
+      }
+      return;
+    }
     if (key === " " || event.code === "Space") {
       event.preventDefault();
       toggleRecord();
@@ -1234,7 +1396,7 @@ function onShortcut(event: KeyboardEvent) {
     }
     if (key === "Enter") {
       event.preventDefault();
-      next();
+      onOralSubmit();
     }
   }
 }

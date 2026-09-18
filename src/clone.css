@@ -5881,3 +5881,684 @@ html.dark .wdMenu img {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* ===== 口语模式（设计稿）===== */
+
+.oralPage {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(180deg, #edf4fb 0%, #e9f2fc 38%, #e7f1fe 68%, #fbfcfe 100%);
+    color: #333;
+}
+
+.oralBgLeft,
+.oralBgRight {
+    position: absolute;
+    bottom: 0;
+    width: 572px;
+    height: 964px;
+    pointer-events: none;
+    user-select: none;
+}
+
+.oralBgLeft {
+    left: 0;
+}
+
+.oralBgRight {
+    right: 0;
+}
+
+.oralHead {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    height: 64px;
+    padding: 0 17px 5px 15px;
+    background: #fff;
+}
+
+.oralLogo {
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.oralLogo img {
+    display: block;
+    width: auto;
+    height: 45px;
+}
+
+.oralCrumbs {
+    margin-left: 46px;
+}
+
+.oralCrumb {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+}
+
+.oralCrumbSep {
+    width: 16px;
+    height: 16px;
+    margin: 0 11px;
+}
+
+.oralCrumbCur {
+    max-width: 40vw;
+    color: #666;
+    font-size: 14px;
+}
+
+.oralBody {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-height: 0;
+    padding: 38px 20px 118px;
+}
+
+.oralLesson {
+    max-width: 100%;
+    color: #6b6d6f;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.oralCard {
+    position: relative;
+    width: 892px;
+    max-width: 100%;
+    height: 750px;
+    margin-top: 30px;
+    padding: 20px 20px 53px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 14px 34px rgba(28, 74, 128, 0.08);
+}
+
+.oralStrip {
+    position: relative;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 56px;
+    border-radius: 14px;
+    background: #f5f8fe;
+}
+
+.oralMode {
+    position: absolute;
+    right: calc(50% + 75px);
+    gap: 13px;
+    color: #0056b5;
+}
+
+.oralModeIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.oralModeText {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.oralTimer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #00c26d;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.oralSpeed {
+    position: absolute;
+    left: calc(50% + 106px);
+    gap: 8px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #0056b5;
+    cursor: pointer;
+}
+
+.oralSpeedIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.oralSpeedText {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.oralMeter {
+    margin-top: 18px;
+}
+
+.oralMeterTip {
+    color: #333;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.oralMeterBar {
+    width: 339px;
+    max-width: 100%;
+    height: 5px;
+    margin-top: 8px;
+    border-radius: 3px;
+    background: #eee;
+    overflow: hidden;
+}
+
+.oralMeterFill {
+    height: 100%;
+    border-radius: 3px;
+    background: #00c26d;
+    transition: width 0.25s ease;
+}
+
+.oralAsk {
+    margin-top: 43px;
+    color: #666;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.oralSentence {
+    margin-top: 38px;
+    max-width: 860px;
+    color: #333;
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 50px;
+    text-align: center;
+    word-break: break-word;
+}
+
+.oralChinese {
+    margin-top: 17px;
+    color: #666;
+    font-size: 24px;
+    line-height: 34px;
+    text-align: center;
+}
+
+.oralPlay {
+    gap: 12px;
+    height: 48px;
+    margin-top: 20px;
+    padding: 0 14px 0 9px;
+    border: none;
+    border-radius: 24px;
+    background: #daebff;
+    color: #0056b5;
+    cursor: pointer;
+}
+
+.oralPlayIcon {
+    width: 32px;
+    height: 32px;
+}
+
+.oralPlayText {
+    font-size: 16px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.oralMicWrap {
+    position: relative;
+    width: 184px;
+    height: 184px;
+    margin-top: 2px;
+}
+
+.oralMic {
+    width: 184px;
+    height: 184px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.oralMic img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.oralMic.is-recording img {
+    animation: oralMicPulse 1.3s ease-in-out infinite;
+}
+
+.oralMic.is-eval img {
+    opacity: 0.72;
+}
+
+@keyframes oralMicPulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
+}
+
+.oralMicHint {
+    position: absolute;
+    top: 161px;
+    left: 50%;
+    width: 340px;
+    transform: translateX(-50%);
+    color: #989999;
+    font-size: 12px;
+    line-height: 17px;
+    text-align: center;
+}
+
+.oralMicHint.is-error {
+    color: #e34d59;
+}
+
+.oralMicHint.is-ok {
+    color: #00c26d;
+}
+
+html.dark .oralHead .userDrop {
+    color: #333;
+}
+
+.oralActions {
+    gap: 20px;
+    margin-top: auto;
+}
+
+.oralBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 200px;
+    height: 60px;
+    padding: 0;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    background: #fbfbfb;
+    color: #666;
+    font-size: 18px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.oralBtn:hover:not(.is-disabled) {
+    border-color: #d9e3f0;
+    color: #0056b5;
+}
+
+.oralBtnPrimary,
+.oralBtnPrimary:hover:not(.is-disabled) {
+    border-color: #0056b5;
+    background: #0056b5;
+    color: #fff;
+}
+
+.oralBtnPrimary:hover:not(.is-disabled) {
+    border-color: #004b9e;
+    background: #004b9e;
+}
+
+.oralBtn.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.oralBtnIcon {
+    width: 20px;
+    height: 20px;
+}
+
+/* ===== 口语模式 · 完成弹窗 ===== */
+
+.oralFinishLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.oralFinishMask {
+    position: absolute;
+    inset: 0;
+    background: rgba(31, 45, 61, 0.45);
+}
+
+.oralFinish {
+    position: relative;
+    width: 536px;
+    height: 548px;
+    padding: 36px 40px 0;
+    border-radius: 16px;
+    background:
+        radial-gradient(120% 130% at 4% 0%, #d5e9ff 0%, rgba(255, 255, 255, 0) 46%),
+        radial-gradient(95% 105% at 100% 48%, #d5f8ea 0%, rgba(255, 255, 255, 0) 58%),
+        #fff;
+    box-shadow: 0 24px 60px rgba(20, 50, 90, 0.18);
+    animation: oralFinishIn 0.22s ease-out;
+}
+
+@keyframes oralFinishIn {
+    from {
+        transform: scale(0.94);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.oralFinishClose {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #f2f3f5;
+    color: #9aa0a6;
+    cursor: pointer;
+}
+
+.oralFinishClose svg {
+    width: 22px;
+    height: 22px;
+}
+
+.oralFinishClose:hover {
+    color: #666;
+}
+
+.oralFinishArt {
+    width: 200px;
+    height: 200px;
+    margin-bottom: -10px;
+}
+
+.oralFinishTitle {
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 38px;
+}
+
+.oralFinishSub {
+    margin-top: 4px;
+    color: #666;
+    font-size: 15px;
+    line-height: 21px;
+}
+
+.oralFinishStats {
+    gap: 20px;
+    margin-top: 17px;
+}
+
+.oralFinishStat {
+    gap: 14px;
+    width: 220px;
+    height: 98px;
+    padding: 0 16px;
+    border-radius: 12px;
+}
+
+.oralFinishStatTime {
+    background: #f3fcf8;
+}
+
+.oralFinishStatCount {
+    background: #f4f9ff;
+}
+
+.oralFinishStatIcon {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+}
+
+.oralFinishStatLabel {
+    color: #666;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.oralFinishStatValue {
+    margin-top: 6px;
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 30px;
+}
+
+.oralFinishActions {
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.oralFinishBtn {
+    width: 220px;
+    height: 55px;
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.oralFinishBtn:hover {
+    filter: brightness(1.06);
+}
+
+.oralFinishBtnPrimary {
+    background: #0056b5;
+}
+
+.oralFinishBtnGreen {
+    background: #00c26d;
+}
+
+@media (max-width: 1200px) {
+    .oralCard {
+        height: auto;
+        min-height: 0;
+        padding-bottom: 40px;
+    }
+
+    .oralMicWrap {
+        margin-bottom: 26px;
+    }
+}
+
+@media (max-width: 900px) {
+    .oralHead {
+        padding: 0 12px;
+    }
+
+    .oralLogo img {
+        height: 34px;
+    }
+
+    .oralCrumbs {
+        margin-left: 16px;
+    }
+
+    .oralCrumb {
+        font-size: 14px;
+    }
+
+    .oralCrumbSep {
+        margin: 0 6px;
+    }
+
+    .oralBody {
+        padding: 16px 12px 32px;
+    }
+
+    .oralLesson {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    .oralCard {
+        margin-top: 14px;
+        padding: 12px 12px 24px;
+        border-radius: 16px;
+    }
+
+    .oralStrip {
+        justify-content: space-between;
+        height: 48px;
+        padding: 0 14px;
+    }
+
+    .oralMode,
+    .oralTimer,
+    .oralSpeed {
+        position: static;
+        transform: none;
+    }
+
+    .oralMode {
+        gap: 8px;
+    }
+
+    .oralModeText {
+        font-size: 14px;
+    }
+
+    .oralTimer {
+        font-size: 18px;
+    }
+
+    .oralMeter {
+        width: 100%;
+        margin-top: 14px;
+    }
+
+    .oralMeterBar {
+        width: 100%;
+    }
+
+    .oralAsk {
+        margin-top: 22px;
+        font-size: 14px;
+    }
+
+    .oralSentence {
+        margin-top: 18px;
+        font-size: 24px;
+        line-height: 34px;
+    }
+
+    .oralChinese {
+        margin-top: 10px;
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .oralMicWrap,
+    .oralMic {
+        width: 140px;
+        height: 140px;
+    }
+
+    .oralMicHint {
+        top: 122px;
+        width: 300px;
+    }
+
+    .oralActions {
+        width: 100%;
+        gap: 10px;
+        margin-top: 26px;
+    }
+
+    .oralBtn {
+        flex: 1;
+        width: auto;
+        height: 48px;
+        gap: 6px;
+        font-size: 15px;
+    }
+
+    .oralBtnIcon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .oralFinish {
+        width: calc(100vw - 32px);
+        height: auto;
+        padding: 24px 20px 24px;
+    }
+
+    .oralFinishArt {
+        width: 150px;
+        height: 150px;
+        margin-bottom: -6px;
+    }
+
+    .oralFinishTitle {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .oralFinishStats {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .oralFinishStat {
+        width: 100%;
+    }
+
+    .oralFinishActions {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .oralFinishBtn {
+        width: 100%;
+    }
+}
