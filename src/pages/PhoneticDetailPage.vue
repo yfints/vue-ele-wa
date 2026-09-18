@@ -21,7 +21,35 @@
     </header>
 
     <div class="phdBody">
-      <section class="phdCard">
+      <el-skeleton v-if="loading" class="phdSkeletonWrap" animated>
+        <template #template>
+          <section class="phdCard">
+            <div class="phdSummary flex ac">
+              <el-skeleton-item variant="image" class="phdSkeletonTile" />
+              <div class="phdSummaryInfo minw0">
+                <el-skeleton-item variant="text" class="phdSkeletonTitle" />
+                <el-skeleton-item variant="text" class="phdSkeletonSub" />
+              </div>
+            </div>
+            <div class="phdDivider" />
+
+            <div v-for="n in 3" :key="n" class="phdGroup">
+              <div class="phdGroupHead flex">
+                <el-skeleton-item variant="circle" class="phdSkeletonDot" />
+                <div class="phdGroupLabels flex col">
+                  <el-skeleton-item variant="text" class="phdSkeletonGroupName" />
+                  <el-skeleton-item variant="text" class="phdSkeletonGroupCount" />
+                </div>
+              </div>
+              <div class="phdChips flex wrap">
+                <el-skeleton-item v-for="i in 4" :key="i" variant="button" class="phdSkeletonChip" />
+              </div>
+            </div>
+          </section>
+        </template>
+      </el-skeleton>
+
+      <section v-else class="phdCard">
         <div class="phdSummary flex ac">
           <div class="phdTile flex ac jc">{{ codeLabel }}</div>
           <div class="phdSummaryInfo minw0">
@@ -149,6 +177,7 @@ import {
 } from "@/data/phonetics";
 
 const route = useRoute();
+const loading = ref(true);
 const detail = ref<CourseDetailVo | null>(null);
 const activeIpa = ref("");
 const playingKey = ref("");
@@ -294,6 +323,8 @@ onMounted(async () => {
     detail.value = await fetchLessonDetails(String(route.params.id || ""));
   } catch {
     detail.value = null;
+  } finally {
+    loading.value = false;
   }
 });
 

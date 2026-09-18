@@ -7681,6 +7681,60 @@ html.dark .practiceHead .userDrop {
     line-height: 17px;
 }
 
+/* 音标详情骨架屏：结构对齐真实卡片（方块 + 标题 + 分组 + 芯片行） */
+.phdSkeletonWrap {
+    display: block;
+}
+
+.phdSkeletonTile {
+    flex: 0 0 auto;
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+}
+
+.phdSkeletonTitle {
+    width: 220px;
+    height: 26px;
+}
+
+.phdSkeletonSub {
+    width: 280px;
+    height: 16px;
+    margin-top: 10px;
+}
+
+.phdSkeletonDot {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+}
+
+.phdSkeletonGroupName {
+    width: 72px;
+    height: 18px;
+}
+
+.phdSkeletonGroupCount {
+    width: 36px;
+    height: 14px;
+    margin-top: 4px;
+}
+
+.phdSkeletonChip {
+    width: 70px;
+    height: 60px;
+    border-radius: 8px;
+}
+
+.phdSkeletonWrap .phdGroup {
+    margin-top: 29px;
+}
+
+.phdSkeletonWrap .phdGroup + .phdGroup {
+    margin-top: 25px;
+}
+
 @media (max-width: 900px) {
     .phdBody {
         padding: 12px;
@@ -7754,5 +7808,27 @@ html.dark .practiceHead .userDrop {
 
     .phdWord {
         width: 100%;
+    }
+
+    .phdSkeletonTile {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+    }
+
+    .phdSkeletonTitle {
+        width: 160px;
+        height: 20px;
+    }
+
+    .phdSkeletonSub {
+        width: 180px;
+        height: 14px;
+        margin-top: 8px;
+    }
+
+    .phdSkeletonChip {
+        width: 56px;
+        height: 48px;
     }
 }
