@@ -15,9 +15,9 @@
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click="openProfile">个人信息</el-dropdown-item>
-          <el-dropdown-item @click="toggleTheme">
+<!--          <el-dropdown-item @click="toggleTheme">
             {{ isDark ? "白天模式" : "夜间模式" }}
-          </el-dropdown-item>
+          </el-dropdown-item>-->
           <el-dropdown-item @click="onLogout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </template>
