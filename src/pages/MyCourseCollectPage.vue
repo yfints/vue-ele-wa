@@ -116,6 +116,10 @@ function goTab(next: "sentence" | "word") {
 }
 
 function goMall() {
+  if(kind.value==="word"){
+    void router.push(`/words/index`);
+    return;
+  }
   void router.push("/courseMall/index");
 }
 
