@@ -208,6 +208,9 @@ const iconGradient = computed(
   () => `linear-gradient(180deg, ${tone.value} 0%, #ffffff 100%)`,
 );
 const progress = computed(() => {
+  // 后端已统一口径下发 progress，优先用它；没有才用 learnedNum / wordCount 自算
+  const fromApi = Number(detail.value?.progress);
+  if (Number.isFinite(fromApi) && fromApi > 0) return Math.min(100, Math.round(fromApi));
   const wordCount = Number(detail.value?.wordCount ?? 0) || 0;
   const learnedNum = Number(detail.value?.learnedNum ?? 0) || 0;
   if (!wordCount) return 0;

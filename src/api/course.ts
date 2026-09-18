@@ -51,8 +51,11 @@ export async function fetchMyLessonDetails(id: string | number) {
 export interface CourseLessonVo {
   id: number | string;
   name: string;
+  /** 单元内序号（教材课，从 1 开始，不要用 sortOrder 代替） */
+  num?: number;
   lessonType?: number | string | null;
   duration?: number;
+  description?: string | null;
   sortOrder?: number;
   wordCount?: number;
   timeSeconds?: number;
@@ -60,6 +63,10 @@ export interface CourseLessonVo {
   status?: number;
   lastStudyTime?: string | null;
   lastTime?: boolean;
+  /** 课时所属单元（教材课） */
+  unitNo?: number | string;
+  unitName?: string;
+  unitLabel?: string;
 }
 
 export interface CourseProgressVo {
@@ -88,6 +95,8 @@ export interface CourseDetailVo {
   lessons?: CourseLessonVo[];
   /** 教材按「单元」下发的课时分组（新接口字段，优先用它渲染详情页） */
   units?: CourseUnitVo[];
+  /** 教材单元数（非教材课为 0） */
+  unitCount?: number;
   progress?: CourseProgressVo;
   timeSeconds?: number;
   lastLessonId?: number | string | null;

@@ -14,6 +14,8 @@ export interface WordSetDetail {
   wordCount?: number;
   /** 我已学单词数（未加入为 0） */
   learnedNum?: number;
+  /** 已学百分比 0-100（后端统一口径，优先读它） */
+  progress?: number;
   /** 是否已加入我的单词学习计划 */
   joined?: boolean;
   userWordId?: number | string | null;

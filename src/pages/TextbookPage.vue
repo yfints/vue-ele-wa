@@ -271,7 +271,8 @@ async function loadCategories() {
 
 async function loadCategoryList(params: { kind: number }) {
   try {
-    const raw = await fetchCourseCategories(params);
+    // 教材分类：/course/categories?type=1（kind=2 年级、kind=3 版本）
+    const raw = await fetchCourseCategories({ type: 1, ...params });
     const list = Array.isArray(raw) ? raw : [];
     // 接口已按 kind 过滤；万一是老接口把全部平铺返回，再兜一层按 kind 过滤
     const hasKind = list.some((item) => item.kind !== undefined && item.kind !== null);
@@ -287,8 +288,9 @@ async function loadBooks() {
   try {
     const page = await fetchCourses({
       type: 1,
-      gradeCategoryId: gradeId.value === "" ? undefined : gradeId.value,
-      versionCategoryId: editionId.value === "" ? undefined : editionId.value,
+      // 两个筛选传 0 表示「全部」（接口约定）
+      gradeCategoryId: gradeId.value === "" ? 0 : gradeId.value,
+      versionCategoryId: editionId.value === "" ? 0 : editionId.value,
       page: 1,
       limit: 100,
     });

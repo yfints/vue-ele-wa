@@ -169,7 +169,8 @@ function openBook(book: WordSetCard) {
 
 async function loadCategoryTab() {
   try {
-    const raw = await fetchCourseCategories({ kind: CATEGORY_KIND.WORD });
+    // 单词库分类：/course/categories?type=4（kind=4）
+    const raw = await fetchCourseCategories({ type: 4, kind: CATEGORY_KIND.WORD });
     const list = Array.isArray(raw) ? raw : [];
     // 接口已按 kind 过滤；万一是老接口把全部平铺返回，再兜一层按 kind 过滤
     const hasKind = list.some((item) => item.kind !== undefined && item.kind !== null);
@@ -188,42 +189,25 @@ async function loadCategoryTab() {
   ];
 }
 
-/** 单个分类下的单词集 */
-async function fetchByCategory(id: string) {
+/**
+ * 单词集列表：GET /courses?type=4&categoryId=<分类 id 或 0>
+ * categoryId=0 就是「全部」（服务端把 0 当不过滤），卡片自带 wordCount / learnedNum / progress。
+ */
+async function fetchWordSets(id: string) {
   const page = await fetchCourses({
-    categoryId: id,
+    type: 4,
+    categoryId: id || 0,
     page: 1,
     limit: 100,
   });
   return unwrapCoursePage(page).records;
 }
 
-/**
- * 课程列表接口没有 kind 参数，「全部」就按 kind=4 的分类逐个取再合并去重；
- * 分类没取到时退回扫描课程列表，按卡片的 kind=4 标签过滤。
- */
-async function fetchAll() {
-  if (wordCategories.value.length) {
-    const groups = await Promise.all(
-      wordCategories.value.map((item) => fetchByCategory(String(item.id))),
-    );
-    const merged = new Map<string, CourseVo>();
-    groups.flat().forEach((course) => {
-      if (course?.id != null) merged.set(String(course.id), course);
-    });
-    return [...merged.values()];
-  }
-  const page = await fetchCourses({ page: 1, limit: 100 });
-  return unwrapCoursePage(page).records.filter((course) =>
-    (course.categories || []).some((item) => Number(item.kind) === CATEGORY_KIND.WORD),
-  );
-}
-
 async function loadList() {
   const seq = ++requestSeq;
   loading.value = true;
   try {
-    const records = categoryId.value ? await fetchByCategory(categoryId.value) : await fetchAll();
+    const records = await fetchWordSets(categoryId.value);
     if (seq !== requestSeq) return;
     cards.value = records.map(toCard);
   } catch {

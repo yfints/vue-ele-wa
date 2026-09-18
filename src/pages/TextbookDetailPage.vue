@@ -77,7 +77,7 @@
               class="tbdLesson flex ac hand"
               @click="startFrom(lesson)"
             >
-              <span class="tbdBadge flex ac jc">{{ index + 1 }}</span>
+              <span class="tbdBadge flex ac jc">{{ lessonNo(lesson, index) }}</span>
               <span class="tbdLessonBody flex ac jb">
                 <span class="tbdLessonName line1">{{ lesson.name }}</span>
                 <span class="tbdLessonTime">{{ durationText(lesson) }}</span>
@@ -150,7 +150,11 @@ const tags = computed<CardTag[]>(() => {
   const edition = nameOfKind(categories, CATEGORY_KIND.EDITION);
   if (grade) list.push({ name: grade, ...gradeTone });
   if (edition) list.push({ name: edition, ...toneOf(edition) });
-  const units = Number(detail.value?.courseNum || 0);
+  // 单元数读 unitCount（非教材课为 0），再退回 units.length，最后才用 courseNum 兜底
+  const units =
+    Number(detail.value?.unitCount || 0) ||
+    (Array.isArray(detail.value?.units) ? detail.value?.units.length || 0 : 0) ||
+    Number(detail.value?.courseNum || 0);
   if (units > 0) list.push({ name: `共${units}单元`, bg: "#EEEEEE", color: "#999999" });
   return list;
 });
@@ -216,7 +220,13 @@ function toneOf(name: string) {
 
 function durationText(lesson: CourseLessonVo) {
   const minutes = Number(lesson.duration || 0);
-  return minutes > 0 ? `${minutes}min` : "";
+  return minutes > 0 ? `${minutes}分钟` : "";
+}
+
+/** 课时行序号：接口的 num（单元内从 1 开始），没有才退回数组下标 */
+function lessonNo(lesson: CourseLessonVo, index: number) {
+  const num = Number(lesson.num);
+  return Number.isFinite(num) && num > 0 ? num : index + 1;
 }
 
 /**

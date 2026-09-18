@@ -300,6 +300,8 @@ export function sendStudyHeartbeat(body: {
   seconds: number;
   sentenceCount?: number;
   wordCount?: number;
+  /** 本次完成的单词内容项 id（方案 A：单词库务必带上，≤100 个，雪花 id 传字符串） */
+  itemIds?: Array<string | number>;
 }) {
   return post("/study/heartbeat", body);
 }

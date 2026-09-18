@@ -406,6 +406,8 @@ const lastResult = ref("");
 const lastExpected = ref("");
 const playUsed = ref(0);
 const answeredCount = ref(0);
+/** 单词库课时里本批已完成的单词内容项 id，随心跳上报（方案 A） */
+const completedItemIds = ref<string[]>([]);
 let lastBeatAt = 0;
 let tick: number | undefined;
 let autoNextTimer: number | undefined;
@@ -838,18 +840,28 @@ async function flushHeartbeat(seconds?: number) {
   const value = Math.min(120, Math.max(0, Math.floor(seconds ?? elapsed.value - lastBeatAt)));
   if (!id || value < 1) return;
   lastBeatAt = elapsed.value;
+  // 单词库课时：心跳要带 source=2 + 本次学完的单词 itemIds，服务端才会记「已学单词」
+  const wordMode = isWordSession();
+  const itemIds = wordMode ? [...completedItemIds.value] : [];
   try {
     await sendStudyHeartbeat({
       lessonId: id,
-      source: 1,
+      source: wordMode ? 2 : 1,
       seconds: value,
-      sentenceCount: answeredCount.value,
-      wordCount: 0,
+      sentenceCount: wordMode ? 0 : answeredCount.value,
+      wordCount: wordMode ? itemIds.length : 0,
+      itemIds: itemIds.length ? itemIds : undefined,
     });
     answeredCount.value = 0;
+    completedItemIds.value = [];
   } catch {
     /* 心跳失败不打断练习 */
   }
+}
+
+/** 单词库练习（从单词集进来的课时），心跳 source 用 2、并带已学单词 id */
+function isWordSession() {
+  return session.value?.gameType === "Word";
 }
 
 async function reportProgress(index: number, status: 0 | 1) {
@@ -880,6 +892,7 @@ async function applyResult(res: { result?: string; expected?: string; nextIndex?
   lastExpected.value = isWrongResult(res.result) ? res.expected || "" : "";
   answering.value = false;
   answeredCount.value += 1;
+  trackLearnedWord();
   await reportProgress(currentIndexValue, 0);
   if (res.finished) {
     await reportProgress(currentIndexValue, 1);
@@ -897,6 +910,15 @@ async function applyResult(res: { result?: string; expected?: string; nextIndex?
     if (autoNextTimer) clearTimeout(autoNextTimer);
     autoNextTimer = window.setTimeout(() => nextFromServer(res.nextIndex), 800);
   }
+}
+
+/** 单词库：答完一题就把这个单词记进待上报列表（心跳时带 itemIds） */
+function trackLearnedWord() {
+  if (!isWordSession()) return;
+  const item = current.value;
+  const id = String(item?.itemId || item?.id || "");
+  if (!id || completedItemIds.value.includes(id)) return;
+  completedItemIds.value.push(id);
 }
 
 function nextFromServer(nextIndex?: number) {
