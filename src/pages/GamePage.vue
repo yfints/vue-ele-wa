@@ -5,7 +5,7 @@
     :title="practiceTitle"
     crumb="课程详情"
     :clock="clock"
-    :speed="practiceSpeed"
+    :speed="speakRate"
     :index="gameIndex"
     :total="gameList.length"
     :english="current?.english || ''"
@@ -440,7 +440,6 @@ const isInputMode = computed(() => isListenMode.value || isTranslateInput.value)
 const isPracticePage = computed(
   () => hasGame.value && (mode.value === "SentenceOral" || isInputMode.value),
 );
-const practiceSpeed = ref(1);
 const finishOpen = ref(false);
 const practiceTitle = computed(() => {
   const course = String(session.value?.courseName || "").trim();
@@ -448,7 +447,8 @@ const practiceTitle = computed(() => {
   if (course && lesson && !course.includes(lesson)) return `${course}-${lesson}`;
   return lesson || course || "练习";
 });
-const speakRate = computed(() => (isPracticePage.value ? practiceSpeed.value : 1));
+/** 播放倍速：存在 gameSetting（localStorage），练习页改完后续所有朗读都按它播 */
+const speakRate = computed(() => Number(gameSetting.value.speak_rate) || 1);
 const finishDuration = computed(() => formatDuration(elapsed.value));
 const oralFeedback = computed(() => {
   if (mode.value !== "SentenceOral" || answering.value) return "";
@@ -1072,7 +1072,8 @@ function onOralSubmit() {
 }
 
 function onSpeedChange(value: number) {
-  practiceSpeed.value = Number(value) || 1;
+  // 倍速设置落到 localStorage（gameSetting），下次进练习页/下次朗读继续用它
+  saveGameSetting({ speak_rate: Number(value) || 1 });
 }
 
 /** 设计稿练习页的「提交」：听力/中译英=提交写的答案，口语=停录评测/下一题 */

@@ -73,6 +73,8 @@ export interface GameSetting {
   typeing_show: boolean;
   show_sentence_pic: boolean;
   answer_auto_show_error_times: number;
+  /** 语音播放倍速（练习页的 1.0x 选择器），持久化在本地，后续朗读都用它 */
+  speak_rate: number;
 }
 
 const STORAGE_KEY = "wxs-game-session";
@@ -132,6 +134,7 @@ export function defaultSetting(): GameSetting {
     typeing_show: true,
     show_sentence_pic: true,
     answer_auto_show_error_times: 0,
+    speak_rate: 1,
   };
 }
 
