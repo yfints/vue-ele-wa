@@ -164,18 +164,6 @@
       @key="onKeyboard"
     />
 
-    <Teleport to="body">
-      <div
-        class="progress gameLearnProgress"
-        role="progressbar"
-        :aria-valuenow="learnPercent"
-        aria-valuemin="0"
-        aria-valuemax="100"
-      >
-        <div class="progress__value" :style="{ width: `${learnPercent}%` }" />
-      </div>
-    </Teleport>
-
       <ModePop ref="modeRef" />
     </template>
   </div>
@@ -428,11 +416,6 @@ let captureCancelled = false;
 let oralGuard: number | undefined;
 
 const isDesktop = computed(() => !isPhone.value);
-const learnPercent = computed(() => {
-  const total = gameList.value.length;
-  if (!total) return 0;
-  return Math.floor(Math.min(1, (gameIndex.value + 1) / total) * 10000) / 100;
-});
 const clock = computed(() => formatClock(elapsed.value));
 
 /** 口语 / 听力 / 中译英（整句）走新版设计稿练习页，其余模式仍是游戏态页面 */
