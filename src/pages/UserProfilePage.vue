@@ -89,6 +89,13 @@
           <div class="pfBlockTitle">安全设置</div>
           <div class="pfDivider" />
           <div class="pfLinkRow">
+            <span class="pfLabel">修改密码</span>
+            <button type="button" class="pfLink hand" @click="changePassword">
+              去修改
+              <img class="pfLinkArrow" src="/clone-assets/practice/icon-next.png" alt="" />
+            </button>
+          </div>
+          <div class="pfLinkRow">
             <span class="pfLabel">注销账号</span>
             <button type="button" class="pfLink pfLinkDanger hand" @click="cancelAccount">
               注销账号
@@ -215,7 +222,10 @@ async function onAvatarChange(event: Event) {
     uploading.value = false;
   }
 }
-
+function changePassword() {
+  // 当前账号是短信验证码登录，后端没有单独的改密接口
+  ElMessage.info("当前账号使用验证码登录，无需修改密码");
+}
 async function cancelAccount() {
   try {
     await ElMessageBox.confirm(
