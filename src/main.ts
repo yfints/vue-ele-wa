@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import ElementPlus from "element-plus";
+import ElementPlus, {ElMessageBox} from "element-plus";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import "element-plus/dist/index.css";
 import "element-plus/theme-chalk/dark/css-vars.css";
@@ -17,6 +17,25 @@ const app = createApp(App);
 app.use(router);
 app.use(ElementPlus, { locale: zhCn });
 app.mount("#root");
+
+/** 新 SW 接管时提示刷新（首次访问不算更新） 可关掉 */
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  let hadController = Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController) {
+      hadController = true;
+      return;
+    }
+    void ElMessageBox.confirm("检测到新版本，刷新后生效。是否立即刷新？", "版本更新", {
+      confirmButtonText: "立即刷新",
+      cancelButtonText: "稍后",
+      type: "info",
+    })
+      .then(() => window.location.reload())
+      .catch(() => {});
+  });
+  navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+}
 
 /**
  * 全局先拉一次用户资料：/game、/gameLoad 这些不经过 AppLayout 的页面
