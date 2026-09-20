@@ -543,6 +543,13 @@ function shortcutBlocked() {
   return pauseOpen.value || leaveOpen.value || resetOpen.value || settingOpen.value || listOpen.value || feedbackOpen.value;
 }
 
+/** 焦点是不是在输入框里（练习页的答案框、设置里的输入等） */
+function isTextInputTarget(target: EventTarget | null) {
+  const el = target as HTMLElement | null;
+  if (!el) return false;
+  return el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable === true;
+}
+
 function markPlaying(on: boolean) {
   playing.value = on;
 }
@@ -1431,6 +1438,11 @@ function onShortcut(event: KeyboardEvent) {
   const key = event.key;
   const currentMode = mode.value;
 
+  // 设计稿练习页的答案就是直接敲字（听力 / 中译英 / 打字练习），
+  // 焦点在答案框里时不能抢键：空格要能打出来、字母要能打、左右键要能移动光标。
+  // 回车提交由输入框自己的 keydown 处理，不受这里影响。
+  if (isPracticePage.value && isTextInputTarget(event.target)) return;
+
   // 完成弹窗：空格=继续练习、回车=下一章、Esc=关闭（口语 / 听力共用）
   if (finishOpen.value) {
     if (key === " " || event.code === "Space") {
@@ -1488,7 +1500,12 @@ function onShortcut(event: KeyboardEvent) {
     return;
   }
 
-  if (currentMode === "SentenceTypeing" && (key === " " || event.code === "Space")) {
+  // 老游戏页的打字模式：空格 = 切换虚拟键盘；新练习页不抢空格（见上面的输入框判断）
+  if (
+    !isPracticePage.value &&
+    currentMode === "SentenceTypeing" &&
+    (key === " " || event.code === "Space")
+  ) {
     event.preventDefault();
     toggleLetters();
     return;
