@@ -26,6 +26,7 @@
     :finish-visible="finishOpen"
     :finish-duration="finishDuration"
     :finish-count="gameList.length"
+    :finish-has-next="Boolean(nextLesson?.hasNext && nextLesson?.lessonId)"
     @update:answer="listenAnswer = $event"
     @prev="prev"
     @next="next"
@@ -335,9 +336,11 @@ import ModePop from "@/components/ModePop.vue";
 import PracticeView from "@/components/practice/PracticeView.vue";
 import {
   evaluateSpeech,
+  fetchNextLesson,
   sendStudyHeartbeat,
   submitPractice,
   syncLessonProgress,
+  type NextLessonVo,
   type SpeechError,
   type SpeechScore,
 } from "@/api/practice";
@@ -352,6 +355,7 @@ import {
   gameTime,
   isImmersiveMode,
   MODE_TO_PRACTICE,
+  saveGameInfo,
   saveGameSetting,
 } from "@/composables/useGame";
 import { isPhone, initLayoutViewport } from "@/composables/useLayout";
@@ -433,6 +437,8 @@ const isPracticePage = computed(
   () => hasGame.value && (mode.value === "SentenceOral" || isInputMode.value),
 );
 const finishOpen = ref(false);
+/** 打开完成弹窗前先查好的「下一章」（`GET /lessons/{id}/next`） */
+const nextLesson = ref<NextLessonVo | null>(null);
 const practiceTitle = computed(() => {
   const course = String(session.value?.courseName || "").trim();
   const lesson = String(session.value?.gameTitle || "").trim();
@@ -906,8 +912,7 @@ async function applyResult(res: { result?: string; expected?: string; nextIndex?
     await reportProgress(currentIndexValue, 1);
     await flushHeartbeat();
     if (isPracticePage.value) {
-      finishOpen.value = true;
-      paused.value = true;
+      await openFinish();
       return;
     }
     ElMessage.success("本轮练习已完成");
@@ -1131,10 +1136,52 @@ function onFinishContinue() {
   resetItem();
 }
 
-function onFinishNext() {
+/**
+ * 打开完成弹窗：先问一次下一章（`GET /lessons/{id}/next`），
+ * 有下一章弹窗里才显示「下一章（回车）」。
+ * 最多等 1.2s，等不到就先弹窗、请求回来再补按钮，避免弹窗被慢接口卡住。
+ */
+async function openFinish() {
+  const id = lessonId();
+  nextLesson.value = null;
+  if (id) {
+    const request = fetchNextLesson(id).catch(() => null);
+    const timeout = new Promise<null>((resolve) => {
+      window.setTimeout(() => resolve(null), 1200);
+    });
+    nextLesson.value = await Promise.race([request, timeout]);
+    void request.then((data) => {
+      // 超时先弹了窗：接口回来后把「下一章」按钮补上
+      if (data?.hasNext) nextLesson.value = data;
+    });
+  }
+  finishOpen.value = true;
+  paused.value = true;
+}
+
+/**
+ * 完成弹窗的「下一章」：用弹窗前查好的下一章数据更新本地练习状态 ——
+ * `wxs-game-session` 换成下一课（chapterId / gameTitle / courseId），
+ * `wxs-game-list / index / time` 交给 /gameLoad 重新拉题时重置。
+ * 没有下一章就提示一句，再按「关闭」的逻辑回课程页。
+ */
+async function onFinishNext() {
+  const next = nextLesson.value;
   finishOpen.value = false;
   paused.value = false;
-  void leave();
+  if (!next?.hasNext || next.lessonId == null || !String(next.lessonId)) {
+    ElMessage.info("已经是最后一章了");
+    await leave();
+    return;
+  }
+  await flushHeartbeat();
+  saveGameInfo({
+    courseId: next.courseId != null ? String(next.courseId) : session.value?.courseId,
+    chapterId: String(next.lessonId),
+    gameTitle: String(next.name || "").trim() || session.value?.gameTitle || "",
+    startItemId: undefined,
+  });
+  await router.replace("/gameLoad");
 }
 
 function onFinishClose() {
@@ -1378,8 +1425,7 @@ function resetProgress() {
 async function finish() {
   if (isPracticePage.value) {
     await flushHeartbeat();
-    finishOpen.value = true;
-    paused.value = true;
+    await openFinish();
     return;
   }
   ElMessage.success("本轮练习已完成");
@@ -1451,6 +1497,8 @@ function onShortcut(event: KeyboardEvent) {
       return;
     }
     if (key === "Enter") {
+      // 没有下一章时弹窗里没有这个按钮，回车也就不响应
+      if (!nextLesson.value?.hasNext) return;
       event.preventDefault();
       onFinishNext();
       return;

@@ -181,6 +181,7 @@
       v-if="finishVisible"
       :duration="finishDuration"
       :count="finishCount"
+      :has-next="finishHasNext"
       @continue="emit('finishContinue')"
       @next="emit('finishNext')"
       @close="emit('finishClose')"
@@ -224,6 +225,8 @@ const props = defineProps<{
   finishVisible: boolean;
   finishDuration: string;
   finishCount: number;
+  /** 有下一章才显示「下一章」按钮（父级先问 /lessons/{id}/next 再弹） */
+  finishHasNext?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -321,6 +324,16 @@ watch(
   () => [props.index, props.english, props.mode],
   () => {
     if (isInput.value) focusInput();
+  },
+);
+
+// 完成弹窗打开时先把焦点从输入框移开，否则回车/空格会被输入框自己的 keydown 吃掉
+// （弹窗上的「下一章（回车）」「继续练习（空格）」就按不动了）；关掉弹窗再聚焦回来继续练。
+watch(
+  () => props.finishVisible,
+  (visible) => {
+    if (visible) inputRef.value?.blur();
+    else if (isInput.value) focusInput();
   },
 );
 

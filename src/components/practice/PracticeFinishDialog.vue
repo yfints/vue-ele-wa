@@ -55,7 +55,12 @@
         <button type="button" class="practiceFinishBtn practiceFinishBtnPrimary hand" @click="emit('continue')">
           继续练习（空格）
         </button>
-        <button type="button" class="practiceFinishBtn practiceFinishBtnGreen hand" @click="emit('next')">
+        <button
+          v-if="hasNext"
+          type="button"
+          class="practiceFinishBtn practiceFinishBtnGreen hand"
+          @click="emit('next')"
+        >
           下一章（回车）
         </button>
       </div>
@@ -67,6 +72,8 @@
 defineProps<{
   duration: string;
   count: number;
+  /** 有没有下一章（父级打开弹窗前先问 /lessons/{id}/next），没有就不显示「下一章」按钮 */
+  hasNext?: boolean;
 }>();
 
 const emit = defineEmits<{

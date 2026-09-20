@@ -295,6 +295,23 @@ export function syncLessonProgress(
   return post(`/lessons/${lessonId}/progress`, body);
 }
 
+/** `GET /lessons/{id}/next` 返回的下一章信息（没有下一章时 lessonId=null、hasNext=false） */
+export interface NextLessonVo {
+  courseId?: number | string | null;
+  lessonId?: number | string | null;
+  name?: string | null;
+  num?: number | string | null;
+  unitNo?: number | string | null;
+  unitLabel?: string | null;
+  unitTitle?: string | null;
+  hasNext?: boolean;
+}
+
+/** 查询下一章（完成弹窗的「下一章」用） */
+export function fetchNextLesson(lessonId: string | number) {
+  return get<NextLessonVo>(`/lessons/${lessonId}/next`, undefined, { skipAuthRedirect: true });
+}
+
 export function sendStudyHeartbeat(body: {
   lessonId?: string | number;
   source: 1 | 2 | 3 | 4;
