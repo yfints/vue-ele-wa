@@ -91,7 +91,7 @@
                     class="phdSpeak flex ac jc hand"
                     aria-label="播放发音"
                     :class="{ 'is-playing': playingKey === `ipa-${active.ipa}` }"
-                    @click="speak(active.ipa.replaceAll('/', ''), `ipa-${active.ipa}`)"
+                    @click="speak(active.ipa.replaceAll('/', ''), `ipa-${active.ipa}`, active.audio)"
                   >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path
@@ -137,7 +137,7 @@
                     class="phdSpeak flex ac jc hand"
                     :aria-label="`播放 ${word.word}`"
                     :class="{ 'is-playing': playingKey === `word-${word.word}` }"
-                    @click="speak(word.word, `word-${word.word}`)"
+                    @click="speak(word.word, `word-${word.word}`, word.audio)"
                   >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path
@@ -169,6 +169,7 @@ import { useRoute } from "vue-router";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
 import { fetchLessonDetails, type CourseDetailVo } from "@/api/course";
+import { localAsset } from "@/data/mall";
 import {
   PHONETIC_TOTAL,
   phoneticGroups as FALLBACK_GROUPS,
@@ -236,6 +237,8 @@ function normalizeItem(entry: unknown): PhoneticItem | null {
   if (!ipa) return null;
   return {
     ipa,
+    // 接口带音频就用它（相对路径由 localAsset 补成完整地址）
+    audio: pickText(item, AUDIO_KEYS),
     type:
       pickText(item, ["type", "typeLabel", "type_label", "label", "category", "description", "desc"]) ||
       "音标",
@@ -266,8 +269,26 @@ function normalizeWord(entry: unknown) {
   const row = (entry || {}) as Record<string, unknown>;
   const word = pickText(row, ["word", "en", "english", "text", "content", "name"]);
   const zh = pickText(row, ["zh", "cn", "chinese", "meaning", "translation", "desc", "description"]);
-  return word || zh ? { word, zh } : null;
+  return word || zh ? { word, zh, audio: pickText(row, AUDIO_KEYS) } : null;
 }
+
+/** 音频字段名后端写法不统一，能识别到的都读一遍 */
+const AUDIO_KEYS = [
+  "audio",
+  "audioUrl",
+  "audio_url",
+  "audioPath",
+  "audio_path",
+  "sound",
+  "soundUrl",
+  "sound_url",
+  "voice",
+  "voiceUrl",
+  "voice_url",
+  "mp3",
+  "audioSrc",
+  "audio_src",
+];
 
 /** 取值：按候选字段名依次找，命中数组/对象都返回，没命中给空数组 */
 function valueOf(source: Record<string, unknown>, keys: string[]): unknown[] {
@@ -292,23 +313,38 @@ function toggleItem(item: PhoneticItem) {
   activeIpa.value = activeIpa.value === item.ipa ? "" : item.ipa;
 }
 
-/** 朗读：走有道发音（英式 type=1），和练习页的 TTS 保持一致 */
-function speak(text: string, key: string) {
+/** 播放一个地址；失败时回调 onFail（用来退回有道 TTS） */
+function playUrl(url: string, onFail?: () => void) {
+  audio = new Audio(url);
+  // onerror 和 play().catch 可能都触发，退回 TTS 只能退一次
+  let settled = false;
+  const fail = () => {
+    if (settled) return;
+    settled = true;
+    if (onFail) onFail();
+    else playingKey.value = "";
+  };
+  audio.onended = () => {
+    settled = true;
+    playingKey.value = "";
+  };
+  audio.onerror = fail;
+  void audio.play().catch(fail);
+}
+
+/**
+ * 朗读：**数据里带 audio 就优先播它**；没带（或音频加载/播放失败）再走有道发音
+ * （英式 type=1），和练习页的 TTS 保持一致。
+ */
+function speak(text: string, key: string, audioUrl?: string) {
   const value = String(text || "").trim();
   if (!value) return;
   stopSpeak();
   playingKey.value = key;
-  const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(value)}&type=1`;
-  audio = new Audio(url);
-  audio.onended = () => {
-    playingKey.value = "";
-  };
-  audio.onerror = () => {
-    playingKey.value = "";
-  };
-  void audio.play().catch(() => {
-    playingKey.value = "";
-  });
+  const tts = () => playUrl(`https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(value)}&type=1`);
+  const custom = localAsset(String(audioUrl || "").trim());
+  if (custom) playUrl(custom, tts);
+  else tts();
 }
 
 function stopSpeak() {

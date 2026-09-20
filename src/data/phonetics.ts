@@ -11,6 +11,8 @@ export interface PhoneticWord {
   word: string;
   /** 中文释义 */
   zh: string;
+  /** 该词自己的发音音频（接口下发时优先用它，没有就走有道 TTS） */
+  audio?: string;
 }
 
 export interface PhoneticSentence {
@@ -21,6 +23,8 @@ export interface PhoneticSentence {
 export interface PhoneticItem {
   /** 音标，例如 /i:/ */
   ipa: string;
+  /** 该音标的发音音频（接口下发时优先用它，没有就走有道 TTS） */
+  audio?: string;
   /** 卡片右上角的类型说明，例如「前元音 · 长元音」 */
   type: string;
   /** 发音要点，最多 3 条 */
