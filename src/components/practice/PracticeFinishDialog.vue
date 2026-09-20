@@ -63,6 +63,14 @@
         >
           下一章（回车）
         </button>
+        <button
+            v-else
+            type="button"
+            class="practiceFinishBtn practiceFinishBtnGreen hand"
+            @click="emit('next')"
+        >
+          返回课程
+        </button>
       </div>
     </div>
   </div>
