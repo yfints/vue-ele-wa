@@ -9468,3 +9468,14 @@ html.dark .practiceHead .userDrop {
         gap: 12px;
     }
 }
+
+/*
+ * Element Plus 的消息提示（接口报错就是走它）默认 z-index 2000 出头，
+ * 会被自建弹层盖住 —— 模式选择 / 完成弹窗是 3000、退出确认 2200、脚本里的自研弹窗 2300 / toast 2400，
+ * 结果就是在弹窗里触发的「验证码错误」这类接口提示用户根本看不见。
+ * 这里统一把 toast / 确认框抬到所有弹层之上。
+ */
+.el-message,
+.el-overlay.is-message-box {
+    z-index: 3300 !important;
+}

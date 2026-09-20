@@ -25,20 +25,35 @@ function apiMessage(payload: unknown, fallback = "请求失败") {
 
 let unauthorizedNotified = false;
 
+/** 网关对「没带 token / token 过期」的统一文案，这种就换成更友好的提示 */
+const GENERIC_UNAUTHORIZED = "未认证或登录已过期";
+
 /**
- * 401（HTTP 状态或业务 code）：清登录态并回登录页。
- * 不论请求是否标记 skipAuthRedirect，只要 token 失效就统一走这里 ——
- * 「登录失效」不该让用户停在半死不活的页面上。
+ * 401（HTTP 状态或业务 code）：清登录态 + 把报错提示出来。
+ *
+ * - 登录页上的 401 是本轮请求的业务报错（后端把「手机号或密码错误」也走 401），
+ *   这种每次都提示、不跳转 —— 否则用户点了登录什么反馈都没有；
+ * - 其他页面的 401 是登录失效：提示一次（带 redirect）回登录页，
+ *   同一批并发请求只提示一次，避免刷屏。
  */
-function handleUnauthorized(message: string = '登录已失效，请重新登录') {
-  clearAuth();
+function handleUnauthorized(message?: string) {
   const route = router.currentRoute.value;
   const onLogin = route.path.startsWith("/login");
-  if (!onLogin && !unauthorizedNotified) {
-    unauthorizedNotified = true;
-    ElMessage.error(message);
+  clearAuth();
+
+  const text = String(message || "").trim();
+  const hasOwnMessage = Boolean(text) && text !== GENERIC_UNAUTHORIZED;
+
+  if (onLogin) {
+    // 登录 / 注册 / 找回密码自己的报错，原样展示后端文案
+    ElMessage.error(hasOwnMessage ? text : "登录失败，请检查账号或密码");
+    return;
   }
-  if (onLogin) return;
+
+  if (unauthorizedNotified) return;
+  unauthorizedNotified = true;
+  ElMessage.error(hasOwnMessage ? text : "登录已失效，请重新登录");
+
   const redirect = route.fullPath && route.fullPath !== "/" ? route.fullPath : "";
   void router.push({
     path: "/login/index",
@@ -132,7 +147,8 @@ function unwrap<T>(payload: ApiResult<T> | T): T {
     const result = payload as ApiResult<T>;
     if (result.code !== 200) {
       if (result.code === 401) {
-        handleUnauthorized();
+        // 业务 401 也带上后端文案（登录页「手机号或密码错误」就是这种）
+        handleUnauthorized(apiMessage(result, "登录已失效，请重新登录"));
         throw new Error(apiMessage(result, "登录已失效，请重新登录"));
       }
       notifyApiError(result, result.code);
