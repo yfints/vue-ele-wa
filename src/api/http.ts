@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from "axios";
 import { ElMessage } from "element-plus";
 import router from "@/router";
-import { clearAuth, getToken } from "./token";
+import { clearAuth, getAuthToken } from "./token";
 
 /** 开发走 Vite 代理；打包后用 `.env` 的 `VITE_API_BASE_URL` */
 export const BASE_URL = import.meta.env.DEV
@@ -103,7 +103,8 @@ export const http: AxiosInstance = axios.create({
 });
 
 http.interceptors.request.use((config) => {
-  const token = getToken();
+  // 正式 token 或「待设置密码」的临时 token（内存里的，不落盘）
+  const token = getAuthToken();
   config.headers.Authorization = `Bearer ${token}`;
   if (typeof FormData !== "undefined" && config.data instanceof FormData) {
     delete config.headers["Content-Type"];

@@ -142,6 +142,7 @@ import { RouterLink, useRoute, useRouter } from "vue-router";
 import { Lock, User } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { loginByPassword, loginBySms, sendSms } from "@/api/auth";
+import { promotePendingToken, setAccount, setPendingToken } from "@/api/token";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
 import ForgotPasswordDialog from "@/components/ForgotPasswordDialog.vue";
 import { applyLogin, fetchMe, logout } from "@/composables/useAuth";
@@ -175,6 +176,8 @@ const forgotOpen = ref(false);
 /** 登录返回 passwordSet=false 时先弹「设置密码」，设置完再进站 */
 const setPasswordOpen = ref(false);
 const pendingTarget = ref("/home/index");
+/** 待设置密码的账号（登录成功但 token 还没落盘时先记着，设置完再写 ACCOUNT） */
+const pendingAccount = ref("");
 const errors = ref<Record<string, string>>({});
 let timer: number | undefined;
 
@@ -270,15 +273,17 @@ async function submit() {
       tab.value === "sms"
         ? await loginBySms(account, code.value.trim())
         : await loginByPassword(account, password.value);
-    applyLogin(data, account);
-    await fetchMe();
     if (data?.passwordSet === false) {
-      // 后端说这个号还没设过密码（验证码登录自动建号就是这种）：先设置密码再进站
+      // 还没设过密码（验证码登录自动建号就是这种）：token 只放内存、不落盘，设置成功后再存
+      setPendingToken(data.token || data.access_token || "");
+      pendingAccount.value = account;
       ElMessage.success("登录成功，请先设置登录密码");
       pendingTarget.value = redirect.value;
       setPasswordOpen.value = true;
       return;
     }
+    applyLogin(data, account);
+    await fetchMe();
     ElMessage.success("登录成功");
     await router.push(redirect.value);
   } catch {
@@ -297,6 +302,10 @@ function onResetDone(account: string) {
 
 /** 首次设置密码完成 → 再进站 */
 async function onSetPasswordDone() {
+  // 设置密码的响应里带新 token（弹窗里已存）；万一没带，就把临时 token 转正
+  promotePendingToken();
+  if (pendingAccount.value) setAccount(pendingAccount.value);
+  await fetchMe();
   ElMessage.success("密码设置成功");
   await router.push(pendingTarget.value || "/home/index");
 }
