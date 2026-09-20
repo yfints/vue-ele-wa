@@ -6,6 +6,14 @@ export interface LoginResult {
   access_token?: string;
   refresh_token?: string;
   expires_in?: number;
+  /** 后端新加的字段：用户信息 + 是否是新号 + 是否已设置登录密码 */
+  userId?: number | string;
+  phone?: string;
+  name?: string;
+  avatar?: string | null;
+  isNewUser?: boolean;
+  /** false 表示账号还没设过密码（验证码登录自动建号就是这种），需要先设置密码再进站 */
+  passwordSet?: boolean;
 }
 
 /** 验证码登录：手机号 + 短信验证码 */

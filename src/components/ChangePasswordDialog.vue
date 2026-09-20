@@ -1,18 +1,24 @@
 <template>
   <Teleport to="body">
     <div v-if="modelValue" class="fpLayer flex ac jc">
-      <div class="fpMask" @click="close" />
-      <div class="fpCard" role="dialog" aria-modal="true" aria-label="修改密码">
+      <div class="fpMask" @click="onMaskClick" />
+      <div class="fpCard" role="dialog" aria-modal="true" :aria-label="isSet ? '设置密码' : '修改密码'">
         <img class="fpShield" src="/clone-assets/login/forgot-shield.png" alt="" />
-        <div class="fpTitle">修改密码</div>
-        <div class="fpDesc">为保证账号安全，请先验证手机号再设置新密码</div>
+        <div class="fpTitle">{{ isSet ? "设置密码" : "修改密码" }}</div>
+        <div class="fpDesc">
+          {{
+            isSet
+              ? "首次登录需要设置登录密码，之后可以用密码登录"
+              : "为保证账号安全，请先验证手机号再设置新密码"
+          }}
+        </div>
 
         <div class="fpRow flex ac">
           <span class="fpLabel">手机号</span>
           <input class="cpPhone" :value="maskedPhone" readonly />
         </div>
 
-        <div class="fpRow flex ac">
+        <div v-if="!isSet" class="fpRow flex ac">
           <span class="fpLabel">验证码</span>
           <el-input v-model="code" class="fpInput" maxlength="6" placeholder="请输入验证码" />
           <el-button class="fpSmsBtn" type="primary" :disabled="cooldown > 0" @click="sendCode">
@@ -45,14 +51,16 @@
         </div>
 
         <div class="fpActions flex jc">
-          <button type="button" class="fpBtn" @click="close">取消</button>
+          <button type="button" class="fpBtn" @click="onCancel">
+            {{ isSet ? "退出登录" : "取消" }}
+          </button>
           <button
             type="button"
             class="fpBtn fpBtnPrimary"
             :disabled="submitting"
             @click="submit"
           >
-            {{ submitting ? "提交中..." : "确认修改" }}
+            {{ submitting ? "提交中..." : isSet ? "确认" : "确认修改" }}
           </button>
         </div>
       </div>
@@ -79,12 +87,19 @@ const props = defineProps<{
   modelValue: boolean;
   /** 当前登录手机号（设计稿里只读展示，中间四位打码） */
   phone?: string;
+  /**
+   * change=个人信息页的「修改密码」（手机号只读 + 验证码 + 新密码 + 确认）
+   * set=登录时 passwordSet=false 的「首次设置密码」（去掉验证码行，刚登录过）
+   */
+  mode?: "change" | "set";
 }>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
   /** 修改成功 */
   done: [];
+  /** set 模式下点「退出登录」：父级负责清登录态 */
+  cancel: [];
 }>();
 
 const code = ref("");
@@ -98,6 +113,8 @@ const maskedPhone = computed(() => {
   const value = String(props.phone || "").trim();
   return /^\d{11}$/.test(value) ? `${value.slice(0, 3)}****${value.slice(7)}` : value;
 });
+
+const isSet = computed(() => props.mode === "set");
 
 watch(
   () => props.modelValue,
@@ -114,9 +131,19 @@ function close() {
   emit("update:modelValue", false);
 }
 
+/** 首次设置密码是必过步骤，点遮罩不关（只能「退出登录」或设置完） */
+function onMaskClick() {
+  if (isSet.value) return;
+  close();
+}
+
+function onCancel() {
+  if (isSet.value) emit("cancel");
+  close();
+}
+
 function fields(): FieldBag {
-  return {
-    code: { value: code.value, rules: smsCodeRules },
+  const bag: FieldBag = {
     newPassword: {
       value: newPassword.value,
       rules: [
@@ -127,6 +154,9 @@ function fields(): FieldBag {
     },
     repeat: { value: repeat.value, rules: [required("请再次输入新密码")] },
   };
+  // 首次设置密码刚用验证码登录过，不再要一次验证码
+  if (!isSet.value) bag.code = { value: code.value, rules: smsCodeRules };
+  return bag;
 }
 
 function startCooldown() {
@@ -172,7 +202,7 @@ async function submit() {
   try {
     const data = await changeMyPassword({
       newPassword: newPassword.value,
-      code: code.value.trim(),
+      ...(isSet.value ? {} : { code: code.value.trim() }),
     });
     // 改密后旧 token 立即失效，必须把新 token 存下来
     const token = data?.token || data?.access_token;
