@@ -90,14 +90,14 @@
           <div class="pfDivider" />
           <div class="pfLinkRow">
             <span class="pfLabel">修改密码</span>
-            <button type="button" class="pfLink hand" @click="changePassword">
+            <button type="button" class="pfLink hand" @click="passwordOpen = true">
               去修改
               <img class="pfLinkArrow" src="/clone-assets/practice/icon-next.png" alt="" />
             </button>
           </div>
           <div class="pfLinkRow">
             <span class="pfLabel">注销账号</span>
-            <button type="button" class="pfLink pfLinkDanger hand" @click="cancelAccount">
+            <button type="button" class="pfLink pfLinkDanger hand" @click="cancelOpen = true">
               注销账号
               <img class="pfLinkArrow" src="/clone-assets/practice/icon-next.png" alt="" />
             </button>
@@ -105,22 +105,49 @@
         </div>
       </section>
     </div>
+
+    <!-- 注销成功：设计稿是顶部居中的蓝色 toast -->
+    <Transition name="pfToast">
+      <div v-if="toastText" class="pfToast flex ac jc" role="status">
+        <svg class="pfToastIcon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="#fff" />
+          <path
+            d="M7.6 12.4l2.9 2.9 5.9-6"
+            fill="none"
+            stroke="#0056b5"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span>{{ toastText }}</span>
+      </div>
+    </Transition>
+
+    <ChangePasswordDialog v-model="passwordOpen" :phone="phone" @done="onPasswordDone" />
+    <CancelAccountDialog v-model="cancelOpen" @done="onAccountCanceled" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import UserDropdown from "@/components/UserDropdown.vue";
+import CancelAccountDialog from "@/components/CancelAccountDialog.vue";
+import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
 import { DEFAULT_AVATAR, avatarUrl, fetchMe, logout, user } from "@/composables/useAuth";
 import { getToken } from "@/api/token";
-import { cancelMyAccount, updateMyProfile, uploadFile } from "@/api/user";
+import { updateMyProfile, uploadFile } from "@/api/user";
 
 const router = useRouter();
 const saving = ref(false);
 const uploading = ref(false);
+const passwordOpen = ref(false);
+const cancelOpen = ref(false);
+const toastText = ref("");
+let toastTimer: number | undefined;
 const fileInputRef = ref<HTMLInputElement>();
 /** 选好待提交的头像文件 + 本地预览（点「提交」才上传） */
 const pendingAvatar = ref<File | null>(null);
@@ -227,38 +254,35 @@ function releasePreview() {
   if (avatarPreview.value.startsWith("blob:")) URL.revokeObjectURL(avatarPreview.value);
   avatarPreview.value = "";
 }
-function changePassword() {
-  // 当前账号是短信验证码登录，后端没有单独的改密接口
-  ElMessage.info("当前账号使用验证码登录，无需修改密码");
+/** 顶部蓝色 toast（设计稿：注销成功后弹一下） */
+function showToast(text: string) {
+  toastText.value = text;
+  if (toastTimer) window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    toastText.value = "";
+    toastTimer = undefined;
+  }, 2200);
 }
-async function cancelAccount() {
-  try {
-    await ElMessageBox.confirm(
-      "注销后账号不可恢复，该手机号也无法再次注册，确定要注销吗？",
-      "注销账号",
-      {
-        confirmButtonText: "确认注销",
-        cancelButtonText: "再想想",
-        type: "warning",
-        closeOnClickModal: false,
-      },
-    );
-  } catch {
-    return;
-  }
-  try {
-    await cancelMyAccount();
+
+function onPasswordDone() {
+  showToast("密码修改成功");
+}
+
+function onAccountCanceled() {
+  // 设计稿：注销成功先在个人信息页弹 toast，再回登录页
+  showToast("注销成功");
+  window.setTimeout(() => {
     logout();
-    ElMessage.success("账号已注销");
-    await router.push("/login/index");
-  } catch {
-    /* http 层已提示 */
-  }
+    void router.push("/login/index");
+  }, 1000);
 }
 
 onMounted(() => {
   if (getToken()) void fetchMe();
 });
 
-onUnmounted(releasePreview);
+onUnmounted(() => {
+  releasePreview();
+  if (toastTimer) window.clearTimeout(toastTimer);
+});
 </script>

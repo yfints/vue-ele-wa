@@ -66,3 +66,19 @@ export function uploadFile(file: File, maxSide = 512) {
 export function cancelMyAccount() {
   return post("/user/cancel");
 }
+
+/**
+ * 修改密码（需登录）：验证码 + 新密码。
+ * 接口会返回一套**新的 token**（旧 token 立刻失效），所以调用方必须把 token 覆盖掉。
+ */
+export interface PasswordChangeResult {
+  user_id?: number;
+  token?: string;
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+}
+
+export function changeMyPassword(payload: { newPassword: string; code?: string }) {
+  return post<PasswordChangeResult>("/user/password", payload);
+}

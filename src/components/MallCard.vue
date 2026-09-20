@@ -1,7 +1,7 @@
 <template>
   <RouterLink :to="detailTo" class="cmCard hand">
     <div class="cmCover">
-      <el-image class="cmCoverImg" :src="localAsset(lesson.image)" fit="cover" />
+      <el-image class="cmCoverImg" :src="localAsset(lesson.image)" fit="fill" />
       <button
         type="button"
         class="cmFav flex ac jc"
