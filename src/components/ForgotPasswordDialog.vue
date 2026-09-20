@@ -116,7 +116,7 @@ function fields(): FieldBag {
     code: { value: code.value, rules: smsCodeRules },
     newPassword: {
       value: newPassword.value,
-      rules: [required("请输入新密码"), noWhitespace("密码不能包含空格"), minLength(8, "密码至少 8 位")],
+      rules: [required("请输入新密码"), noWhitespace("密码不能包含空格"), minLength(8, "密码至少8-32位，且包含字母和数字")],
     },
   };
 }
