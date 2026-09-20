@@ -10,6 +10,7 @@ import GameLoadPage from "@/pages/GameLoadPage.vue";
 import GamePage from "@/pages/GamePage.vue";
 import PhoneticPage from "@/pages/PhoneticPage.vue";
 import PhoneticDetailPage from "@/pages/PhoneticDetailPage.vue";
+import RegisterPage from "@/pages/RegisterPage.vue";
 import TextbookPage from "@/pages/TextbookPage.vue";
 import TextbookDetailPage from "@/pages/TextbookDetailPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
@@ -20,7 +21,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/login", redirect: "/login/index" },
-    { path: "/login/index", component: LoginPage },
+    { path: "/login/index", component: LoginPage, meta: { public: true } },
+    { path: "/login/register", component: RegisterPage, meta: { public: true } },
     { path: "/gam", redirect: "/game", meta: { public: true } },
     { path: "/gameLoad", component: GameLoadPage, meta: { public: true } },
     { path: "/game", component: GamePage, meta: { public: true } },

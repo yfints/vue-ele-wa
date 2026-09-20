@@ -1,5 +1,5 @@
 <template>
-  <div class="loginPage">
+  <div class="loginPage registerPage">
     <div class="loginStage">
       <div class="loginHeroCopy">
         <p class="loginHeroTitle">用英语，<br />打开更大的自己</p>
@@ -9,24 +9,27 @@
 
       <div class="loginCard">
         <div class="loginCardInner">
-          <div class="loginBrand">
-            <img src="/clone-assets/login/logo-englishgo.png" class="loginLogo" alt="Englishgo" />
-          </div>
-
-          <div class="loginTabs flex ac jc">
-            <button
-              v-for="item in TABS"
-              :key="item.key"
-              type="button"
-              class="loginTab"
-              :class="{ 'is-on': tab === item.key }"
-              @click="switchTab(item.key)"
-            >
-              {{ item.label }}
+          <div class="registerHead flex ac">
+            <button type="button" class="registerBack flex ac hand" @click="goLogin">
+              <svg class="registerBackIcon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M15 3.5 8 12l7 8.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <span>返回</span>
             </button>
+            <div class="registerTitle">
+              <span class="registerWave" aria-hidden="true">👋</span>
+              欢迎注册账号
+            </div>
           </div>
 
-          <el-form class="loginForm" @submit.prevent="submit">
+          <el-form class="loginForm registerForm" @submit.prevent="submit">
             <div class="loginField" :class="{ isError: Boolean(errors.phone) }">
               <el-icon class="loginFieldIcon"><User /></el-icon>
               <el-input
@@ -41,7 +44,7 @@
             </div>
             <p class="fieldError">{{ errors.phone || "" }}</p>
 
-            <div v-if="tab === 'sms'" class="loginField" :class="{ isError: Boolean(errors.code) }">
+            <div class="loginField" :class="{ isError: Boolean(errors.code) }">
               <el-icon class="loginFieldIcon"><Lock /></el-icon>
               <el-input
                 v-model="code"
@@ -61,27 +64,47 @@
                 {{ cooldown > 0 ? `${cooldown}s` : "获取验证码" }}
               </el-button>
             </div>
-            <div v-else class="loginField" :class="{ isError: Boolean(errors.password) }">
+            <p class="fieldError">{{ errors.code || "" }}</p>
+
+            <div class="loginField" :class="{ isError: Boolean(errors.password) }">
               <el-icon class="loginFieldIcon"><Lock /></el-icon>
               <el-input
                 v-model="password"
                 class="loginInput"
                 type="password"
                 maxlength="20"
-                placeholder="请输入密码"
+                placeholder="设置密码，6-20位字母、数字或字符"
                 show-password
                 @blur="touch('password')"
               />
             </div>
-            <p class="fieldError">{{ (tab === "sms" ? errors.code : errors.password) || "" }}</p>
+            <p class="fieldError">{{ errors.password || "" }}</p>
 
-            <div v-if="tab === 'pwd'" class="loginForgot flex je">
-              <button type="button" class="loginLinkBtn" @click="forgotOpen = true">
-                忘记密码？
-              </button>
+            <div class="loginField" :class="{ isError: Boolean(errors.repeat) }">
+              <el-icon class="loginFieldIcon"><Lock /></el-icon>
+              <el-input
+                v-model="repeat"
+                class="loginInput"
+                type="password"
+                maxlength="20"
+                placeholder="确认密码"
+                show-password
+                @blur="touch('repeat')"
+              />
             </div>
+            <p class="fieldError">{{ errors.repeat || "" }}</p>
 
-            <el-checkbox v-model="agreed" class="loginAgree">
+            <el-button
+              class="loginSubmit registerSubmit"
+              type="primary"
+              native-type="submit"
+              :loading="submitting"
+              :disabled="submitting"
+            >
+              {{ submitting ? "注册中..." : "注册" }}
+            </el-button>
+
+            <el-checkbox v-model="agreed" class="loginAgree registerAgree">
               我已阅读并同意
               <el-link type="primary" :underline="false" @click.stop.prevent="openDoc('用户协议')">
                 《用户协议》
@@ -92,53 +115,29 @@
               </el-link>
             </el-checkbox>
             <p class="fieldError">{{ errors.agreed || "" }}</p>
-
-            <el-button
-              class="loginSubmit"
-              type="primary"
-              native-type="submit"
-              :loading="submitting"
-              :disabled="submitting"
-            >
-              {{ submitting ? "登录中..." : "登录" }}
-            </el-button>
           </el-form>
 
-          <div class="loginThird flex ac jc">
-            <span class="loginThirdLine" />
-            <span class="loginThirdText">第三方登录</span>
-            <span class="loginThirdLine" />
-          </div>
-
-          <div class="loginThirdBody flex jc">
-            <button type="button" class="loginWechat hand" aria-label="微信登录" @click="wechatLogin">
-              <img src="/clone-assets/login/wechat.png" alt="" />
-            </button>
-          </div>
-
-          <div class="loginRegisterRow">
-            还没有账号？
-            <RouterLink to="/login/register" class="loginLink">立即注册</RouterLink>
+          <div class="loginRegisterRow registerLoginRow">
+            已有账号？
+            <RouterLink to="/login/index" class="loginLink">返回登录</RouterLink>
           </div>
         </div>
       </div>
     </div>
-
-    <ForgotPasswordDialog v-model="forgotOpen" :phone="phone" @done="onResetDone" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { Lock, User } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { loginByPassword, loginBySms, sendSms } from "@/api/auth";
-import ForgotPasswordDialog from "@/components/ForgotPasswordDialog.vue";
+import { registerAccount, sendSms } from "@/api/auth";
 import { applyLogin, fetchMe } from "@/composables/useAuth";
 import {
   agreeRules,
   collectFieldErrors,
+  noWhitespace,
   phoneRules,
   required,
   smsCodeRules,
@@ -146,63 +145,48 @@ import {
   type FieldBag,
 } from "@/lib/rules";
 
-type LoginTab = "sms" | "pwd";
-
-const TABS: { key: LoginTab; label: string }[] = [
-  { key: "sms", label: "验证码登录" },
-  { key: "pwd", label: "密码登录" },
-];
-
 const router = useRouter();
 const route = useRoute();
-const tab = ref<LoginTab>("sms");
 const phone = ref("");
 const code = ref("");
 const password = ref("");
+const repeat = ref("");
 const agreed = ref(false);
 const submitting = ref(false);
 const cooldown = ref(0);
-const forgotOpen = ref(false);
 const errors = ref<Record<string, string>>({});
 let timer: number | undefined;
 
-const redirect = computed(() => {
-  const value = route.query.redirect;
-  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//")
-    ? value
-    : "/home/index";
-});
+/** 注册密码按设计稿：6–20 位字母、数字或字符 */
+const registerPasswordRules = [
+  required("请设置密码"),
+  noWhitespace("密码不能包含空格"),
+  { id: "length", message: "密码长度 6–20 位", test: (v: string) => v.trim().length >= 6 && v.trim().length <= 20 },
+];
 
-function currentFields(): FieldBag {
-  const bag: FieldBag = {
+function fields(): FieldBag {
+  return {
     phone: { value: phone.value, rules: phoneRules },
+    code: { value: code.value, rules: smsCodeRules },
+    password: { value: password.value, rules: registerPasswordRules },
+    repeat: { value: repeat.value, rules: [required("请再次输入密码")] },
     agreed: { value: String(agreed.value), rules: agreeRules },
   };
-  if (tab.value === "sms") {
-    bag.code = { value: code.value, rules: smsCodeRules };
-  } else {
-    // 密码登录只校验非空：老账号的密码不一定是现在的 8–20 位规则
-    bag.password = { value: password.value, rules: [required("请输入密码")] };
-  }
-  return bag;
 }
 
 function touch(field: string) {
-  const item = currentFields()[field];
+  const item = fields()[field];
   if (!item) return;
-  const message = validate(item.value, item.rules);
+  let message = validate(item.value, item.rules);
+  if (!message && field === "repeat" && repeat.value !== password.value) {
+    message = "两次输入的密码不一致";
+  }
   if (message) errors.value = { ...errors.value, [field]: message };
   else {
     const next = { ...errors.value };
     delete next[field];
     errors.value = next;
   }
-}
-
-function switchTab(next: LoginTab) {
-  if (tab.value === next) return;
-  tab.value = next;
-  errors.value = {};
 }
 
 function startCooldown() {
@@ -238,13 +222,16 @@ function openDoc(name: string) {
   ElMessage.info(`${name}即将上线`);
 }
 
-function wechatLogin() {
-  ElMessage.info("微信登录即将上线");
+function goLogin() {
+  void router.push({ path: "/login/index", query: route.query });
 }
 
 async function submit() {
   if (submitting.value) return;
-  const nextErrors = collectFieldErrors(currentFields());
+  const nextErrors = collectFieldErrors(fields());
+  if (!nextErrors.repeat && repeat.value !== password.value) {
+    nextErrors.repeat = "两次输入的密码不一致";
+  }
   errors.value = nextErrors;
   const first = Object.values(nextErrors)[0];
   if (first) {
@@ -254,26 +241,25 @@ async function submit() {
   submitting.value = true;
   try {
     const account = phone.value.trim();
-    const data =
-      tab.value === "sms"
-        ? await loginBySms(account, code.value.trim())
-        : await loginByPassword(account, password.value);
+    const data = await registerAccount({
+      phone: account,
+      code: code.value.trim(),
+      password: password.value,
+    });
     applyLogin(data, account);
     await fetchMe();
-    ElMessage.success("登录成功");
-    await router.push(redirect.value);
+    ElMessage.success("注册成功");
+    const redirect = route.query.redirect;
+    const target =
+      typeof redirect === "string" && redirect.startsWith("/") && !redirect.startsWith("//")
+        ? redirect
+        : "/home/index";
+    await router.push(target);
   } catch {
     /* unwrap 已提示 */
   } finally {
     submitting.value = false;
   }
-}
-
-/** 重置密码成功后：回到密码登录并带上手机号 */
-function onResetDone(account: string) {
-  tab.value = "pwd";
-  phone.value = account;
-  errors.value = {};
 }
 
 onUnmounted(() => {
