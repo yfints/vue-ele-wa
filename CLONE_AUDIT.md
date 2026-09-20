@@ -1,0 +1,381 @@
+# Clone Audit
+
+- Project: D:\wkk
+- Scanned files: 35
+- Findings: 500
+
+## 保真度硬伤（字体 / 图片 / 颜色）
+- 未发现
+
+## 追踪脚本 / 统计像素
+- 未发现
+
+## 原站品牌残留
+- index.html:13 · brand residue: Englishgo · `Englishgo`
+- index.html:16 · brand residue: Englishgo · `Englishgo`
+- src\components\Sidebar.tsx:88 · brand residue: Englishgo · `Englishgo`
+- src\data\asset-map.json:2 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:3 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:4 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:5 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:6 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:7 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:8 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:9 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:10 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:11 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:12 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:13 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:14 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:15 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:16 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:17 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:18 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:19 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:20 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:21 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:22 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:23 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:24 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:25 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:26 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:27 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:28 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:29 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:30 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:31 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:32 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:33 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:34 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:35 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:36 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:37 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:38 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:39 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:40 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:41 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:42 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:43 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:44 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:45 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:46 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:47 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:48 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:49 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:50 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:51 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:52 · brand residue: waxueshe · `waxueshe`
+- src\data\asset-map.json:53 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:10 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:23 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:30 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:43 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:50 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:63 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:70 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:83 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:90 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:103 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:110 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:123 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:130 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:143 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:150 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:163 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:170 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:183 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:190 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:203 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:210 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:223 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:230 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:243 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:250 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:263 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:270 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:283 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:290 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:303 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:310 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:323 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:330 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:343 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:350 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:363 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:370 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:383 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:390 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:403 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:410 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:423 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:430 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:443 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:450 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:463 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:470 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:483 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:490 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:503 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:510 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:523 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:530 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:543 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:550 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:563 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:570 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:583 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:590 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:603 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:610 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:623 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:630 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:643 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:650 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:663 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:670 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:683 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:690 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:703 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:710 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:723 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:730 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:743 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:750 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:763 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:770 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:783 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:790 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:803 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:810 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:823 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:830 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:843 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:850 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:863 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:870 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:883 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:890 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:903 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:910 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:923 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:930 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:943 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:950 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:963 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:970 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:983 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:990 · brand residue: waxueshe · `waxueshe`
+- src\data\lesson-mall.json:1003 · brand residue: waxueshe · `waxueshe`
+
+## 日文残留
+- 未发现
+
+## TODO / 占位内容
+- assets\css\www.waxueshe.com\index-CvhtvZC7-f3b0ebc293.css:1 · TODO / placeholder content · `todo`
+- assets\css\www.waxueshe.com\index-CvhtvZC7-f3b0ebc293.css:1 · TODO / placeholder content · `todo`
+
+## 外部依赖 / 外链风险
+- assets\css\www.waxueshe.com\index-CvhtvZC7-f3b0ebc293.css:2 · external URL · `https://animate.style/`
+- assets\css\www.waxueshe.com\index-CvhtvZC7-f3b0ebc293.css:4 · external URL · `http://opensource.org/licenses/MIT`
+- package-lock.json:27 · external URL · `https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.29.7.tgz`
+- package-lock.json:42 · external URL · `https://registry.npmjs.org/@babel/compat-data/-/compat-data-7.29.7.tgz`
+- package-lock.json:52 · external URL · `https://registry.npmjs.org/@babel/core/-/core-7.29.7.tgz`
+- package-lock.json:78 · external URL · `https://opencollective.com/babel`
+- package-lock.json:83 · external URL · `https://registry.npmjs.org/@babel/generator/-/generator-7.29.8.tgz`
+- package-lock.json:100 · external URL · `https://registry.npmjs.org/@babel/helper-compilation-targets/-/helper-compilation-targets-7.29.7.tgz`
+- package-lock.json:117 · external URL · `https://registry.npmjs.org/@babel/helper-globals/-/helper-globals-7.29.7.tgz`
+- package-lock.json:127 · external URL · `https://registry.npmjs.org/@babel/helper-module-imports/-/helper-module-imports-7.29.7.tgz`
+- package-lock.json:141 · external URL · `https://registry.npmjs.org/@babel/helper-module-transforms/-/helper-module-transforms-7.29.7.tgz`
+- package-lock.json:159 · external URL · `https://registry.npmjs.org/@babel/helper-plugin-utils/-/helper-plugin-utils-7.29.7.tgz`
+- package-lock.json:169 · external URL · `https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.7.tgz`
+- package-lock.json:179 · external URL · `https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz`
+- package-lock.json:189 · external URL · `https://registry.npmjs.org/@babel/helper-validator-option/-/helper-validator-option-7.29.7.tgz`
+- package-lock.json:199 · external URL · `https://registry.npmjs.org/@babel/helpers/-/helpers-7.29.7.tgz`
+- package-lock.json:213 · external URL · `https://registry.npmjs.org/@babel/parser/-/parser-7.29.8.tgz`
+- package-lock.json:229 · external URL · `https://registry.npmjs.org/@babel/plugin-transform-react-jsx-self/-/plugin-transform-react-jsx-self-7.29.7.tgz`
+- package-lock.json:245 · external URL · `https://registry.npmjs.org/@babel/plugin-transform-react-jsx-source/-/plugin-transform-react-jsx-source-7.29.7.tgz`
+- package-lock.json:261 · external URL · `https://registry.npmjs.org/@babel/template/-/template-7.29.7.tgz`
+- package-lock.json:276 · external URL · `https://registry.npmjs.org/@babel/traverse/-/traverse-7.29.8.tgz`
+- package-lock.json:295 · external URL · `https://registry.npmjs.org/@babel/types/-/types-7.29.8.tgz`
+- package-lock.json:309 · external URL · `https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.28.2.tgz`
+- package-lock.json:326 · external URL · `https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.28.2.tgz`
+- package-lock.json:343 · external URL · `https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.28.2.tgz`
+- package-lock.json:360 · external URL · `https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.28.2.tgz`
+- package-lock.json:377 · external URL · `https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.28.2.tgz`
+- package-lock.json:394 · external URL · `https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.28.2.tgz`
+- package-lock.json:411 · external URL · `https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.28.2.tgz`
+- package-lock.json:428 · external URL · `https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.28.2.tgz`
+- package-lock.json:445 · external URL · `https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.28.2.tgz`
+- package-lock.json:462 · external URL · `https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.28.2.tgz`
+- package-lock.json:479 · external URL · `https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.28.2.tgz`
+- package-lock.json:496 · external URL · `https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.28.2.tgz`
+- package-lock.json:513 · external URL · `https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.28.2.tgz`
+- package-lock.json:530 · external URL · `https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.28.2.tgz`
+- package-lock.json:547 · external URL · `https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.28.2.tgz`
+- package-lock.json:564 · external URL · `https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.28.2.tgz`
+- package-lock.json:581 · external URL · `https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.28.2.tgz`
+- package-lock.json:598 · external URL · `https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.28.2.tgz`
+- package-lock.json:615 · external URL · `https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.28.2.tgz`
+- package-lock.json:632 · external URL · `https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.28.2.tgz`
+- package-lock.json:649 · external URL · `https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.28.2.tgz`
+- package-lock.json:666 · external URL · `https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.28.2.tgz`
+- package-lock.json:683 · external URL · `https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.28.2.tgz`
+- package-lock.json:700 · external URL · `https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.28.2.tgz`
+- package-lock.json:717 · external URL · `https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.28.2.tgz`
+- package-lock.json:734 · external URL · `https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.28.2.tgz`
+- package-lock.json:751 · external URL · `https://registry.npmjs.org/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz`
+- package-lock.json:762 · external URL · `https://registry.npmjs.org/@jridgewell/remapping/-/remapping-2.3.5.tgz`
+- package-lock.json:773 · external URL · `https://registry.npmjs.org/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz`
+- package-lock.json:783 · external URL · `https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz`
+- package-lock.json:790 · external URL · `https://registry.npmjs.org/@jridgewell/trace-mapping/-/trace-mapping-0.3.31.tgz`
+- package-lock.json:801 · external URL · `https://registry.npmjs.org/@napi-rs/lzma-linux-x64-gnu/-/lzma-linux-x64-gnu-1.5.1.tgz`
+- package-lock.json:821 · external URL · `https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-rc.3.tgz`
+- package-lock.json:828 · external URL · `https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.63.1.tgz`
+- package-lock.json:842 · external URL · `https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.63.1.tgz`
+- package-lock.json:856 · external URL · `https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.63.1.tgz`
+- package-lock.json:870 · external URL · `https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.63.1.tgz`
+- package-lock.json:884 · external URL · `https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.63.1.tgz`
+- package-lock.json:898 · external URL · `https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.63.1.tgz`
+- package-lock.json:912 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.63.1.tgz`
+- package-lock.json:929 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.63.1.tgz`
+- package-lock.json:946 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.63.1.tgz`
+- package-lock.json:963 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.63.1.tgz`
+- package-lock.json:980 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-loong64-gnu/-/rollup-linux-loong64-gnu-4.63.1.tgz`
+- package-lock.json:997 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-loong64-musl/-/rollup-linux-loong64-musl-4.63.1.tgz`
+- package-lock.json:1014 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.63.1.tgz`
+- package-lock.json:1031 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-ppc64-musl/-/rollup-linux-ppc64-musl-4.63.1.tgz`
+- package-lock.json:1048 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.63.1.tgz`
+- package-lock.json:1065 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.63.1.tgz`
+- package-lock.json:1082 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.63.1.tgz`
+- package-lock.json:1099 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.63.1.tgz`
+- package-lock.json:1116 · external URL · `https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.63.1.tgz`
+- package-lock.json:1133 · external URL · `https://registry.npmjs.org/@rollup/rollup-openbsd-x64/-/rollup-openbsd-x64-4.63.1.tgz`
+- package-lock.json:1147 · external URL · `https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.63.1.tgz`
+- package-lock.json:1161 · external URL · `https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.63.1.tgz`
+- package-lock.json:1175 · external URL · `https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.63.1.tgz`
+- package-lock.json:1189 · external URL · `https://registry.npmjs.org/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.63.1.tgz`
+- package-lock.json:1203 · external URL · `https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.63.1.tgz`
+- package-lock.json:1217 · external URL · `https://registry.npmjs.org/@tailwindcss/node/-/node-4.3.3.tgz`
+- package-lock.json:1233 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.3.3.tgz`
+- package-lock.json:1257 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-android-arm64/-/oxide-android-arm64-4.3.3.tgz`
+- package-lock.json:1274 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-darwin-arm64/-/oxide-darwin-arm64-4.3.3.tgz`
+- package-lock.json:1291 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-darwin-x64/-/oxide-darwin-x64-4.3.3.tgz`
+- package-lock.json:1308 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-freebsd-x64/-/oxide-freebsd-x64-4.3.3.tgz`
+- package-lock.json:1325 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-linux-arm-gnueabihf/-/oxide-linux-arm-gnueabihf-4.3.3.tgz`
+- package-lock.json:1342 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-gnu/-/oxide-linux-arm64-gnu-4.3.3.tgz`
+- package-lock.json:1362 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-musl/-/oxide-linux-arm64-musl-4.3.3.tgz`
+- package-lock.json:1382 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-gnu/-/oxide-linux-x64-gnu-4.3.3.tgz`
+- package-lock.json:1402 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-musl/-/oxide-linux-x64-musl-4.3.3.tgz`
+- package-lock.json:1422 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-wasm32-wasi/-/oxide-wasm32-wasi-4.3.3.tgz`
+- package-lock.json:1452 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-win32-arm64-msvc/-/oxide-win32-arm64-msvc-4.3.3.tgz`
+- package-lock.json:1469 · external URL · `https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.3.3.tgz`
+- package-lock.json:1486 · external URL · `https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.3.3.tgz`
+- package-lock.json:1501 · external URL · `https://registry.npmjs.org/@types/babel__core/-/babel__core-7.20.5.tgz`
+- package-lock.json:1515 · external URL · `https://registry.npmjs.org/@types/babel__generator/-/babel__generator-7.27.0.tgz`
+- package-lock.json:1525 · external URL · `https://registry.npmjs.org/@types/babel__template/-/babel__template-7.4.4.tgz`
+- package-lock.json:1536 · external URL · `https://registry.npmjs.org/@types/babel__traverse/-/babel__traverse-7.28.0.tgz`
+- package-lock.json:1546 · external URL · `https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz`
+- package-lock.json:1553 · external URL · `https://registry.npmjs.org/@types/react/-/react-19.2.18.tgz`
+- package-lock.json:1563 · external URL · `https://registry.npmjs.org/@types/react-dom/-/react-dom-19.2.5.tgz`
+- package-lock.json:1573 · external URL · `https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-5.2.0.tgz`
+- package-lock.json:1594 · external URL · `https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.11.20.tgz`
+- package-lock.json:1607 · external URL · `https://registry.npmjs.org/browserslist/-/browserslist-4.28.8.tgz`
+- package-lock.json:1613 · external URL · `https://opencollective.com/browserslist`
+- package-lock.json:1617 · external URL · `https://tidelift.com/funding/github/npm/browserslist`
+- package-lock.json:1621 · external URL · `https://github.com/sponsors/ai`
+- package-lock.json:1641 · external URL · `https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001810.tgz`
+- package-lock.json:1647 · external URL · `https://opencollective.com/browserslist`
+- package-lock.json:1651 · external URL · `https://tidelift.com/funding/github/npm/caniuse-lite`
+- package-lock.json:1655 · external URL · `https://github.com/sponsors/ai`
+- package-lock.json:1662 · external URL · `https://registry.npmjs.org/convert-source-map/-/convert-source-map-2.0.0.tgz`
+- package-lock.json:1669 · external URL · `https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz`
+- package-lock.json:1677 · external URL · `https://opencollective.com/express`
+- package-lock.json:1682 · external URL · `https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz`
+- package-lock.json:1689 · external URL · `https://registry.npmjs.org/debug/-/debug-4.4.3.tgz`
+- package-lock.json:1707 · external URL · `https://registry.npmjs.org/detect-libc/-/detect-libc-2.1.2.tgz`
+- package-lock.json:1717 · external URL · `https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.420.tgz`
+- package-lock.json:1724 · external URL · `https://registry.npmjs.org/enhanced-resolve/-/enhanced-resolve-5.24.5.tgz`
+- package-lock.json:1738 · external URL · `https://registry.npmjs.org/esbuild/-/esbuild-0.28.2.tgz`
+- package-lock.json:1780 · external URL · `https://registry.npmjs.org/escalade/-/escalade-3.2.0.tgz`
+- package-lock.json:1790 · external URL · `https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz`
+- package-lock.json:1808 · external URL · `https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz`
+- package-lock.json:1823 · external URL · `https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz`
+- package-lock.json:1833 · external URL · `https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz`
+- package-lock.json:1840 · external URL · `https://registry.npmjs.org/jiti/-/jiti-2.7.0.tgz`
+- package-lock.json:1850 · external URL · `https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz`
+- package-lock.json:1857 · external URL · `https://registry.npmjs.org/jsesc/-/jsesc-3.1.0.tgz`
+- package-lock.json:1870 · external URL · `https://registry.npmjs.org/json5/-/json5-2.2.3.tgz`
+- package-lock.json:1883 · external URL · `https://registry.npmjs.org/lightningcss/-/lightningcss-1.32.0.tgz`
+- package-lock.json:1895 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:1913 · external URL · `https://registry.npmjs.org/lightningcss-android-arm64/-/lightningcss-android-arm64-1.32.0.tgz`
+- package-lock.json:1929 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:1934 · external URL · `https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.32.0.tgz`
+- package-lock.json:1950 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:1955 · external URL · `https://registry.npmjs.org/lightningcss-darwin-x64/-/lightningcss-darwin-x64-1.32.0.tgz`
+- package-lock.json:1971 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:1976 · external URL · `https://registry.npmjs.org/lightningcss-freebsd-x64/-/lightningcss-freebsd-x64-1.32.0.tgz`
+- package-lock.json:1992 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:1997 · external URL · `https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf/-/lightningcss-linux-arm-gnueabihf-1.32.0.tgz`
+- package-lock.json:2013 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:2018 · external URL · `https://registry.npmjs.org/lightningcss-linux-arm64-gnu/-/lightningcss-linux-arm64-gnu-1.32.0.tgz`
+- package-lock.json:2037 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:2042 · external URL · `https://registry.npmjs.org/lightningcss-linux-arm64-musl/-/lightningcss-linux-arm64-musl-1.32.0.tgz`
+- package-lock.json:2061 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:2066 · external URL · `https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.32.0.tgz`
+- package-lock.json:2085 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:2090 · external URL · `https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.32.0.tgz`
+- package-lock.json:2109 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:2114 · external URL · `https://registry.npmjs.org/lightningcss-win32-arm64-msvc/-/lightningcss-win32-arm64-msvc-1.32.0.tgz`
+- package-lock.json:2130 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:2135 · external URL · `https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.32.0.tgz`
+- package-lock.json:2151 · external URL · `https://opencollective.com/parcel`
+- package-lock.json:2156 · external URL · `https://registry.npmjs.org/lru-cache/-/lru-cache-5.1.1.tgz`
+- package-lock.json:2166 · external URL · `https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz`
+- package-lock.json:2176 · external URL · `https://registry.npmjs.org/ms/-/ms-2.1.3.tgz`
+- package-lock.json:2183 · external URL · `https://registry.npmjs.org/nanoid/-/nanoid-3.3.18.tgz`
+- package-lock.json:2189 · external URL · `https://github.com/sponsors/ai`
+- package-lock.json:2202 · external URL · `https://registry.npmjs.org/node-releases/-/node-releases-2.0.54.tgz`
+- package-lock.json:2212 · external URL · `https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz`
+- package-lock.json:2219 · external URL · `https://registry.npmjs.org/picomatch/-/picomatch-4.0.7.tgz`
+- package-lock.json:2227 · external URL · `https://github.com/sponsors/jonschlinkert`
+- package-lock.json:2232 · external URL · `https://registry.npmjs.org/postcss/-/postcss-8.5.26.tgz`
+- package-lock.json:2238 · external URL · `https://opencollective.com/postcss/`
+- package-lock.json:2242 · external URL · `https://tidelift.com/funding/github/npm/postcss`
+- package-lock.json:2246 · external URL · `https://github.com/sponsors/ai`
+- package-lock.json:2261 · external URL · `https://registry.npmjs.org/react/-/react-19.2.8.tgz`
+- package-lock.json:2270 · external URL · `https://registry.npmjs.org/react-dom/-/react-dom-19.2.8.tgz`
+- package-lock.json:2282 · external URL · `https://registry.npmjs.org/react-refresh/-/react-refresh-0.18.0.tgz`
+- package-lock.json:2292 · external URL · `https://registry.npmjs.org/react-router/-/react-router-7.18.3.tgz`
+- package-lock.json:2314 · external URL · `https://registry.npmjs.org/react-router-dom/-/react-router-dom-7.18.3.tgz`
+- package-lock.json:2330 · external URL · `https://registry.npmjs.org/rollup/-/rollup-4.63.1.tgz`
+- package-lock.json:2376 · external URL · `https://registry.npmjs.org/scheduler/-/scheduler-0.27.0.tgz`
+- package-lock.json:2382 · external URL · `https://registry.npmjs.org/semver/-/semver-6.3.1.tgz`
+- package-lock.json:2392 · external URL · `https://registry.npmjs.org/set-cookie-parser/-/set-cookie-parser-2.7.2.tgz`
+- package-lock.json:2398 · external URL · `https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz`
+- package-lock.json:2408 · external URL · `https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.3.3.tgz`
+- package-lock.json:2415 · external URL · `https://registry.npmjs.org/tapable/-/tapable-2.3.3.tgz`
+- package-lock.json:2424 · external URL · `https://opencollective.com/webpack`
+- package-lock.json:2429 · external URL · `https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.17.tgz`
+- package-lock.json:2441 · external URL · `https://github.com/sponsors/SuperchupuDev`
+- package-lock.json:2446 · external URL · `https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz`
+- package-lock.json:2460 · external URL · `https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.3.2.tgz`
+- package-lock.json:2466 · external URL · `https://opencollective.com/browserslist`
+- package-lock.json:2470 · external URL · `https://tidelift.com/funding/github/npm/browserslist`
+- package-lock.json:2474 · external URL · `https://github.com/sponsors/ai`
+- package-lock.json:2491 · external URL · `https://registry.npmjs.org/vite/-/vite-7.3.6.tgz`
+- package-lock.json:2510 · external URL · `https://github.com/vitejs/vite?sponsor=1`
+- package-lock.json:2566 · external URL · `https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz`
+- src\data\asset-map.json:2 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1787552588238674865.png`
+- src\data\asset-map.json:3 · external URL · `https://res.waxueshe.com/uploads/images/e4bf329427825a989110285ba1799ac4e254cf8fc27b21fb9c012df826b93cf9.jpg`
+- src\data\asset-map.json:4 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785574422939520186.png`
+- src\data\asset-map.json:5 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785574693872352079.png`
+- src\data\asset-map.json:6 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785573922081032673.png`
+- src\data\asset-map.json:7 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785574113581884363.png`
+- src\data\asset-map.json:8 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785572161055060141.png`
+- src\data\asset-map.json:9 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785572643498478682.png`
+- src\data\asset-map.json:10 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785571363832877862.png`
+- src\data\asset-map.json:11 · external URL · `https://res.waxueshe.com/content/uploads/lesson_cover/lesson-cover-1785571937136395728.png`
+- 还有 143 条未展开
+
+## 结论
+- 需要处理上面的残留项后再声明可部署。
