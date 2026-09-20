@@ -192,27 +192,31 @@
       </div>
     </div>
 
-    <div v-if="leaveOpen" class="searchLayer">
-      <div class="van-overlay vanPopupMask" />
-      <div class="van-popup van-popup--center" role="dialog">
-        <div class="galssPop popXS">
-          <div class="galssHead flex jb ac">
-            <div class="size30 white">退出练习</div>
-            <button type="button" class="img60 hand searchClose" aria-label="关闭" @click="resume">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4" />
-                <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-              </svg>
-            </button>
-          </div>
-          <div class="size26 pl40 pr40 mt60 white">
-            <div>确定退出本次练习吗？</div>
-            <div class="mt30">学习进度会保存在当前课程里。</div>
-          </div>
-          <div class="flex je mt60 pr40 pb40">
-            <div class="smallCancel mr20" @click="resume">继续练习</div>
-            <div class="smallConfirm" @click="leave">返回课程</div>
-          </div>
+    <!-- 退出确认（设计稿：白卡 + 继续练习 / 返回课程） -->
+    <div v-if="leaveOpen" class="exitLayer flex ac jc">
+      <div class="exitMask" @click="resume" />
+      <div
+        class="exitCard"
+        role="dialog"
+        aria-modal="true"
+        aria-label="确认退出本次练习吗？"
+      >
+        <button type="button" class="exitClose flex ac jc" aria-label="关闭" @click="resume">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+        <div class="exitTitle">确认退出本次练习吗？</div>
+        <div class="exitDesc">学习进度会保存在当前课程里。</div>
+        <div class="exitActions flex ac jc">
+          <button type="button" class="exitBtn" @click="resume">继续练习</button>
+          <button type="button" class="exitBtn exitBtnPrimary" @click="leave">返回课程</button>
         </div>
       </div>
     </div>

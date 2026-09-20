@@ -8610,3 +8610,119 @@ html.dark .practiceHead .userDrop {
         width: 160px;
     }
 }
+
+/* ===== 退出确认弹窗（练习页 / 游戏页，设计稿）===== */
+
+.exitLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 2200;
+}
+
+.exitMask {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* 白卡 440×198：内边距 40、圆角 16，标题 18/26 → 副标题 14/20（距 8）→ 按钮 150×44（距 20） */
+.exitCard {
+    position: relative;
+    width: 440px;
+    max-width: calc(100vw - 32px);
+    padding: 40px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 18px 48px rgba(20, 60, 110, 0.16);
+    text-align: center;
+}
+
+.exitClose {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #f2f2f2;
+    color: #999;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.exitClose:hover {
+    background: #e9e9e9;
+    color: #666;
+}
+
+.exitClose svg {
+    width: 12px;
+    height: 12px;
+}
+
+.exitTitle {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+}
+
+.exitDesc {
+    margin-top: 8px;
+    color: #666;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.exitActions {
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.exitBtn {
+    width: 150px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    background: #fbfbfb;
+    color: #666;
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.exitBtn:hover {
+    border-color: #d9e3f0;
+    color: #0056b5;
+}
+
+.exitBtnPrimary,
+.exitBtnPrimary:hover {
+    border-color: #0056b5;
+    background: #0056b5;
+    color: #fff;
+}
+
+@media (max-width: 575px) {
+    .exitCard {
+        padding: 28px 20px 20px;
+    }
+
+    .exitTitle {
+        font-size: 16px;
+    }
+
+    .exitActions {
+        gap: 12px;
+    }
+
+    .exitBtn {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+    }
+}
