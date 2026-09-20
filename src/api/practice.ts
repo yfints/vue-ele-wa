@@ -139,6 +139,7 @@ export function fetchLessonPractice(
 }
 
 export async function fetchAllLessonPractice(lessonId: string | number) {
+  localStorage.setItem("lessonId", String(lessonId));
   const sentences: PracticeSentence[] = [];
   let page = 1;
   let meta: PracticeMeta = {};
