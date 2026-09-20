@@ -31,7 +31,7 @@
       <template v-else-if="detail">
         <section class="cdHead flex">
           <div class="cdCover">
-            <el-image class="cdCoverImg" :src="cover" fit="fill" />
+            <el-image class="cdCoverImg" :src="cover" fit="cover" />
           </div>
           <div class="cdInfo flex col">
             <h1 class="cdTitle line1">{{ detail.name }}</h1>
