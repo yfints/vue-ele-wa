@@ -1,0 +1,368 @@
+<template>
+  <div class="contentBox phoneticDetailPage">
+    <header class="phdHead flex jb ac">
+      <div class="phdHeadLeft flex ac">
+        <button
+          v-if="isPhone"
+          type="button"
+          class="phdMenu flex ac"
+          aria-label="切换菜单"
+          @click="toggleMenu"
+        >
+          <img src="/clone-assets/menu.png" class="img32" alt="" />
+        </button>
+        <div class="phdCrumbs flex ac">
+          <RouterLink to="/phonetic/index" class="phdCrumb">音标学习</RouterLink>
+          <img src="/clone-assets/practice/icon-next.png" class="phdCrumbSep" alt="" />
+          <span class="phdCrumbCur line1">{{ title }}</span>
+        </div>
+      </div>
+      <UserDropdown />
+    </header>
+
+    <div class="phdBody">
+      <el-skeleton v-if="loading" class="phdSkeletonWrap" animated>
+        <template #template>
+          <section class="phdCard">
+            <div class="phdSummary flex ac">
+              <el-skeleton-item variant="image" class="phdSkeletonTile" />
+              <div class="phdSummaryInfo minw0">
+                <el-skeleton-item variant="text" class="phdSkeletonTitle" />
+                <el-skeleton-item variant="text" class="phdSkeletonSub" />
+              </div>
+            </div>
+            <div class="phdDivider" />
+
+            <div v-for="n in 3" :key="n" class="phdGroup">
+              <div class="phdGroupHead flex">
+                <el-skeleton-item variant="circle" class="phdSkeletonDot" />
+                <div class="phdGroupLabels flex col">
+                  <el-skeleton-item variant="text" class="phdSkeletonGroupName" />
+                  <el-skeleton-item variant="text" class="phdSkeletonGroupCount" />
+                </div>
+              </div>
+              <div class="phdChips flex wrap">
+                <el-skeleton-item v-for="i in 4" :key="i" variant="button" class="phdSkeletonChip" />
+              </div>
+            </div>
+          </section>
+        </template>
+      </el-skeleton>
+
+      <section v-else class="phdCard">
+        <div class="phdSummary flex ac">
+          <div class="phdTile flex ac jc">{{ codeLabel }}</div>
+          <div class="phdSummaryInfo minw0">
+            <div class="phdTitle line1">{{ title }}</div>
+            <div class="phdSub line1">{{ subtitle }}</div>
+          </div>
+        </div>
+        <div class="phdDivider" />
+
+        <div v-for="group in groups" :key="group.name" class="phdGroup">
+          <div class="phdGroupHead flex">
+            <span class="phdDot" :style="{ background: group.tone }" />
+            <div class="phdGroupLabels flex col">
+              <span class="phdGroupName">{{ group.name }}</span>
+              <span class="phdGroupCount">{{ group.items.length }}个</span>
+            </div>
+          </div>
+
+          <div class="phdChips flex wrap">
+            <button
+              v-for="item in group.items"
+              :key="item.ipa"
+              type="button"
+              class="phdChip hand"
+              :class="{ 'is-active': item.ipa === activeIpa }"
+              @click="toggleItem(item)"
+            >
+              {{ item.ipa }}
+            </button>
+          </div>
+
+          <div v-if="active && group.items.includes(active)" class="phdPanel">
+            <div class="phdPanelTop flex">
+              <div class="phdIpaCard flex col jb">
+                <div class="phdIpaText">{{ active.ipa }}</div>
+                <div class="phdIpaMeta flex ac">
+                  <button
+                    type="button"
+                    class="phdSpeak flex ac jc hand"
+                    aria-label="播放发音"
+                    :class="{ 'is-playing': playingKey === `ipa-${active.ipa}` }"
+                    @click="speak(active.ipa.replaceAll('/', ''), `ipa-${active.ipa}`, active.audio)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M4 9.5h3l4-3.5v12l-4-3.5H4zm11.5-2.2a6.2 6.2 0 0 1 0 9.4m2.6-12a9.6 9.6 0 0 1 0 14.6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+                  <span class="phdIpaType">{{ active.type }}</span>
+                </div>
+              </div>
+
+              <div class="phdTips flex1 minw0">
+                <div class="phdPanelTitle">发音要点</div>
+                <ol class="phdTipList">
+                  <li v-for="(tip, index) in active.tips" :key="tip">
+                    <span class="phdTipIndex">{{ index + 1 }}</span>
+                    <span>{{ tip }}</span>
+                  </li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="phdSection">
+              <div class="phdPanelTitle">例句</div>
+              <div class="phdExamples flex wrap">
+                <div v-for="sentence in active.sentences" :key="sentence.en" class="phdExample">
+                  <div class="phdExampleEn line1">{{ sentence.en }}</div>
+                  <div class="phdExampleZh line1">{{ sentence.zh }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="phdSection">
+              <div class="phdPanelTitle">示例单词</div>
+              <div class="phdWords flex wrap">
+                <div v-for="word in active.words" :key="word.word" class="phdWord flex ac">
+                  <button
+                    type="button"
+                    class="phdSpeak flex ac jc hand"
+                    :aria-label="`播放 ${word.word}`"
+                    :class="{ 'is-playing': playingKey === `word-${word.word}` }"
+                    @click="speak(word.word, `word-${word.word}`, word.audio)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M4 9.5h3l4-3.5v12l-4-3.5H4zm11.5-2.2a6.2 6.2 0 0 1 0 9.4m2.6-12a9.6 9.6 0 0 1 0 14.6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+                  <div class="phdWordText minw0">
+                    <div class="phdWordEn line1">{{ word.word }}</div>
+                    <div class="phdWordZh line1">{{ word.zh }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { isPhone, toggleMenu } from "@/composables/useLayout";
+import UserDropdown from "@/components/UserDropdown.vue";
+import { fetchLessonDetails, type CourseDetailVo } from "@/api/course";
+import { localAsset } from "@/data/mall";
+import {
+  PHONETIC_TOTAL,
+  phoneticGroups as FALLBACK_GROUPS,
+  type PhoneticGroup,
+  type PhoneticItem,
+} from "@/data/phonetics";
+
+const route = useRoute();
+const loading = ref(true);
+const detail = ref<CourseDetailVo | null>(null);
+const activeIpa = ref("");
+const playingKey = ref("");
+let audio: HTMLAudioElement | null = null;
+
+const title = computed(() => String(detail.value?.name || "音标学习").trim());
+/** 英式课显示 GB、美式课显示 US（设计稿里是 GB） */
+const codeLabel = computed(() => (/美式|american/i.test(title.value) ? "US" : "GB"));
+const subtitle = computed(
+  () =>
+    String(detail.value?.description || "").trim() ||
+    `${PHONETIC_TOTAL}个音标 · 点击音标查看卡片详情`,
+);
+const active = computed<PhoneticItem | null>(
+  () =>
+    groups.value
+      .flatMap((group) => group.items)
+      .find((item) => item.ipa === activeIpa.value) || null,
+);
+
+/**
+ * 分组数据优先用接口下发的 course.phoneticGroups；
+ * 接口没给（或结构为空）时退回设计稿整理的本地数据，保证页面可用。
+ */
+const groups = computed<PhoneticGroup[]>(() => normalizeGroups(detail.value?.phoneticGroups) || FALLBACK_GROUPS);
+
+/** 分组圆点配色，接口没给 tone/color 时按顺序取 */
+const TONES = ["#00C26D", "#1667EB", "#FFA726", "#7C4DFF", "#00A3A3", "#E0457B"];
+
+function normalizeGroups(raw: unknown): PhoneticGroup[] | null {
+  const list = Array.isArray(raw) ? raw : [];
+  if (!list.length) return null;
+  const result = list
+    .map((entry, index) => {
+      const group = (entry || {}) as Record<string, unknown>;
+      const items = valueOf(group, ["items", "phonetics", "phoneticItems", "phonetic_items", "list", "children"])
+        .map(normalizeItem)
+        .filter((item): item is PhoneticItem => Boolean(item));
+      return {
+        name:
+          pickText(group, ["name", "title", "label", "groupName", "group_name"]) ||
+          `第${index + 1}组`,
+        tone:
+          pickText(group, ["tone", "color", "dotColor", "dot_color"]) ||
+          TONES[index % TONES.length],
+        items,
+      };
+    })
+    .filter((group) => group.items.length > 0);
+  return result.length ? result : null;
+}
+
+function normalizeItem(entry: unknown): PhoneticItem | null {
+  const item = (entry || {}) as Record<string, unknown>;
+  const ipa = pickText(item, ["ipa", "symbol", "phonetic", "text", "content", "value"]);
+  if (!ipa) return null;
+  return {
+    ipa,
+    // 接口带音频就用它（相对路径由 localAsset 补成完整地址）
+    audio: pickText(item, AUDIO_KEYS),
+    type:
+      pickText(item, ["type", "typeLabel", "type_label", "label", "category", "description", "desc"]) ||
+      "音标",
+    tips: valueOf(item, ["tips", "points", "tipList", "tip_list", "keyPoints", "key_points", "keys"])
+      .map((tip) =>
+        typeof tip === "string" ? tip.trim() : pickText((tip || {}) as Record<string, unknown>, ["text", "content", "tip", "desc", "description"]),
+      )
+      .filter(Boolean),
+    sentences: valueOf(item, ["sentences", "examples", "exampleList", "example_list", "sentenceList", "sentence_list"])
+      .map(normalizeSentence)
+      .filter((row): row is { en: string; zh: string } => Boolean(row)),
+    words: valueOf(item, ["words", "samples", "sampleList", "sample_list", "wordList", "word_list", "vocabulary"])
+      .map(normalizeWord)
+      .filter((row): row is { word: string; zh: string } => Boolean(row)),
+  };
+}
+
+function normalizeSentence(entry: unknown) {
+  if (typeof entry === "string") return entry.trim() ? { en: entry.trim(), zh: "" } : null;
+  const row = (entry || {}) as Record<string, unknown>;
+  const en = pickText(row, ["en", "english", "content", "text", "sentence", "example"]);
+  const zh = pickText(row, ["zh", "cn", "chinese", "translation", "meaning", "contentCn", "content_cn"]);
+  return en || zh ? { en, zh } : null;
+}
+
+function normalizeWord(entry: unknown) {
+  if (typeof entry === "string") return entry.trim() ? { word: entry.trim(), zh: "" } : null;
+  const row = (entry || {}) as Record<string, unknown>;
+  const word = pickText(row, ["word", "en", "english", "text", "content", "name"]);
+  const zh = pickText(row, ["zh", "cn", "chinese", "meaning", "translation", "desc", "description"]);
+  return word || zh ? { word, zh, audio: pickText(row, AUDIO_KEYS) } : null;
+}
+
+/** 音频字段名后端写法不统一，能识别到的都读一遍 */
+const AUDIO_KEYS = [
+  "audio",
+  "audioUrl",
+  "audio_url",
+  "audioPath",
+  "audio_path",
+  "sound",
+  "soundUrl",
+  "sound_url",
+  "voice",
+  "voiceUrl",
+  "voice_url",
+  "mp3",
+  "audioSrc",
+  "audio_src",
+];
+
+/** 取值：按候选字段名依次找，命中数组/对象都返回，没命中给空数组 */
+function valueOf(source: Record<string, unknown>, keys: string[]): unknown[] {
+  for (const key of keys) {
+    const value = source[key];
+    if (Array.isArray(value)) return value;
+  }
+  return [];
+}
+
+function pickText(source: Record<string, unknown>, keys: string[]): string {
+  for (const key of keys) {
+    const value = source[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number") return String(value);
+  }
+  return "";
+}
+
+/** 点同一个音标收起，点别的音标切换 */
+function toggleItem(item: PhoneticItem) {
+  activeIpa.value = activeIpa.value === item.ipa ? "" : item.ipa;
+}
+
+/** 播放一个地址；失败时回调 onFail（用来退回有道 TTS） */
+function playUrl(url: string, onFail?: () => void) {
+  audio = new Audio(url);
+  // onerror 和 play().catch 可能都触发，退回 TTS 只能退一次
+  let settled = false;
+  const fail = () => {
+    if (settled) return;
+    settled = true;
+    if (onFail) onFail();
+    else playingKey.value = "";
+  };
+  audio.onended = () => {
+    settled = true;
+    playingKey.value = "";
+  };
+  audio.onerror = fail;
+  void audio.play().catch(fail);
+}
+
+/**
+ * 朗读：**数据里带 audio 就优先播它**；没带（或音频加载/播放失败）再走有道发音
+ * （英式 type=1），和练习页的 TTS 保持一致。
+ */
+function speak(text: string, key: string, audioUrl?: string) {
+  const value = String(text || "").trim();
+  if (!value) return;
+  stopSpeak();
+  playingKey.value = key;
+  const tts = () => playUrl(`https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(value)}&type=1`);
+  const custom = localAsset(String(audioUrl || "").trim());
+  if (custom) playUrl(custom, tts);
+  else tts();
+}
+
+function stopSpeak() {
+  if (!audio) return;
+  audio.pause();
+  audio = null;
+  playingKey.value = "";
+}
+
+onMounted(async () => {
+  try {
+    detail.value = await fetchLessonDetails(String(route.params.id || ""));
+  } catch {
+    detail.value = null;
+  } finally {
+    loading.value = false;
+  }
+});
+
+onUnmounted(stopSpeak);
+</script>
