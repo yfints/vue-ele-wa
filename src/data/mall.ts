@@ -26,6 +26,16 @@ export interface MallLesson {
   is_collect: number;
   user_lesson_id: number | string;
   founder?: Founder;
+  /** 1=免费 2=会员 */
+  courseType?: number;
+  /** 课时数（课程广场卡片显示「已学 x/y 课时」的分母） */
+  courseNum?: number;
+  /** 已学百分比（老字段） */
+  percentage?: number;
+  /** 进度汇总：列表接口不一定下发，读到就用 */
+  progress?: { doneCount?: number; total?: number; percentage?: number } | number;
+  /** 是否已收藏（接口 isCollect） */
+  isCollect?: boolean;
 }
 
 export interface LessonCategory {
@@ -71,6 +81,19 @@ export function toMallLesson(course: {
   describe?: string;
   categoryId?: number | string;
   lesson_category_id?: number | string;
+  courseType?: number;
+  courseNum?: number;
+  course_num?: number;
+  heat?: number;
+  humanNum?: number;
+  human_num?: number;
+  isHave?: boolean;
+  is_have?: number;
+  userLessonId?: number | string | null;
+  user_lesson_id?: number | string | null;
+  percentage?: number;
+  progress?: { doneCount?: number; total?: number; percentage?: number } | number;
+  isCollect?: boolean;
   categories?: { id: number | string; kind?: number; name?: string }[];
 }): MallLesson {
   return {
@@ -81,15 +104,20 @@ export function toMallLesson(course: {
     categories: Array.isArray(course.categories) ? course.categories : [],
     lesson_category_id: String(course.categoryId ?? course.lesson_category_id ?? 0),
     status: 1,
-    heat: 0,
+    heat: Number(course.heat || 0) || 0,
     created_at: 0,
     course_num: 0,
     course_published_count: 0,
-    human_num: 0,
-    is_have: 0,
+    human_num: Number(course.humanNum ?? course.human_num ?? 0) || 0,
+    is_have: course.isHave === true || Number(course.is_have || 0) ? 1 : 0,
     is_collect: 0,
-    user_lesson_id: 0,
+    user_lesson_id: course.userLessonId ?? course.user_lesson_id ?? 0,
     founder: { name: "", head_img: "" },
+    courseType: course.courseType,
+    courseNum: Number(course.courseNum ?? course.course_num ?? 0) || 0,
+    percentage: course.percentage,
+    progress: course.progress,
+    isCollect: course.isCollect === true,
   };
 }
 

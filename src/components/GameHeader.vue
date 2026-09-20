@@ -1,16 +1,24 @@
 <template>
   <div class="headbarWrap">
     <header class="headbar flex jb ac">
-      <!-- 左：logo + 面包屑，和口语练习页保持一致 -->
+      <!-- 左：logo + 返回，和练习页（口语 / 听力 / 中译英 / 打字）保持一致 -->
       <div class="headbarLeft flex ac minw0">
         <button type="button" class="headbarLogo hand" aria-label="退出练习" @click="emit('exit')">
           <img src="/clone-assets/home/logo-englishgo.png" alt="Englishgo" />
         </button>
-        <nav class="headbarCrumbs flex ac minw0" aria-label="面包屑">
-          <RouterLink to="/home/index" class="headbarCrumb">首页</RouterLink>
-          <img class="headbarCrumbSep" src="/clone-assets/practice/icon-next.png" alt="" />
-          <span class="headbarCrumbCur line1 hand" @click="emit('exit')">{{ crumb }}</span>
-        </nav>
+        <button type="button" class="practiceBack flex ac hand" aria-label="返回" @click="emit('exit')">
+          <svg class="practiceBackIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M15 3.5 8 12l7 8.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>返回</span>
+        </button>
       </div>
 
       <UserDropdown />
@@ -131,12 +139,9 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
 import UserDropdown from "@/components/UserDropdown.vue";
 
 defineProps<{
-  /** 面包屑最后一段（课程详情 / 单词库），点它等同退出练习 */
-  crumb: string;
   title: string;
   courseName: string;
   index: number;

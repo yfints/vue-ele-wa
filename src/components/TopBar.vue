@@ -5,7 +5,7 @@
         <img src="/clone-assets/menu.png" class="img32" alt=""/>
       </button>
       <div class="pc flex ac flex1">
-        <el-breadcrumb separator="/" aria-label="面包屑">
+        <el-breadcrumb separator="›" aria-label="面包屑">
           <el-breadcrumb-item
               v-for="(crumb, index) in breadcrumbs"
               :key="`${crumb.label}-${index}`"
@@ -29,6 +29,7 @@ import {computed} from "vue";
 import {useRoute} from "vue-router";
 import {isPhone, menuOpen, toggleMenu} from "@/composables/useLayout";
 import {avatarUrl, isLoggedIn} from "@/composables/useAuth";
+import {pageCrumb} from "@/composables/usePageCrumb";
 
 const route = useRoute();
 
@@ -39,10 +40,12 @@ interface Crumb {
 
 const breadcrumbs = computed<Crumb[]>(() => {
   const titled = route.matched.filter((record) => typeof record.meta.title === "string");
-  return titled.map((record, index) => ({
-    label: String(record.meta.title),
-    to: index < titled.length - 1 ? record.path : undefined,
-  }));
+  return titled.map((record, index) => {
+    const isLast = index === titled.length - 1;
+    // 详情页会把最后一段换成具体名字（设计稿：父级 › 课程名）
+    const label = isLast && pageCrumb.value ? pageCrumb.value : String(record.meta.title);
+    return { label, to: isLast ? undefined : record.path };
+  });
 });
 
 const profileTo = computed(() =>

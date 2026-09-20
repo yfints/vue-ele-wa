@@ -1,9 +1,8 @@
 <template>
   <PracticeView
     v-if="isPracticePage"
-    :mode="isListenMode ? 'listen' : isTranslateInput ? 'translate' : 'oral'"
+    :mode="isTypingMode ? 'typing' : isListenMode ? 'listen' : isTranslateInput ? 'translate' : 'oral'"
     :title="practiceTitle"
-    :crumb="practiceCrumb"
     :clock="clock"
     :speed="speakRate"
     :index="gameIndex"
@@ -44,7 +43,6 @@
   <div v-else class="gamePage gamePageFixed">
     <template v-if="hasGame">
     <GameHeader
-      :crumb="practiceCrumb"
       :title="session?.gameTitle || '练习'"
       :course-name="session?.courseName || ''"
       :index="gameIndex"
@@ -420,11 +418,13 @@ const clock = computed(() => formatClock(elapsed.value));
 
 /** 口语 / 听力 / 中译英（整句）走新版设计稿练习页，其余模式仍是游戏态页面 */
 const isListenMode = computed(() => mode.value === "SentenceListen");
+/** 打字练习：照着英文逐字母输入（设计稿） */
+const isTypingMode = computed(() => mode.value === "SentenceTypeing");
 /** 中译英：translateType=1 是整句默写（设计稿），2 是逐词拼句（仍是老页面） */
 const isTranslateInput = computed(
   () => mode.value === "SentenceTranslate" && (current.value?.settings?.translateType ?? 1) === 1,
 );
-const isInputMode = computed(() => isListenMode.value || isTranslateInput.value);
+const isInputMode = computed(() => isListenMode.value || isTranslateInput.value || isTypingMode.value);
 const isPracticePage = computed(
   () => hasGame.value && (mode.value === "SentenceOral" || isInputMode.value),
 );
@@ -437,8 +437,6 @@ const practiceTitle = computed(() => {
 });
 /** 播放倍速：存在 gameSetting（localStorage），练习页改完后续所有朗读都按它播 */
 const speakRate = computed(() => Number(gameSetting.value.speak_rate) || 1);
-/** 练习页顶部面包屑：从词书进来的显示「单词库」，其余是「课程详情」 */
-const practiceCrumb = computed(() => (isWordSession() ? "单词库" : "课程详情"));
 const finishDuration = computed(() => formatDuration(elapsed.value));
 const oralFeedback = computed(() => {
   if (mode.value !== "SentenceOral" || answering.value) return "";
@@ -451,7 +449,7 @@ const oralFeedbackTone = computed<"" | "ok" | "bad">(() => {
   return isWrongResult(lastResult.value) ? "bad" : "ok";
 });
 
-/** 听力 / 中译英：输入与反馈 */
+/** 听力 / 中译英 / 打字练习：输入与反馈 */
 const listenAnswer = ref("");
 const listenWrong = ref(false);
 let listenWrongTimer: number | undefined;
@@ -460,10 +458,17 @@ const listenAnswerOk = computed(
 );
 const listenFeedback = computed(() => {
   if (!isInputMode.value) return "";
+  const typing = isTypingMode.value;
   const translate = isTranslateInput.value;
-  if (listenWrong.value) return translate ? "没翻译对，再改改试试～" : "没听对，再听一遍试试～";
+  if (listenWrong.value) {
+    if (typing) return "没打对，照着上面的句子再打一遍～";
+    return translate ? "没翻译对，再改改试试～" : "没听对，再听一遍试试～";
+  }
   if (answering.value) return "";
-  if (isWrongResult(lastResult.value)) return translate ? "再想想，重新输入" : "再听一遍，重新输入";
+  if (isWrongResult(lastResult.value)) {
+    return typing ? "再对着上面的句子打一遍" : translate ? "再想想，重新输入" : "再听一遍，重新输入";
+  }
+  if (typing) return "很棒！打字正确";
   return translate ? "很棒！翻译正确" : "很棒！听写正确";
 });
 const listenFeedbackTone = computed<"" | "ok" | "bad">(() => {
@@ -863,7 +868,11 @@ async function reportProgress(index: number, status: 0 | 1) {
 }
 
 function isRetryInputMode() {
-  return mode.value === "SentenceListen" || (mode.value === "SentenceTranslate" && translateType.value === 1);
+  return (
+    mode.value === "SentenceListen" ||
+    mode.value === "SentenceTypeing" ||
+    (mode.value === "SentenceTranslate" && translateType.value === 1)
+  );
 }
 
 function isWrongResult(result?: string) {

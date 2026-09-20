@@ -1,71 +1,96 @@
 <template>
-  <div class="contentBox">
-    <div class="pl30 pr30 pt30">
-      <div class="cates">
-        <div class="flex jb ac pb20">
-          <div class="flex ac">
-            <button
-              type="button"
-              class="cate gray mr20"
-              :class="{ cateAct: categoryId === 0 }"
-              @click="categoryId = 0"
-            >
-              全部
-            </button>
-            <button
-              v-for="category in lessonCategories"
-              :key="category.id"
-              type="button"
-              class="cate gray mr20"
-              :class="{ cateAct: categoryId === category.id }"
-              @click="categoryId = category.id"
-            >
-              {{ category.name }}
-            </button>
+  <div class="contentBox courseMallPage">
+    <header class="cmHead flex jb ac">
+      <div class="cmHeadLeft flex ac">
+        <button
+          v-if="isPhone"
+          type="button"
+          class="cmMenu flex ac"
+          aria-label="切换菜单"
+          @click="toggleMenu"
+        >
+          <img src="/clone-assets/menu.png" class="img32" alt="" />
+        </button>
+        <div class="cmTabs flex ac">
+          <button
+            type="button"
+            class="cmTab"
+            :class="{ cmTabAct: categoryId === 0 }"
+            @click="categoryId = 0"
+          >
+            全部
+          </button>
+          <button
+            v-for="category in lessonCategories"
+            :key="category.id"
+            type="button"
+            class="cmTab"
+            :class="{ cmTabAct: categoryId === category.id }"
+            @click="categoryId = category.id"
+          >
+            {{ category.name }}
+          </button>
+        </div>
+      </div>
+      <UserDropdown />
+    </header>
+
+    <div ref="listRef" class="pageScroll cmBody" @scroll="onListScroll">
+      <el-skeleton v-if="loading" animated>
+        <template #template>
+          <div class="cmGrid">
+            <div v-for="n in 10" :key="n" class="cmCard">
+              <el-skeleton-item variant="image" class="cmSkeletonCover" />
+              <div class="cmInfo">
+                <el-skeleton-item variant="text" class="cmSkeletonTitle" />
+                <div class="cmTags flex ac">
+                  <el-skeleton-item variant="button" class="cmSkeletonTag" />
+                  <el-skeleton-item variant="button" class="cmSkeletonTag" />
+                </div>
+                <el-skeleton-item variant="text" class="cmSkeletonBar" />
+                <el-skeleton-item variant="text" class="cmSkeletonLearned" />
+              </div>
+            </div>
           </div>
-<!--          <div class="flex0">
-            <el-link type="info" :underline="'hover'" :href="moreCoursesUrl">
-              <el-icon>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-                  <path
-                    fill="currentColor"
-                    d="M192 736h640V128H256a64 64 0 0 0-64 64zm64-672h608a32 32 0 0 1 32 32v672a32 32 0 0 1-32 32H160l-32 57.536V192A128 128 0 0 1 256 64"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M240 800a48 48 0 1 0 0 96h592v-96zm0-64h656v160a64 64 0 0 1-64 64H240a112 112 0 0 1 0-224m144-608v250.88l96-76.8 96 76.8V128zm-64-64h320v381.44a32 32 0 0 1-51.968 24.96L480 384l-108.032 86.4A32 32 0 0 1 320 445.44z"
-                  />
-                </svg>
-              </el-icon>
-              想要更多课程？
-            </el-link>
-          </div>-->
-        </div>
+        </template>
+      </el-skeleton>
+
+      <div v-else-if="filtered.length" class="cmGrid">
+        <MallCard
+          v-for="lesson in filtered"
+          :key="lesson.id"
+          :lesson="lesson"
+          :faved="isFav(lesson.id)"
+          @collect="toggleFav"
+        />
       </div>
-      <div
-        ref="listRef"
-        v-loading="loading"
-        class="pageScroll listScroll"
-        @scroll="onListScroll"
-      >
-        <el-empty v-if="!loading && !filtered.length" description="暂无课程" />
-        <div v-else class="gridContainer">
-          <MallCard v-for="lesson in filtered" :key="lesson.id" :lesson="lesson" />
-        </div>
-        <div v-if="loadingMore" class="tc opc6 size20 pt20 pb10">加载中…</div>
-        <div class="opc6 size20 mt30 pb20">共 {{ mallTotal }} 门课，当前展示 {{ filtered.length }} 门</div>
+
+      <div v-else class="cmEmpty flex col ac jc">
+        <img src="/clone-assets/nodata.png" class="cmEmptyImg" alt="" />
+        <div class="cmEmptyText">暂无课程</div>
       </div>
+
+      <div v-if="loadingMore" class="tc opc6 size20 pt20 pb10">加载中…</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
+import { ElMessage } from "element-plus";
 import MallCard from "@/components/MallCard.vue";
+import UserDropdown from "@/components/UserDropdown.vue";
+import { isPhone, toggleMenu } from "@/composables/useLayout";
+import { isLoggedIn, ensureLogin } from "@/composables/useAuth";
+import { getToken } from "@/api/token";
 import { toMallLesson, type MallLesson } from "@/data/mall";
 import {
+  fetchLessonDetails,
+  fetchCollectLessons,
   fetchCourseCategories,
   fetchCourses,
+  toggleCollect,
+  unwrapCollectPage,
   unwrapCoursePage,
   type CourseCategory,
 } from "@/api/course";
@@ -80,6 +105,8 @@ const loadingMore = ref(false);
 const pageSize = 20;
 const current = ref(1);
 const finished = ref(false);
+/** 收藏的课程 id（课程广场是 type=0 的收藏夹） */
+const favIds = ref<string[]>([]);
 let requestSeq = 0;
 
 async function loadCategories() {
@@ -118,6 +145,8 @@ async function loadCourses(reset = false) {
     const items = records.map(toMallLesson);
     if (reset) filtered.value = items;
     else filtered.value.push(...items);
+    // 注意：必须从 filtered（响应式代理）里取卡片再改，直接改 items 里的原始对象不会触发更新
+    void hydrateProgress();
     mallTotal.value = Number(result?.total ?? mallTotal.value);
     if (items.length < pageSize || filtered.value.length >= mallTotal.value) {
       finished.value = true;
@@ -153,6 +182,78 @@ function ensureFill() {
   }
 }
 
+function isFav(id: number | string) {
+  return favIds.value.includes(String(id));
+}
+
+/** 已经问过进度接口的课程 id（含查不到结果的，避免重复请求） */
+const progressAsked = new Set<string>();
+
+/**
+ * 课程广场的卡片要显示「已学 x/y 课时」，但列表接口不下发 progress，
+ * 只有课程详情接口有。这里只对「已加入学习计划」的课程补一次详情，
+ * 其余课程按 0 进度展示（和设计稿里「已学 0/15 课时」一致）。
+ */
+async function hydrateProgress() {
+  const targets = filtered.value.filter((item) => {
+    const id = String(item.id);
+    if (progressAsked.has(id)) return false;
+    if (item.progress && typeof item.progress === "object") return false;
+    return Boolean(item.is_have) || Boolean(item.user_lesson_id);
+  });
+  targets.forEach((item) => progressAsked.add(String(item.id)));
+  if (!targets.length) return;
+
+  const queue = [...targets];
+  const workers = Array.from({ length: Math.min(4, queue.length) }, async () => {
+    while (queue.length) {
+      const item = queue.shift();
+      if (!item) break;
+      try {
+        const detail = await fetchLessonDetails(item.id);
+        if (detail?.progress) item.progress = detail.progress;
+        if (Number(detail?.courseNum)) item.courseNum = Number(detail?.courseNum);
+      } catch {
+        /* 详情拿不到就按 0 进度展示，不影响列表 */
+      }
+    }
+  });
+  await Promise.all(workers);
+}
+
+/** 页面加载时拉一次已收藏课程（未登录跳过） */
+async function loadFavs() {
+  if (!getToken()) {
+    favIds.value = [];
+    return;
+  }
+  try {
+    const data = await fetchCollectLessons({ type: 0, page: 1, limit: 100 });
+    favIds.value = unwrapCollectPage(data).items.map((item) => String(item.courseId));
+  } catch {
+    favIds.value = [];
+  }
+}
+
+/** 卡片上的爱心：切换收藏（未登录先引导登录） */
+async function toggleFav(lesson: MallLesson) {
+  if (!isLoggedIn.value) {
+    await ensureLogin();
+    return;
+  }
+  const id = String(lesson.id);
+  const faved = favIds.value.includes(id);
+  try {
+    await toggleCollect(id, 0);
+    favIds.value = faved
+      ? favIds.value.filter((item) => item !== id)
+      : [...favIds.value, id];
+    ElMessage.success(faved ? "已取消收藏" : "已加入收藏");
+  } catch {
+    /* http 层已提示 */
+  }
+}
+
 watch(categoryId, () => {
   listRef.value?.scrollTo({ top: 0 });
   void loadCourses(true);
@@ -161,5 +262,6 @@ watch(categoryId, () => {
 onMounted(() => {
   void loadCategories();
   void loadCourses(true);
+  void loadFavs();
 });
 </script>

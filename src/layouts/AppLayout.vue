@@ -24,10 +24,14 @@ import { closeMenu, initLayoutViewport, isPhone, menuOpen } from "@/composables/
 import { fetchMe } from "@/composables/useAuth";
 
 const route = useRoute();
-/** 首页 / 教材学习 / 音标练习 / 单词库 / 个人信息自带顶部栏（顶部栏由页面自己渲染），所以隐藏公共 TopBar */
+/** 首页 / 课程广场 / 教材学习 / 音标练习 / 单词库 / 个人信息自带顶部栏（顶部栏由页面自己渲染），所以隐藏公共 TopBar */
 const bareHeader = computed(
   () =>
     route.path.startsWith("/home") ||
+    // 课程广场列表页自带顶部分类栏；/courseMall/:id 课程详情页仍用公共 TopBar
+    route.path === "/courseMall" ||
+    route.path === "/courseMall/" ||
+    route.path === "/courseMall/index" ||
     route.path.startsWith("/textbook") ||
     route.path.startsWith("/phonetic") ||
     route.path.startsWith("/words") ||

@@ -8,11 +8,20 @@
         <button type="button" class="practiceLogo flex0 hand" aria-label="返回课程详情" @click="emit('exit')">
           <img src="/clone-assets/home/logo-englishgo.png" alt="Englishgo" />
         </button>
-        <nav class="practiceCrumbs flex ac minw0" aria-label="面包屑">
-          <RouterLink to="/home/index" class="practiceCrumb">首页</RouterLink>
-          <img class="practiceCrumbSep" src="/clone-assets/practice/icon-next.png" alt="" />
-          <span class="practiceCrumbCur line1 hand" @click="emit('exit')">{{ crumb }}</span>
-        </nav>
+        <!-- 设计稿：面包屑换成「‹ 返回」 -->
+        <button type="button" class="practiceBack flex ac hand" aria-label="返回" @click="emit('exit')">
+          <svg class="practiceBackIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M15 3.5 8 12l7 8.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>返回</span>
+        </button>
       </div>
       <UserDropdown />
     </header>
@@ -86,10 +95,22 @@
           </div>
         </template>
 
-        <!-- 听力 / 中译英：题目 + 输入框 -->
+        <!-- 听力 / 中译英 / 打字练习：题目 + 输入框 -->
         <template v-else>
           <div class="practiceAsk inputAsk">{{ inputAsk }}</div>
-          <div v-if="isTranslate" class="practiceTranslate">{{ chinese }}</div>
+          <template v-if="isTyping">
+            <div class="practiceSentence typingSentence">{{ english }}</div>
+            <div v-if="showChinese && chinese" class="practiceChinese">{{ chinese }}</div>
+            <button
+              type="button"
+              class="practicePlay practicePlayTyping flex ac hand"
+              @click="emit('speak')"
+            >
+              <img class="practicePlayIcon" src="/clone-assets/practice/icon-play.png" alt="" />
+              <span class="practicePlayText">{{ playing ? "播放中..." : "朗读" }}</span>
+            </button>
+          </template>
+          <div v-else-if="isTranslate" class="practiceTranslate">{{ chinese }}</div>
           <button
             v-else
             type="button"
@@ -105,6 +126,7 @@
             class="listenInput"
             :class="{
               translateInput: isTranslate,
+              typingInput: isTyping,
               'is-error': answerError,
               'is-ok': answerOk,
               'animate__animated': true,
@@ -168,15 +190,16 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { RouterLink } from "vue-router";
 import UserDropdown from "@/components/UserDropdown.vue";
 import PracticeFinishDialog from "@/components/practice/PracticeFinishDialog.vue";
 
 const props = defineProps<{
-  /** oral=口语练习（朗读+录音），listen=听力练习（听音+默写），translate=中译英（看中文+写英文） */
-  mode?: "oral" | "listen" | "translate";
+  /**
+   * oral=口语练习（朗读+录音），listen=听力练习（听音+默写），
+   * translate=中译英（看中文+写英文），typing=打字练习（照着英文逐字母输入）
+   */
+  mode?: "oral" | "listen" | "translate" | "typing";
   title: string;
-  crumb: string;
   clock: string;
   speed: number;
   index: number;
@@ -229,21 +252,39 @@ const SPEED_TEXT: Record<string, string> = {
 
 const isListen = computed(() => props.mode === "listen");
 const isTranslate = computed(() => props.mode === "translate");
-const isInput = computed(() => isListen.value || isTranslate.value);
-const modeLabel = computed(() => (isTranslate.value ? "中译英" : isListen.value ? "听力练习" : "口语练习"));
+const isTyping = computed(() => props.mode === "typing");
+const isInput = computed(() => isListen.value || isTranslate.value || isTyping.value);
+const modeLabel = computed(() =>
+  isTyping.value
+    ? "打字练习"
+    : isTranslate.value
+      ? "中译英"
+      : isListen.value
+        ? "听力练习"
+        : "口语练习",
+);
 const modeIcon = computed(() =>
-  isTranslate.value
-    ? "/clone-assets/practice/icon-translate.png"
-    : isListen.value
-      ? "/clone-assets/practice/icon-listen.png"
-      : "/clone-assets/practice/icon-oral.png",
+  isTyping.value
+    ? "/clone-assets/practice/icon-typing.svg"
+    : isTranslate.value
+      ? "/clone-assets/practice/icon-translate.png"
+      : isListen.value
+        ? "/clone-assets/practice/icon-listen.png"
+        : "/clone-assets/practice/icon-oral.png",
 );
 const oralAsk = "请大声朗读以下英语句子";
 const listenAsk = "听力模式一听音频，写出你听到的英文：";
 const translateAsk = "中译英练习——看中文，写出英文：";
-const inputAsk = computed(() => (isTranslate.value ? translateAsk : listenAsk));
+const typingAsk = "打字练习-照着下面的英文逐字母输入：";
+const inputAsk = computed(() =>
+  isTyping.value ? typingAsk : isTranslate.value ? translateAsk : listenAsk,
+);
 const inputPlaceholder = computed(() =>
-  isTranslate.value ? "Write the English translation..." : "Type what you hear...",
+  isTyping.value
+    ? "在此照打上面的英文句子..."
+    : isTranslate.value
+      ? "Write the English translation..."
+      : "Type what you hear...",
 );
 
 const inputRef = ref<HTMLInputElement>();
