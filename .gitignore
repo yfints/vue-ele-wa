@@ -6,7 +6,9 @@ dist/
 .env.*.local
 .idea/
 .cursor/
+.codex/
 .codebuddy/
 scripts/
 RECON/
 *.log
+*.md/
