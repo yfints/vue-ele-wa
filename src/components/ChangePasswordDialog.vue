@@ -2,18 +2,24 @@
   <Teleport to="body">
     <div v-if="modelValue" class="fpLayer flex ac jc">
       <div class="fpMask" @click="onMaskClick" />
-      <div class="fpCard" role="dialog" aria-modal="true" :aria-label="isSet ? '设置密码' : '修改密码'">
-        <img class="fpShield" src="/clone-assets/login/forgot-shield.png" alt="" />
-        <div class="fpTitle">{{ isSet ? "设置密码" : "修改密码" }}</div>
+      <div class="fpCard" role="dialog" aria-modal="true" :aria-label="isSet ? '设置登录密码' : '修改密码'">
+        <img
+          class="fpShield"
+          :class="{ fpShieldSet: isSet }"
+          :src="isSet ? '/clone-assets/login/set-password-shield.png' : '/clone-assets/login/forgot-shield.png'"
+          alt=""
+        />
+        <div class="fpTitle">{{ isSet ? "设置登录密码" : "修改密码" }}</div>
         <div class="fpDesc">
           {{
             isSet
-              ? "首次登录需要设置登录密码，之后可以用密码登录"
+              ? "首次登录，请设置您的登录密码"
               : "为保证账号安全，请先验证手机号再设置新密码"
           }}
         </div>
 
-        <div class="fpRow flex ac">
+        <!-- 修改密码：手机号只读展示 + 验证码校验；首次设置密码刚登录过，这两行都不要 -->
+        <div v-if="!isSet" class="fpRow flex ac">
           <span class="fpLabel">手机号</span>
           <input class="cpPhone" :value="maskedPhone" readonly />
         </div>
@@ -27,40 +33,39 @@
         </div>
 
         <div class="fpRow flex ac">
-          <span class="fpLabel">新密码</span>
+          <span class="fpLabel">{{ isSet ? "设置密码" : "新密码" }}</span>
           <el-input
             v-model="newPassword"
             class="fpInput"
             type="password"
             maxlength="20"
-            placeholder="请输入新密码（至少8位）"
+            :placeholder="isSet ? '请输入密码（至少8位）' : '请输入新密码（至少8位）'"
             show-password
           />
         </div>
 
         <div class="fpRow flex ac">
-          <span class="fpLabel">确认新密码</span>
+          <span class="fpLabel">{{ isSet ? "确认密码" : "确认新密码" }}</span>
           <el-input
             v-model="repeat"
             class="fpInput"
             type="password"
             maxlength="20"
-            placeholder="请输入新密码（至少8位）"
+            :placeholder="isSet ? '请再次输入密码' : '请输入新密码（至少8位）'"
             show-password
           />
         </div>
 
         <div class="fpActions flex jc">
-          <button type="button" class="fpBtn" @click="onCancel">
-            {{ isSet ? "退出登录" : "取消" }}
-          </button>
+          <!-- 首次设置密码按设计稿只有一个「确认设置」，不留取消（想退出直接刷新即可，token 还没落盘） -->
+          <button v-if="!isSet" type="button" class="fpBtn" @click="onCancel">取消</button>
           <button
             type="button"
             class="fpBtn fpBtnPrimary"
             :disabled="submitting"
             @click="submit"
           >
-            {{ submitting ? "提交中..." : isSet ? "确认" : "确认修改" }}
+            {{ submitting ? "提交中..." : isSet ? "确认设置" : "确认修改" }}
           </button>
         </div>
       </div>
@@ -98,8 +103,6 @@ const emit = defineEmits<{
   "update:modelValue": [value: boolean];
   /** 修改成功 */
   done: [];
-  /** set 模式下点「退出登录」：父级负责清登录态 */
-  cancel: [];
 }>();
 
 const code = ref("");
@@ -138,7 +141,6 @@ function onMaskClick() {
 }
 
 function onCancel() {
-  if (isSet.value) emit("cancel");
   close();
 }
 

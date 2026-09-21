@@ -9071,6 +9071,12 @@ html.dark .practiceHead .userDrop {
     pointer-events: none;
 }
 
+/* 首次设置登录密码用的绿色对勾盾牌（切图比蓝色锁盾高一点，位置按设计稿微调） */
+.fpShieldSet {
+    top: 29px;
+    width: 62px;
+}
+
 .fpTitle {
     color: #333;
     font-size: 20px;

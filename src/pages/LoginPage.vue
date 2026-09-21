@@ -131,7 +131,6 @@
       mode="set"
       :phone="phone"
       @done="onSetPasswordDone"
-      @cancel="onSetPasswordCancel"
     />
   </div>
 </template>
@@ -145,7 +144,7 @@ import { loginByPassword, loginBySms, sendSms } from "@/api/auth";
 import { promotePendingToken, setAccount, setPendingToken } from "@/api/token";
 import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
 import ForgotPasswordDialog from "@/components/ForgotPasswordDialog.vue";
-import { applyLogin, fetchMe, logout } from "@/composables/useAuth";
+import { applyLogin, fetchMe } from "@/composables/useAuth";
 import {
   agreeRules,
   collectFieldErrors,
@@ -308,12 +307,6 @@ async function onSetPasswordDone() {
   await fetchMe();
   ElMessage.success("密码设置成功");
   await router.push(pendingTarget.value || "/home/index");
-}
-
-/** 首次设置密码点「退出登录」：不留半登录状态 */
-function onSetPasswordCancel() {
-  logout();
-  ElMessage.info("已退出登录，登录后可继续设置密码");
 }
 
 onUnmounted(() => {
