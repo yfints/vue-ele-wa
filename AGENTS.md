@@ -7,7 +7,10 @@
 
 后续开发优先用 **Element Plus** 组件完成页面，不要再手写一套按钮、输入框、弹窗、表格、分页、表单、Tag、Breadcrumb、Message、Dialog。
 
-- 布局/表单：`el-button`、`el-input`、`el-form`、`el-select`、`el-dialog`、`el-drawer`、`el-table`、`el-pagination`、`el-tabs`、`el-tag`、`el-breadcrumb`、`el-message` / `ElMessage`、`el-progress`、`el-statistic`、`el-segmented`、`el-divider`
+- 布局/容器：`el-container`、`el-row` / `el-col`、`el-space`、`el-scrollbar`、`el-affix`、`el-backtop`
+- 表单/数据录入：`el-button`、`el-input`、`el-input-number`、`el-form` / `el-form-item`、`el-select` / `el-option`、`el-radio` / `el-radio-group`、`el-checkbox` / `el-checkbox-group`、`el-switch`、`el-slider`、`el-rate`、`el-date-picker`、`el-time-picker`、`el-cascader`、`el-upload`、`el-autocomplete`、`el-color-picker`
+- 数据展示：`el-table` / `el-table-column`、`el-pagination`、`el-tag`、`el-tabs` / `el-tab-pane`、`el-progress`、`el-statistic`、`el-segmented`、`el-image`、`el-avatar`、`el-badge`、`el-card`、`el-descriptions`、`el-empty`、`el-skeleton`、`el-collapse`、`el-timeline`、`el-steps`、`el-carousel`、`el-calendar`、`el-tree`、`el-divider`
+- 导航/反馈：`el-menu`、`el-breadcrumb` / `el-breadcrumb-item`、`el-dropdown` / `el-dropdown-menu` / `el-dropdown-item`、`el-page-header`、`el-link`、`el-text`、`el-dialog`、`el-drawer`、`el-popover`、`el-popconfirm`、`el-tooltip`、`el-alert`、`el-result`、`el-message` / `ElMessage`、`ElMessageBox`、`ElNotification`、`ElLoading`
 - 图标：`@element-plus/icons-vue` + `el-icon`
 - 夜间模式：保持 `html.dark`，沿用 Element Plus 暗色变量，不要另起一套主题 class
 - 只有 Element Plus 没有对应能力时，才用 Tailwind 补间距/布局；不要用 Tailwind 重做已有 EP 组件样式
