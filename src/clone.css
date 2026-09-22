@@ -4650,7 +4650,7 @@ html:not(.dark) .listPop .galssPop {
 .tbCover {
     display: block;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 0.88 / 1;
     background: #f7f9fc;
 }
 
