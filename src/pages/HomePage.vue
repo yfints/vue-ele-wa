@@ -1,16 +1,28 @@
 <template>
   <div class="contentBox dashPage" style="padding-top: 0;padding-left: 0;padding-right: 0;">
     <header class="dashHead">
-      <div class="dashTabs" style="padding-left: 20px;">
-        <el-button
-          v-for="tab in studyTabs"
-          :key="tab.value"
-          :type="studyTab === tab.value ? 'primary' : 'default'"
-          round
-          @click="changeStudyTab(tab.value)"
+      <div class="dashHeadLeft flex ac">
+        <!-- 手机端：左侧汉堡按钮，切出侧边导航（和其它页一致） -->
+        <button
+          v-if="isPhone"
+          type="button"
+          class="dashMenu flex ac"
+          aria-label="切换菜单"
+          @click="toggleMenu"
         >
-          {{ tab.name }}
-        </el-button>
+          <img src="/clone-assets/menu.png" class="img32" alt="" />
+        </button>
+        <div class="dashTabs">
+          <el-button
+            v-for="tab in studyTabs"
+            :key="tab.value"
+            :type="studyTab === tab.value ? 'primary' : 'default'"
+            round
+            @click="changeStudyTab(tab.value)"
+          >
+            {{ tab.name }}
+          </el-button>
+        </div>
       </div>
       <div class=" flex ac">
         <el-image
@@ -26,7 +38,7 @@
         </el-image>
         <el-dropdown trigger="click">
           <button type="button" class="dashUser">
-          <span class="dashUserName userDrop">{{ displayName }}</span>
+          <span class="dashUserName userDrop" v-if="!isPhone">{{ displayName }}</span>
             <el-icon class="userDropArrow"><ArrowDown /></el-icon>
           </button>
           <template #dropdown>
@@ -218,6 +230,7 @@ import {
   type StudyNum,
 } from "@/api/home";
 import { DEFAULT_AVATAR, avatarUrl, displayName, logout } from "@/composables/useAuth";
+import { isPhone, toggleMenu } from "@/composables/useLayout";
 import { currentYearMonth, formatDurationParts } from "@/lib/time";
 
 const studyTabs = [

@@ -2600,6 +2600,23 @@ html.dark .colLine {
     transition: background-color 0.3s;
 }
 
+.dashHeadLeft {
+    min-width: 0;
+}
+
+/* 手机端汉堡按钮（和课程广场/学习计划那些页一致） */
+.dashMenu {
+    flex: 0 0 auto;
+    margin-right: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.dashTabs {
+    padding-left: 20px;
+}
+
 .dashTabs .el-button {
     min-width: 56px;
     height: 32px;
@@ -3031,6 +3048,12 @@ html.dark .colLine {
     .dashHead {
         flex-wrap: wrap;
         gap: 12px;
+        padding: 0 12px;
+    }
+
+    /* 左侧有汉堡按钮（自带间距），页签不用再缩进 */
+    .dashTabs {
+        padding-left: 0;
     }
 
     .dashCards,
@@ -3114,6 +3137,11 @@ html.dark .dashTabs .el-button {
 html.dark .dashHead {
     background: var(--bg-container);
 }
+
+html.dark .dashMenu img {
+    filter: invert(1);
+}
+
 html.dark .dashTabs .el-button--primary {
     color: #fff;
 }
