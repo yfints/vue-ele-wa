@@ -11,7 +11,7 @@
         <img class="userDropAvatar hand" :src="DEFAULT_AVATAR" alt="个人信息" />
       </template>
     </el-image>
-    <el-dropdown trigger="click">
+    <el-dropdown trigger="click" v-if="isLoggedIn">
       <button type="button" class="userDrop flex ac">
         <span class="userDropName">{{ displayName }}</span>
         <el-icon class="userDropArrow"><ArrowDown /></el-icon>
@@ -22,6 +22,7 @@
 <!--          <el-dropdown-item @click="toggleTheme">
             {{ isDark ? "白天模式" : "夜间模式" }}
           </el-dropdown-item>-->
+          <!-- 未登录时不给「退出登录」 -->
           <el-dropdown-item @click="onLogout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </template>
@@ -32,7 +33,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { ArrowDown } from "@element-plus/icons-vue";
-import { DEFAULT_AVATAR, avatarUrl, displayName, logout } from "@/composables/useAuth";
+import { DEFAULT_AVATAR, avatarUrl, displayName, isLoggedIn, logout } from "@/composables/useAuth";
 
 const router = useRouter();
 

@@ -47,7 +47,8 @@
 <!--            <el-dropdown-item @click="toggleTheme">
                 {{ isDark ? "白天模式" : "夜间模式" }}
               </el-dropdown-item>-->
-              <el-dropdown-item @click="onLogout">退出登录</el-dropdown-item>
+              <!-- 未登录时不给「退出登录」 -->
+              <el-dropdown-item v-if="isLoggedIn" @click="onLogout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -229,7 +230,7 @@ import {
   type StudyCount,
   type StudyNum,
 } from "@/api/home";
-import { DEFAULT_AVATAR, avatarUrl, displayName, logout } from "@/composables/useAuth";
+import { DEFAULT_AVATAR, avatarUrl, displayName, isLoggedIn, logout } from "@/composables/useAuth";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
 import { currentYearMonth, formatDurationParts } from "@/lib/time";
 
