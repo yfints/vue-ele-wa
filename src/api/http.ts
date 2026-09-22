@@ -174,28 +174,28 @@ function unwrap<T>(payload: ApiResult<T> | T, silent = false): T {
   return payload as T;
 }
 
-async function request<T>(config: AxiosRequestConfig): Promise<T> {
+async function request<T>(config: ApiRequestConfig): Promise<T> {
   const response: AxiosResponse<ApiResult<T> | T> = await http.request(config);
-  return unwrap(response.data, Boolean((config as ApiRequestConfig | undefined)?.silent));
+  return unwrap(response.data, Boolean(config.silent));
 }
 
-export function get<T>(url: string, params?: unknown, config?: AxiosRequestConfig) {
+export function get<T>(url: string, params?: unknown, config?: ApiRequestConfig) {
   return request<T>({ ...config, method: "GET", url, params });
 }
 
-export function post<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+export function post<T>(url: string, data?: unknown, config?: ApiRequestConfig) {
   return request<T>({ ...config, method: "POST", url, data });
 }
 
-export function put<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+export function put<T>(url: string, data?: unknown, config?: ApiRequestConfig) {
   return request<T>({ ...config, method: "PUT", url, data });
 }
 
-export function patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+export function patch<T>(url: string, data?: unknown, config?: ApiRequestConfig) {
   return request<T>({ ...config, method: "PATCH", url, data });
 }
 
-export function del<T>(url: string, params?: unknown, config?: AxiosRequestConfig) {
+export function del<T>(url: string, params?: unknown, config?: ApiRequestConfig) {
   return request<T>({ ...config, method: "DELETE", url, params });
 }
 

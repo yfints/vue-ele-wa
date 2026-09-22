@@ -10432,7 +10432,7 @@ html.dark .spBar .el-progress-bar__outer {
 
 /* ---------- 套餐 ---------- */
 
-/* 推荐那张卡整体比另外两张高 20（顶部多一条缎带），三张底边对齐 */
+/* 带角标（推荐）那张整体比其它高 20（顶部多一条缎带），各卡底边对齐 */
 .vpPlans {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -10442,8 +10442,10 @@ html.dark .spBar .el-progress-bar__outer {
 
 .vpPlan {
     position: relative;
+    display: flex;
+    flex-direction: column;
     box-sizing: border-box;
-    height: 251px;
+    min-height: 251px;
     border-radius: 12px;
     background: #fff;
     /* 用 inset 阴影描边，避免 border 影响内部尺寸 */
@@ -10451,7 +10453,7 @@ html.dark .spBar .el-progress-bar__outer {
 }
 
 .vpPlanRec {
-    height: 271px;
+    min-height: 271px;
     background: #fffbf3;
     box-shadow: inset 0 0 0 3px #ffd173;
     overflow: hidden;
@@ -10482,16 +10484,51 @@ html.dark .spBar .el-progress-bar__outer {
 
 .vpPlanBody {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
     box-sizing: border-box;
-    height: 100%;
     padding: 32px 20px 20px;
 }
 
-.vpPlanRec .vpPlanBody {
-    height: calc(100% - 20px);
-    padding-top: 31px;
+/* 名额/套餐加载失败 */
+.vpPlansEmpty {
+    min-height: 251px;
+}
+
+.vpPlansEmptyText {
+    color: #999;
+    font-size: 14px;
+}
+
+/* 骨架屏（套餐卡同尺寸） */
+.vpSkeletonName {
+    width: 96px;
+    height: 20px;
+}
+
+.vpSkeletonPrice {
+    width: 140px;
+    height: 44px;
+    margin-top: 24px;
+}
+
+.vpSkeletonBtn {
+    width: 100%;
+    height: 60px;
+    margin-top: auto;
+    border-radius: 8px;
+}
+
+/* 已是会员：有效期提示行 */
+.vpMemberLine {
+    margin-top: 16px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fff8ea;
+    color: #8a5a00;
+    font-size: 13px;
+    line-height: 20px;
 }
 
 .vpPlanName {
@@ -10560,14 +10597,7 @@ html.dark .spBar .el-progress-bar__outer {
     margin-top: 14px;
 }
 
-.vpQr {
-    display: block;
-    width: 80px;
-    height: 80px;
-}
-
 .vpPayTip {
-    margin-top: 16px;
     gap: 7px;
     color: #666;
     font-size: 12px;
@@ -10578,6 +10608,82 @@ html.dark .spBar .el-progress-bar__outer {
     display: block;
     width: 20px;
     height: 20px;
+}
+
+/* ---------- 支付弹窗（接口返回 codeUrl / payUrl，前端画二维码） ---------- */
+
+.vpPayBox {
+    gap: 4px;
+}
+
+.vpPayName {
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.vpPayRenewTag {
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: #fff3e0;
+    color: #e6a23c;
+    font-size: 12px;
+}
+
+.vpPayAmount {
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 38px;
+}
+
+.vpPayChannel {
+    margin: 10px 0 14px;
+}
+
+.vpQrBox {
+    width: 168px;
+    height: 168px;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.vpQrImg {
+    display: block;
+    width: 152px;
+    height: 152px;
+}
+
+.vpQrLoading {
+    padding: 0 16px;
+    color: #999;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: center;
+}
+
+.vpPayText {
+    margin-top: 14px;
+    color: #666;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: center;
+}
+
+.vpPayRemain {
+    margin-top: 4px;
+    color: #999;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.vpPayLink {
+    margin-top: 8px;
+    color: #0056b5;
+    font-size: 13px;
+    text-decoration: none;
 }
 
 /* ---------- 侧边栏「开通会员」选中态：金色胶囊 + 白色图标 ---------- */
