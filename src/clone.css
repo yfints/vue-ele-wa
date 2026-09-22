@@ -8316,7 +8316,7 @@ html.dark .listEnd::after {
     .cmCover,
     .cmSkeletonCover {
         height: auto;
-        aspect-ratio: 15 / 8;
+        aspect-ratio: 0.88 / 1;
     }
 
     .cmInfo {
