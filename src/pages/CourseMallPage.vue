@@ -70,13 +70,16 @@
         <div class="cmEmptyText">暂无课程</div>
       </div>
 
+      <!-- 数据全部渲染完 + 到底了：底部提示 -->
+      <div v-if="showEnd" class="listEnd flex ac jc">已经到底了</div>
+
       <div v-if="loadingMore" class="tc opc6 size20 pt20 pb10">加载中…</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import MallCard from "@/components/MallCard.vue";
 import UserDropdown from "@/components/UserDropdown.vue";
@@ -105,6 +108,11 @@ const loadingMore = ref(false);
 const pageSize = 20;
 const current = ref(1);
 const finished = ref(false);
+
+/** 列表到底且数据都渲染完了，底部给一句提示 */
+const showEnd = computed(
+  () => !loading.value && !loadingMore.value && finished.value && filtered.value.length > 0,
+);
 /** 收藏的课程 id（课程广场是 type=0 的收藏夹） */
 const favIds = ref<string[]>([]);
 let requestSeq = 0;

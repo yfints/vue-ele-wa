@@ -8195,6 +8195,33 @@ html.dark .practiceHead .userDrop {
     font-size: 14px;
 }
 
+/* 列表到底提示：两侧细线 + 中间文案（课程广场/教材/单词库/音标/收藏/学习计划/学习手帐 通用） */
+.listEnd {
+    /* 音标页的列表容器是 flex-wrap 行，靠 width:100% 换到独立一行 */
+    width: 100%;
+    gap: 10px;
+    padding: 18px 0 6px;
+    color: #bbbbbb;
+    font-size: 12px;
+}
+
+.listEnd::before,
+.listEnd::after {
+    content: "";
+    width: 40px;
+    height: 1px;
+    background: #e5e5e5;
+}
+
+html.dark .listEnd {
+    color: var(--el-text-color-placeholder);
+}
+
+html.dark .listEnd::before,
+html.dark .listEnd::after {
+    background: var(--theme-border);
+}
+
 /* 骨架屏：与真实卡片同尺寸 */
 .cmSkeletonCover {
     display: block;

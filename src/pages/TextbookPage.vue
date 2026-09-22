@@ -102,6 +102,9 @@
         <img src="/clone-assets/nodata.png" class="tbEmptyImg" alt="" />
         <div class="tbEmptyText">该条件下暂无教材</div>
       </div>
+
+      <!-- 数据全部渲染完 + 到底了：底部提示 -->
+      <div v-if="showEnd" class="listEnd flex ac jc">已经到底了</div>
     </div>
 
   </div>
@@ -160,6 +163,9 @@ const loadingList = ref(true);
 let inited = false;
 let requestSeq = 0;
 const router = useRouter();
+
+/** 列表一次取完，加载完且有条目就提示到底 */
+const showEnd = computed(() => !loadingList.value && books.value.length > 0);
 
 const gradeTabs = computed<TabItem[]>(() =>
   gradeCats.value.map((item) => ({ id: item.id, name: String(item.name || "").trim() })),

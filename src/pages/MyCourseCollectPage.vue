@@ -69,6 +69,9 @@
         <div class="cfEmptyText">这里空空的，什么都还没有收藏</div>
       </div>
 
+      <!-- 数据全部渲染完 + 到底了：底部提示 -->
+      <div v-if="showEnd" class="listEnd flex ac jc">已经到底了</div>
+
       <div v-if="loadingMore" class="tc opc6 size20 pt20 pb10">加载中…</div>
     </div>
   </div>
@@ -114,6 +117,11 @@ const pageSize = 50;
 const current = ref(1);
 const finished = ref(false);
 let requestSeq = 0;
+
+/** 列表到底且数据都渲染完了，底部给一句提示 */
+const showEnd = computed(
+  () => !loading.value && !loadingMore.value && finished.value && items.value.length > 0,
+);
 
 /** 副标题：接口给了简介就用简介，字数少的单词集退化成「共 N 个单词」 */
 function rowDesc(item: CollectLessonItem) {

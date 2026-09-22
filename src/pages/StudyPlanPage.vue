@@ -95,6 +95,9 @@
             {{ isDone(item) ? "复习" : "继续学习" }}
           </el-button>
         </div>
+
+        <!-- 数据全部渲染完 + 到底了：底部提示 -->
+        <div v-if="showEnd" class="listEnd flex ac jc">已经到底了</div>
       </div>
 
       <div v-else class="spEmpty flex col ac jc">
@@ -197,6 +200,9 @@ const rows = computed(() =>
     return true;
   }),
 );
+
+/** 列表到底且数据都渲染完了（学习计划一次把分页取完），底部给一句提示 */
+const showEnd = computed(() => !loading.value && rows.value.length > 0);
 
 const emptyText = computed(() => {
   if (!loggedIn.value) return "登录后可以查看你的学习计划";

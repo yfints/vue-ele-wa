@@ -106,6 +106,8 @@
           </div>
 
           <div v-if="loadingMore" class="jbMore">加载中…</div>
+          <!-- 数据全部渲染完 + 到底了：底部提示 -->
+          <div v-if="showEnd" class="listEnd flex ac jc">已经到底了</div>
         </template>
 
         <div v-else class="jbEmpty flex col ac jc">
@@ -159,11 +161,16 @@ const actingId = ref<string | number>("");
 
 const pageSize = 50;
 let current = 1;
-let finished = false;
+const finished = ref(false);
 let requestSeq = 0;
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
 const sortLabel = computed(() => (sortType.value === 2 ? "错误次数" : "创建日期"));
+
+/** 列表到底且数据都渲染完了，底部给一句提示 */
+const showEnd = computed(
+  () => !loading.value && !loadingMore.value && finished.value && items.value.length > 0,
+);
 
 const emptyText = computed(() => {
   if (!getToken()) return "登录后可以查看你的学习手帐";
@@ -176,16 +183,16 @@ const itemType = computed(() => (kind.value === "word" ? JOURNAL_ITEM_TYPE.WORD 
 async function loadList(reset = false) {
   if (!getToken()) {
     items.value = [];
-    finished = true;
+    finished.value = true;
     loading.value = false;
     loadingMore.value = false;
     return;
   }
-  if (!reset && (loading.value || loadingMore.value || finished)) return;
+  if (!reset && (loading.value || loadingMore.value || finished.value)) return;
   const seq = ++requestSeq;
   if (reset) {
     current = 1;
-    finished = false;
+    finished.value = false;
     loading.value = true;
     items.value = [];
   } else {
@@ -205,12 +212,12 @@ async function loadList(reset = false) {
     if (seq !== requestSeq) return;
     items.value = reset ? result.items : [...items.value, ...result.items];
     if (result.items.length < pageSize || (result.total != null && items.value.length >= result.total)) {
-      finished = true;
+      finished.value = true;
     }
     current += 1;
   } catch {
     if (reset) items.value = [];
-    finished = true;
+    finished.value = true;
   } finally {
     if (seq === requestSeq) {
       loading.value = false;
@@ -222,7 +229,7 @@ async function loadList(reset = false) {
 
 function onScroll() {
   const el = bodyRef.value;
-  if (!el || loading.value || loadingMore.value || finished) return;
+  if (!el || loading.value || loadingMore.value || finished.value) return;
   if (el.scrollTop + el.clientHeight >= el.scrollHeight - 120) {
     void loadList();
   }
@@ -230,7 +237,7 @@ function onScroll() {
 
 function ensureFill() {
   const el = bodyRef.value;
-  if (!el || loading.value || loadingMore.value || finished) return;
+  if (!el || loading.value || loadingMore.value || finished.value) return;
   if (el.scrollHeight <= el.clientHeight) void loadList();
 }
 

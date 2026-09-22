@@ -90,12 +90,15 @@
         <img src="/clone-assets/nodata.png" class="wdEmptyImg" alt="" />
         <div class="wdEmptyText">该分类下暂无词库</div>
       </div>
+
+      <!-- 数据全部渲染完 + 到底了：底部提示 -->
+      <div v-if="showEnd" class="listEnd flex ac jc">已经到底了</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { isPhone, toggleMenu } from "@/composables/useLayout";
@@ -143,6 +146,9 @@ const categoryId = ref<string>(ALL);
 const cards = ref<WordSetCard[]>([]);
 const loading = ref(true);
 const favIds = ref<string[]>([]);
+
+/** 列表一次取完，加载完且有条目就提示到底 */
+const showEnd = computed(() => !loading.value && cards.value.length > 0);
 
 /** 分类接口返回的分类，用于「全部」时逐个分类取列表 */
 const wordCategories = ref<CourseCategory[]>([]);
