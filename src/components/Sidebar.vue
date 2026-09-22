@@ -49,6 +49,7 @@ const primary = [
   {
     label: "学习计划",
     icon: "/clone-assets/menu/plan.svg",
+    to: "/studyPlan/index",
   },
   {
     label: "学习手帐",

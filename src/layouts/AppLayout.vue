@@ -33,6 +33,7 @@ const bareHeader = computed(
     route.path === "/courseMall/" ||
     route.path === "/courseMall/index" ||
     route.path.startsWith("/myCourse") ||
+    route.path.startsWith("/studyPlan") ||
     route.path.startsWith("/textbook") ||
     route.path.startsWith("/phonetic") ||
     route.path.startsWith("/words") ||

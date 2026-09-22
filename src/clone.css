@@ -9746,3 +9746,463 @@ html.dark .cfBtnFav.el-button {
         margin-left: 0;
     }
 }
+
+/* ===== 学习计划（设计稿 image_id=530ef9b7）=====
+ * 口径（设计稿 1440 宽，侧边栏 180 + 内容左右各 20）：
+ *  内容区底色 #F7F7F7，内边距 20；统计卡 3 张等宽、高 120、圆角 12、间距 10；
+ *  页签卡白底高 40（与统计卡间距 20）；列表距页签 15，行高 120、圆角 12、行距 10。
+ */
+
+.planPage {
+    background: #f7f7f7;
+}
+
+/* 顶栏 60 高：左边标题（设计稿 ink 201,23 → 16px/#333），右边用户下拉 */
+.spHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: var(--bg-card);
+}
+
+.spHeadLeft {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.spMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.spTitle {
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.planBody {
+    padding: 20px;
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.planBody::-webkit-scrollbar {
+    display: none;
+}
+
+/* ---------- 统计卡 ---------- */
+
+.spStats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.spStat {
+    box-sizing: border-box;
+    height: 120px;
+    padding-left: 25px;
+    border-radius: 12px;
+    background: var(--bg-card);
+}
+
+/* 80×80 圆形底（设计稿 y=100~178，卡片内垂直居中） */
+.spStatIcon {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.spStatIconBlue {
+    background: #dfebff;
+}
+
+.spStatIconGreen {
+    background: #e7ffdf;
+}
+
+.spStatIconOrange {
+    background: #ffefdf;
+}
+
+/* 图标按设计稿原始尺寸渲染（帽 47×36 / 对勾 51×50 / 时钟 49×48） */
+.spStatImgBlue {
+    width: 52px;
+}
+
+.spStatImgGreen {
+    width: 56px;
+}
+
+.spStatImgOrange {
+    width: 54px;
+}
+
+.spStatText {
+    min-width: 0;
+    margin-left: 28px;
+    /* 设计稿里「数字 + 标签」整体比卡片中心高 2px（Figma 字体基线差异），这里抵消掉 */
+    margin-top: -4px;
+}
+
+.spStatNum {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 34px;
+}
+
+.spStatNum.isBlue {
+    color: #0056b5;
+}
+
+.spStatNum.isGreen {
+    color: #00c26d;
+}
+
+.spStatNum.isOrange {
+    color: #ff9f43;
+}
+
+.spStatLabel {
+    margin-top: 9px;
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+/* ---------- 页签 ---------- */
+
+.spTabsCard {
+    height: 40px;
+    margin-top: 20px;
+    border-radius: 12px;
+    background: var(--bg-card);
+}
+
+.spTabs,
+.spTabs .el-tabs__header {
+    height: 40px;
+    margin: 0;
+}
+
+.spTabs .el-tabs__nav-wrap::after,
+.spTabs .el-tabs__active-bar {
+    display: none;
+}
+
+.spTabs .el-tabs__nav {
+    height: 40px;
+}
+
+/* 设计稿：文字 14px（灰 #666 / 激活蓝 #0056B5），下划线只有文字宽，3 高、距底 2 */
+.spTabs .el-tabs__item {
+    position: relative;
+    height: 40px;
+    padding: 0 20px !important;
+    color: #666;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 40px;
+}
+
+.spTabs .el-tabs__item.is-active {
+    color: #0056b5;
+}
+
+.spTabs .el-tabs__item.is-active::after {
+    content: "";
+    position: absolute;
+    right: 20px;
+    bottom: 2px;
+    left: 20px;
+    height: 3px;
+    border-radius: 2px;
+    background: #0056b5;
+}
+
+.spTabs .el-tabs__item:hover {
+    color: #0056b5;
+}
+
+/* ---------- 列表 ---------- */
+
+.spList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.spRow {
+    box-sizing: border-box;
+    height: 120px;
+    padding: 0 10px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    transition: box-shadow 0.2s;
+}
+
+.spRow:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* 封面 100×100、圆角 8（设计稿 x=210~310） */
+.spCover {
+    flex: 0 0 auto;
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-box);
+}
+
+.spCoverFallback {
+    width: 100%;
+    height: 100%;
+    color: #c0c4cc;
+}
+
+.spInfo {
+    flex: 1;
+    min-width: 0;
+    margin-left: 10px;
+}
+
+/* 标题 ink 293（16px）→ 副标题 ink 325（13px）→ 进度条 348（高 10）→ 脚注 ink 367（12px） */
+.spName {
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.spMeta {
+    margin-top: 10px;
+    color: #666;
+    font-size: 13px;
+    line-height: 18px;
+}
+
+.spMetaSep {
+    margin: 0 6px;
+    color: #b9b9b9;
+    font-style: normal;
+}
+
+/* 进度条 x=320~531（212 宽）、高 10、圆角 5、底色 #EAEDEF、填充 #00C26D */
+.spBar {
+    width: 212px;
+    margin-top: 9px;
+}
+
+.spBar .el-progress-bar__outer {
+    border-radius: 5px;
+    background: #eaedef;
+}
+
+.spBar .el-progress-bar__inner {
+    border-radius: 5px;
+}
+
+.spFoot {
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* 按钮 140×40、圆角 10：未学完=实心蓝「继续学习」，学完=绿色「复习」 */
+.spBtn.el-button {
+    flex: 0 0 auto;
+    width: 140px;
+    height: 40px;
+    margin-left: 10px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.spBtnGo.el-button {
+    background: #0056b5;
+    color: #fff;
+}
+
+.spBtnGo.el-button:hover,
+.spBtnGo.el-button:focus {
+    background: #00499c;
+    color: #fff;
+}
+
+.spBtnReview.el-button {
+    background: #00c26d;
+    color: #fff;
+}
+
+.spBtnReview.el-button:hover,
+.spBtnReview.el-button:focus {
+    background: #00a95f;
+    color: #fff;
+}
+
+/* 空态 */
+.spEmpty {
+    min-height: 480px;
+    padding-top: 40px;
+}
+
+.spEmptyImg {
+    width: 136px;
+}
+
+.spEmptyText {
+    margin-top: 40px;
+    color: #999;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+/* 骨架屏 */
+.spSkeletonCover {
+    flex: 0 0 auto;
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+}
+
+.spSkeletonName {
+    width: 320px;
+    height: 16px;
+}
+
+.spSkeletonMeta {
+    width: 240px;
+    height: 13px;
+    margin-top: 10px;
+}
+
+.spSkeletonBar {
+    width: 212px;
+    height: 10px;
+    margin-top: 14px;
+}
+
+.spSkeletonBtn {
+    flex: 0 0 auto;
+    width: 140px;
+    height: 40px;
+    margin-left: 10px;
+    border-radius: 10px;
+}
+
+html.dark .planPage {
+    background: var(--bg-container);
+}
+
+html.dark .spTitle,
+html.dark .spStatLabel,
+html.dark .spName {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .spMeta,
+html.dark .spFoot {
+    color: var(--el-text-color-secondary);
+}
+
+html.dark .spTabs .el-tabs__item {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .spBar .el-progress-bar__outer {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* 手机端：统计卡竖排，行卡换成两行（信息一行、按钮一行） */
+@media (max-width: 900px) {
+    .planBody {
+        height: calc(100dvh - 60px);
+        padding: 12px;
+    }
+
+    .spHead {
+        padding: 0 12px;
+    }
+
+    .spStats {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .spStat {
+        height: 92px;
+        padding-left: 16px;
+    }
+
+    .spStatIcon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .spStatImgBlue {
+        width: 39px;
+    }
+
+    .spStatImgGreen {
+        width: 42px;
+    }
+
+    .spStatImgOrange {
+        width: 41px;
+    }
+
+    .spStatText {
+        margin-left: 16px;
+    }
+
+    .spStatNum {
+        font-size: 26px;
+        line-height: 32px;
+    }
+
+    .spStatLabel {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    .spRow {
+        height: auto;
+        padding: 12px;
+        flex-wrap: wrap;
+        row-gap: 12px;
+    }
+
+    .spCover {
+        width: 72px;
+        height: 72px;
+    }
+
+    .spInfo {
+        flex: 1 1 200px;
+    }
+
+    .spBar {
+        width: 100%;
+    }
+
+    .spBtn.el-button {
+        flex: 1 1 120px;
+        width: auto;
+        margin-left: 0;
+    }
+}

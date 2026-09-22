@@ -319,11 +319,100 @@ export function removeStudyPlanLesson(userLessonId: string | number) {
 }
 
 export function fetchStudyPlanLessons(params?: { page?: number; limit?: number }) {
-  return get("/study-plan/lessons", params);
+  const page = Number(params?.page) || 1;
+  const limit = Number(params?.limit) || 50;
+  // 后端分页参数两套都认（page/limit 与 current/size），一起传更稳
+  return get(
+    "/study-plan/lessons",
+    { page, limit, current: page, size: limit },
+    { skipAuthRedirect: true },
+  );
 }
 
 export function topStudyPlanLesson(body: { userLessonId?: string | number; courseId?: string | number; isTop: boolean }) {
   return post("/study-plan/lessons/top", body);
+}
+
+/** 学习计划里的一条课程（`/study-plan/lessons` 的 records[]） */
+export interface StudyPlanLessonItem {
+  /** 学习计划记录 ID（user_course.id） */
+  id: number | string;
+  courseId: number | string;
+  name: string;
+  cover: string;
+  description: string;
+  /** 课时数（课程卡片的 courseNum，列表副标题用） */
+  courseNum: number;
+  /** 已完成章节数 */
+  courseDoneCount: number;
+  /** 章节总数 */
+  courseCount: number;
+  /** 进度百分比 0~100 */
+  progress: number;
+  /** 是否置顶：1=置顶 */
+  isTop: number;
+  categories: CourseCategoryRef[];
+  /** 最近学习时间（接口暂未下发时为空字符串） */
+  lastStudyTime: string;
+}
+
+/** 学习计划条目：接口把课程信息放在 lesson 里，进度在记录上，这里拍平成一层 */
+export function normalizeStudyPlanLesson(row: unknown): StudyPlanLessonItem | null {
+  const raw = asRecord(row);
+  if (!raw) return null;
+  const lesson = asRecord(raw.lesson) || asRecord(raw.course) || raw;
+  const courseId = lesson.id ?? raw.courseId ?? raw.lessonId;
+  if (courseId == null || courseId === "") return null;
+
+  const courseCount = Number(raw.courseCount ?? lesson.courseCount ?? 0) || 0;
+  const courseDoneCount = Number(raw.courseDoneCount ?? lesson.doneNum ?? 0) || 0;
+  const rawProgress = Number(lesson.progress ?? lesson.percentage ?? NaN);
+  const progress = Number.isFinite(rawProgress)
+    ? Math.max(0, Math.min(100, Math.round(rawProgress)))
+    : courseCount > 0
+      ? Math.round((courseDoneCount / courseCount) * 100)
+      : 0;
+
+  return {
+    id: (raw.id as number | string | undefined) ?? (courseId as number | string),
+    courseId: courseId as number | string,
+    name: textOf(lesson.name),
+    cover: textOf(lesson.cover || lesson.image),
+    description: textOf(lesson.description || lesson.describe),
+    courseNum: Number(lesson.courseNum ?? lesson.course_num ?? 0) || 0,
+    courseDoneCount,
+    courseCount,
+    progress,
+    isTop: Number(raw.isTop ?? 0) || 0,
+    categories: Array.isArray(lesson.categories) ? (lesson.categories as CourseCategoryRef[]) : [],
+    lastStudyTime: textOf(
+      raw.lastStudyTime || raw.lastStudyTimeText || lesson.lastStudyTime || lesson.lastStudyTimeText,
+    ),
+  };
+}
+
+/** 分页结构兼容：records / data / list / rows，或者直接返回数组 */
+export function unwrapStudyPlanLessons(data: unknown): {
+  items: StudyPlanLessonItem[];
+  total?: number;
+} {
+  const obj = asRecord(data);
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(obj?.records)
+      ? obj?.records
+      : Array.isArray(obj?.data)
+        ? obj?.data
+        : Array.isArray(obj?.list)
+          ? obj?.list
+          : Array.isArray(obj?.rows)
+            ? obj?.rows
+            : [];
+  const items = list
+    .map(normalizeStudyPlanLesson)
+    .filter((item): item is StudyPlanLessonItem => Boolean(item));
+  const total = obj?.total ?? obj?.count;
+  return { items, total: total == null ? undefined : Number(total) };
 }
 
 export interface CollectLessonItem {

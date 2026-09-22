@@ -11,6 +11,7 @@ import GamePage from "@/pages/GamePage.vue";
 import PhoneticPage from "@/pages/PhoneticPage.vue";
 import PhoneticDetailPage from "@/pages/PhoneticDetailPage.vue";
 import RegisterPage from "@/pages/RegisterPage.vue";
+import StudyPlanPage from "@/pages/StudyPlanPage.vue";
 import TextbookPage from "@/pages/TextbookPage.vue";
 import TextbookDetailPage from "@/pages/TextbookDetailPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
@@ -94,6 +95,12 @@ const router = createRouter({
           path: "myCourse/word",
           component: MyCourseCollectPage,
           meta: { public: true, title: "我的收藏" },
+        },
+        { path: "studyPlan", redirect: "/studyPlan/index", meta: { public: true } },
+        {
+          path: "studyPlan/index",
+          component: StudyPlanPage,
+          meta: { public: true, title: "学习计划" },
         },
         { path: ":pathMatch(.*)*", redirect: "/home/index" },
       ],
