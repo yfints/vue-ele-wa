@@ -21,6 +21,7 @@
 import { computed, type Component } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { isDetailPath, navSection, navSectionKey } from "@/composables/useNavSection";
 import { isPhone, menuOpen } from "@/composables/useLayout";
 
 const props = defineProps<{
@@ -46,11 +47,17 @@ const collapsed = computed(() => !menuOpen.value && !isPhone.value);
 const active = computed(() => {
   if (props.active) return true;
   if (!props.to) return false;
+  // 详情页（课程/单词集/教材/音标详情）沿用进入前的栏目：
+  // 从「我的收藏」点进课程详情，左边仍然高亮我的收藏，不会跳到课程广场
+  if (isDetailPath(route.path) && navSection.value) {
+    return navSectionKey(props.to) === navSection.value;
+  }
   if (props.to.startsWith("/home")) return route.path.startsWith("/home");
   if (props.to.startsWith("/courseMall")) {
     return route.path.startsWith("/courseMall") || route.path.startsWith("/courses");
   }
   if (props.to.startsWith("/myCourse")) return route.path.startsWith("/myCourse");
+  if (props.to.startsWith("/words")) return route.path.startsWith("/words");
   return route.path === props.to;
 });
 

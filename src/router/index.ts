@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { getToken } from "@/api/token";
+import { rememberNavSection } from "@/composables/useNavSection";
 import AppLayout from "@/layouts/AppLayout.vue";
 import CourseDetailPage from "@/pages/CourseDetailPage.vue";
 import CourseMallPage from "@/pages/CourseMallPage.vue";
@@ -139,6 +140,11 @@ router.beforeEach((to: any) => {
     return { path: "/login/index", query: { redirect: to.fullPath } };
   }
   return true;
+});
+
+// 记下当前处在哪个一级栏目，详情页（课程/单词集/教材/音标详情）据此保持侧边栏高亮
+router.afterEach((to) => {
+  rememberNavSection(to.path);
 });
 
 export default router;
