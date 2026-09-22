@@ -51,7 +51,8 @@
 
       <section v-else class="phdCard">
         <div class="phdSummary flex ac">
-          <div class="phdTile flex ac jc">{{ codeLabel }}</div>
+          <!-- 左上角音标位：课程封面当底图（cover 裁切），GB/US 文案压在上面 -->
+          <div class="phdTile flex ac jc" :style="tileStyle">{{ codeLabel }}</div>
           <div class="phdSummaryInfo minw0">
             <div class="phdTitle line1">{{ title }}</div>
             <div class="phdSub line1">{{ subtitle }}</div>
@@ -187,6 +188,11 @@ let audio: HTMLAudioElement | null = null;
 const title = computed(() => String(detail.value?.name || "音标学习").trim());
 /** 英式课显示 GB、美式课显示 US（设计稿里是 GB） */
 const codeLabel = computed(() => (/美式|american/i.test(title.value) ? "US" : "GB"));
+/** 音标位底图：用课程封面；没封面就只留纯色底 + 文案 */
+const tileCover = computed(() => localAsset(String(detail.value?.cover || "")));
+const tileStyle = computed(() =>
+  tileCover.value ? { backgroundImage: `url("${tileCover.value}")` } : {},
+);
 const subtitle = computed(
   () =>
     String(detail.value?.description || "").trim() ||

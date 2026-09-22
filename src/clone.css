@@ -4659,7 +4659,9 @@ html:not(.dark) .listPop .galssPop {
 
 .tbGrid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    /* 与课程广场/单词库同一口径：卡片最小 220、列数随宽度自适应，
+       窗口变宽是「多出一列」，不是把卡片拉宽（1440 下仍是 5 列 232 宽） */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 10px;
 }
 
@@ -7648,7 +7650,11 @@ html.dark .practiceHead .userDrop {
     width: 80px;
     height: 80px;
     border-radius: 12px;
+    /* 课程封面当底图覆盖在上面（cover 裁切、居中）；没有封面时露出设计稿这层绿色渐变 */
     background: linear-gradient(135deg, #00c26d 0%, #04a97f 100%);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     color: #fff;
     font-size: 28px;
     font-weight: 700;
