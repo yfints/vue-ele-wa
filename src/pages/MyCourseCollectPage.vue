@@ -1,78 +1,75 @@
 <template>
   <div class="contentBox collectPage">
-    <div class="pl30 pr30 pt30">
-      <div class="flex pl20 headTab">
-        <div
-          class="size28 bold mr46"
-          :class="kind === 'sentence' ? 'act' : 'opc6 hand'"
-          @click="goTab('sentence')"
+    <header class="cfHead flex jb ac">
+      <div class="cfHeadLeft flex ac">
+        <button
+          v-if="isPhone"
+          type="button"
+          class="cfMenu flex ac"
+          aria-label="切换菜单"
+          @click="toggleMenu"
         >
-          句子
-        </div>
+          <img src="/clone-assets/menu.png" class="img32" alt="" />
+        </button>
+        <!-- 设计稿：顶部两个胶囊页签（收藏的课程 / 收藏的单词库），没有面包屑 -->
+        <el-tabs v-model="tab" class="cfTabs" @tab-change="onTabChange">
+          <el-tab-pane v-for="item in TABS" :key="item.name" :label="item.label" :name="item.name" />
+        </el-tabs>
+      </div>
+      <UserDropdown />
+    </header>
+
+    <div ref="listRef" class="pageScroll cfBody" @scroll="onListScroll">
+      <el-skeleton v-if="loading" animated>
+        <template #template>
+          <div class="cfRow flex ac" v-for="n in 4" :key="n">
+            <el-skeleton-item variant="image" class="cfSkeletonCover" />
+            <div class="cfInfo flex col flex1">
+              <el-skeleton-item variant="text" class="cfSkeletonName" />
+              <el-skeleton-item variant="text" class="cfSkeletonDesc" />
+            </div>
+            <el-skeleton-item variant="button" class="cfSkeletonBtn" />
+            <el-skeleton-item variant="button" class="cfSkeletonBtn" />
+          </div>
+        </template>
+      </el-skeleton>
+
+      <div v-else-if="items.length" class="cfList">
         <div
-          class="size28 bold mr46"
-          :class="kind === 'word' ? 'act' : 'opc6 hand'"
-          @click="goTab('word')"
+          v-for="item in items"
+          :key="item.id"
+          class="cfRow flex ac hand"
+          @click="openDetail(item)"
         >
-          单词
+          <el-image class="cfCover" :src="localAsset(item.image) || undefined" fit="cover" lazy>
+            <template #error>
+              <div class="cfCoverFallback flex ac jc">
+                <el-icon class="img40"><Picture /></el-icon>
+              </div>
+            </template>
+          </el-image>
+
+          <div class="cfInfo flex col flex1">
+            <div class="cfName line1">{{ item.name }}</div>
+            <div class="cfDesc line1">{{ rowDesc(item) }}</div>
+          </div>
+
+          <el-button class="cfBtn cfBtnPrimary" @click.stop="openDetail(item)">开始学习</el-button>
+          <el-button class="cfBtn cfBtnFav" @click.stop="remove(item)">
+            <svg class="cfHeart" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20.1 4.9 13.3A4.6 4.6 0 0 1 12 7.1a4.6 4.6 0 0 1 7.1 6.2z" />
+            </svg>
+            取消收藏
+          </el-button>
         </div>
       </div>
-      <div
-        ref="listRef"
-        v-loading="loading"
-        class="pageScroll listScroll"
-        @scroll="onListScroll"
-      >
-        <div v-if="!loading && !items.length" class="flex col ac collectEmpty">
-          <img src="/clone-assets/nodata.png" class="nodata" alt="" />
-          <div class="flex jc pt100">
-            <div class="nodataBtn hand" @click="goMall">{{ emptyCta }}</div>
-          </div>
-        </div>
-        <div v-else class="gridContainer">
-          <div
-            v-for="item in items"
-            :key="item.id"
-            class="collectCard hand mb20"
-            @click="openDetail(item)"
-          >
-            <div class="delBox flex jc ac gray ani img50" @click.stop="askRemove(item)">
-              <el-icon class="img30"><Delete /></el-icon>
-            </div>
-            <div class="imgBox">
-              <el-image
-                class="cardimg"
-                :src="localAsset(item.image) || undefined"
-                fit="cover"
-                lazy
-              >
-                <template #error>
-                  <div class="cardimgFallback" />
-                </template>
-              </el-image>
-              <div class="cardtag">用户共享</div>
-            </div>
-            <div class="line1 size20 mt10">{{ item.name }}</div>
-            <div class="flex jb ac mt10 size14">
-              <div class="flex ac flex1">
-                <img
-                  :src="localAsset(item.founderAvatar) || '/clone-assets/ico.png'"
-                  class="img25 avatar circle"
-                  alt=""
-                />
-                <div class="ml5 line1 name opc6">{{ item.founderName || "官方" }}</div>
-              </div>
-              <div v-if="item.heat" class="flex ac opc6">
-                <strong>
-                  <i class="van-badge__wrapper van-icon van-icon-fire-o" />
-                </strong>
-                <div class="ml5">{{ item.heat }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-if="loadingMore" class="tc opc6 size20 pt20 pb10">加载中…</div>
+
+      <div v-else class="cfEmpty flex col ac jc">
+        <img class="cfEmptyImg" src="/clone-assets/collect/empty.png" alt="" />
+        <div class="cfEmptyText">这里空空的，什么都还没有收藏</div>
       </div>
+
+      <div v-if="loadingMore" class="tc opc6 size20 pt20 pb10">加载中…</div>
     </div>
   </div>
 </template>
@@ -80,8 +77,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Delete } from "@element-plus/icons-vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
+import { Picture } from "@element-plus/icons-vue";
+import UserDropdown from "@/components/UserDropdown.vue";
 import {
   fetchCollectLessons,
   toggleCollect,
@@ -90,16 +88,23 @@ import {
 } from "@/api/course";
 import { getToken } from "@/api/token";
 import { ensureLogin } from "@/composables/useAuth";
+import { isPhone, toggleMenu } from "@/composables/useLayout";
 import { localAsset } from "@/data/mall";
+
+type TabName = "sentence" | "word";
+
+const TABS: { name: TabName; label: string }[] = [
+  { name: "sentence", label: "收藏的课程" },
+  { name: "word", label: "收藏的单词库" },
+];
 
 const route = useRoute();
 const router = useRouter();
 
-const kind = computed(() => (route.path.includes("/myCourse/word") ? "word" : "sentence"));
+const kind = computed<TabName>(() => (route.path.includes("/myCourse/word") ? "word" : "sentence"));
+const tab = ref<TabName>(kind.value);
+/** 收藏接口的 type：0=课程 1=单词集 */
 const collectType = computed(() => (kind.value === "word" ? 1 : 0));
-const emptyCta = computed(() =>
-  kind.value === "word" ? "去收藏单词课程包" : "去收藏句子课程包",
-);
 
 const listRef = ref<HTMLElement>();
 const items = ref<CollectLessonItem[]>([]);
@@ -110,25 +115,24 @@ const current = ref(1);
 const finished = ref(false);
 let requestSeq = 0;
 
-function goTab(next: "sentence" | "word") {
-  if (kind.value === next) return;
+/** 副标题：接口给了简介就用简介，字数少的单词集退化成「共 N 个单词」 */
+function rowDesc(item: CollectLessonItem) {
+  const desc = String(item.description || "").trim();
+  if (desc) return desc;
+  if (kind.value === "word") {
+    return item.wordCount ? `共 ${item.wordCount} 个单词` : "单词集";
+  }
+  return item.courseNum ? `共 ${item.courseNum} 课时` : "课程";
+}
+
+function onTabChange(name: string | number) {
+  const next = name as TabName;
+  if (next === kind.value) return;
   void router.push(next === "word" ? "/myCourse/word" : "/myCourse/sentence");
 }
 
-function goMall() {
-  if(kind.value==="word"){
-    void router.push(`/words/index`);
-    return;
-  }
-  void router.push("/courseMall/index");
-}
-
 function openDetail(item: CollectLessonItem) {
-  if(kind.value==="word"){
-    void router.push(`/words/${item.courseId}`);
-    return;
-  }
-  void router.push(`/courseMall/${item.courseId}`);
+  void router.push(kind.value === "word" ? `/words/${item.courseId}` : `/courseMall/${item.courseId}`);
 }
 
 async function loadList(reset = false) {
@@ -192,23 +196,14 @@ function ensureFill() {
   }
 }
 
-async function askRemove(item: CollectLessonItem) {
-  try {
-    await ElMessageBox.confirm("确定要取消收藏吗？", "提示", {
-      confirmButtonText: "确认",
-      cancelButtonText: "取消",
-      type: "warning",
-      closeOnClickModal: false,
-    });
-  } catch {
-    return;
-  }
+/** 取消收藏：设计稿就是一个按钮，点了直接取消并给反馈（要再收藏回课程详情/单词库即可） */
+async function remove(item: CollectLessonItem) {
   try {
     await toggleCollect(item.courseId, collectType.value);
-    ElMessage.success("移除成功");
     items.value = items.value.filter((row) => String(row.courseId) !== String(item.courseId));
+    ElMessage.success("已取消收藏");
   } catch {
-    /* unwrap 已提示 */
+    /* http 层已提示 */
   }
 }
 
@@ -223,10 +218,12 @@ async function boot() {
 }
 
 watch(
-  () => kind.value,
-  () => {
+  kind,
+  (value) => {
+    tab.value = value;
     void loadList(true);
   },
+  { immediate: false },
 );
 
 onMounted(() => {

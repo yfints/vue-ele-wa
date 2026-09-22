@@ -331,7 +331,19 @@ export interface CollectLessonItem {
   courseId: number | string;
   name: string;
   image: string;
+  /** 课程/单词集简介（列表页副标题） */
+  description: string;
   heat: number;
+  /** 1=免费 2=会员 */
+  courseType: number;
+  /** 课时数（单词集是单词集里的课时数） */
+  courseNum: number;
+  /** 单词集的单词数 */
+  wordCount: number;
+  /** 学习进度百分比 */
+  progress: number;
+  /** 分类标签（接口 categories） */
+  categories: CourseCategoryRef[];
   isHave: boolean;
   userLessonId?: number | string | null;
   founderName: string;
@@ -353,12 +365,21 @@ export function normalizeCollectItem(row: unknown): CollectLessonItem | null {
   const founder = asRecord(detail.founder) || {};
   const courseId = detail.id ?? raw.courseId ?? raw.lesson_id ?? raw.lessonId;
   if (courseId == null || courseId === "") return null;
+  const categories = Array.isArray(detail.categories)
+    ? (detail.categories as CourseCategoryRef[])
+    : [];
   return {
     id: (raw.id as number | string | undefined) ?? (courseId as number | string),
     courseId: courseId as number | string,
     name: textOf(detail.name),
     image: textOf(detail.image || detail.cover),
+    description: textOf(detail.description || detail.describe),
     heat: Number(detail.heat ?? 0) || 0,
+    courseType: Number(detail.courseType ?? 0) || 0,
+    courseNum: Number(detail.courseNum ?? detail.course_num ?? 0) || 0,
+    wordCount: Number(detail.wordCount ?? detail.word_count ?? 0) || 0,
+    progress: Number(detail.progress ?? detail.percentage ?? 0) || 0,
+    categories,
     isHave: detail.is_have == 1 || detail.isHave === true,
     userLessonId: (detail.user_lesson_id ?? detail.userLessonId) as number | string | null | undefined,
     founderName: textOf(founder.nickname || founder.name),

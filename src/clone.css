@@ -9485,3 +9485,264 @@ html.dark .practiceHead .userDrop {
 .el-overlay.is-message-box {
     z-index: 3300 !important;
 }
+
+/* ===== 我的收藏（设计稿）===== */
+
+.collectPage {
+    background: #f7f7f7;
+}
+
+/* 顶栏 60 高：左边两个胶囊页签（用 el-tabs 改的样式），右边用户头像 */
+.cfHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: var(--bg-card);
+}
+
+.cfHeadLeft {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.cfMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.cfTabs {
+    min-width: 0;
+}
+
+.cfHead .cfTabs .el-tabs__header {
+    margin: 0;
+}
+
+.cfHead .cfTabs .el-tabs__nav-wrap::after,
+.cfHead .cfTabs .el-tabs__active-bar {
+    display: none;
+}
+
+.cfHead .cfTabs .el-tabs__nav {
+    gap: 20px;
+}
+
+.cfHead .cfTabs .el-tabs__item {
+    height: 36px;
+    padding: 0 18px !important;
+    border-radius: 18px;
+    color: #666;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 36px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.cfHead .cfTabs .el-tabs__item.is-active {
+    background: #0056b5;
+    color: #fff;
+    font-weight: 600;
+}
+
+.cfHead .cfTabs .el-tabs__item:hover {
+    color: #0056b5;
+}
+
+.cfHead .cfTabs .el-tabs__item.is-active:hover {
+    color: #fff;
+}
+
+.cfBody {
+    padding: 20px;
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.cfBody::-webkit-scrollbar {
+    display: none;
+}
+
+/* 一行一张白卡：80 高、圆角 12、行距 10 */
+.cfList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cfRow {
+    box-sizing: border-box;
+    height: 80px;
+    padding: 0 10px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    transition: box-shadow 0.2s;
+}
+
+.cfRow:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.cfCover {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-box);
+}
+
+.cfCoverFallback {
+    width: 100%;
+    height: 100%;
+    color: #c0c4cc;
+}
+
+.cfInfo {
+    min-width: 0;
+    margin-left: 12px;
+    /* 设计稿：标题 ink 99、副标题 ink 131 → 两行之间空 10 */
+    gap: 10px;
+}
+
+.cfName {
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.cfDesc {
+    color: #999;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* 两个按钮各 140×40、圆角 10：开始学习（实心蓝）/ 取消收藏（浅蓝 + 心形） */
+.collectPage .cfBtn.el-button {
+    flex: 0 0 auto;
+    width: 140px;
+    height: 40px;
+    margin-left: 10px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.collectPage .cfBtnPrimary.el-button {
+    background: #0056b5;
+    color: #fff;
+}
+
+.collectPage .cfBtnPrimary.el-button:hover,
+.collectPage .cfBtnPrimary.el-button:focus {
+    background: #00499c;
+    color: #fff;
+}
+
+.collectPage .cfBtnFav.el-button {
+    background: #e9f3ff;
+    color: #0056b5;
+}
+
+.collectPage .cfBtnFav.el-button:hover,
+.collectPage .cfBtnFav.el-button:focus {
+    background: #daeaff;
+    color: #0056b5;
+}
+
+.cfHeart {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+}
+
+/* 空态：猫头鹰望空箱子 + 文案（设计稿没有按钮） */
+.cfEmpty {
+    height: 100%;
+    min-height: 480px;
+}
+
+.cfEmptyImg {
+    width: 136px;
+}
+
+.cfEmptyText {
+    margin-top: 40px;
+    color: #999;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+/* 骨架屏 */
+.cfSkeletonCover {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+}
+
+.cfSkeletonName {
+    width: 240px;
+    height: 16px;
+}
+
+.cfSkeletonDesc {
+    width: 200px;
+    height: 12px;
+}
+
+.cfSkeletonBtn {
+    flex: 0 0 auto;
+    width: 140px;
+    height: 40px;
+    margin-left: 10px;
+    border-radius: 10px;
+}
+
+html.dark .collectPage {
+    background: var(--bg-container);
+}
+
+html.dark .cfName {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .cfBtnFav.el-button {
+    background: #14233a;
+    color: #7eb6ff;
+}
+
+/* 手机端：卡片换成两行（信息一行、按钮一行） */
+@media (max-width: 900px) {
+    .cfBody {
+        height: calc(100dvh - 60px);
+        padding: 12px;
+    }
+
+    .cfRow {
+        height: auto;
+        padding: 12px;
+        flex-wrap: wrap;
+        row-gap: 12px;
+    }
+
+    .cfInfo {
+        flex: 1 1 160px;
+    }
+
+    .collectPage .cfBtn.el-button {
+        flex: 1 1 120px;
+        width: auto;
+        margin-left: 0;
+    }
+}
