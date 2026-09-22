@@ -45,6 +45,25 @@ export function currentYearMonth(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
+/**
+ * 学习计划的「最近学习」文案：今天 / 昨天 / N天前 / M月D日 / 跨年给完整日期。
+ * 传空（从未学过）返回空串，由调用方显示「还未开始」。
+ */
+export function formatStudyTime(value: string | null | undefined, now = new Date()) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  // 兼容 "yyyy-MM-dd HH:mm:ss" 与 ISO：按本地时间解析（"yyyy/MM/dd" 在各浏览器都稳）
+  const date = new Date(raw.replace(/-/g, "/").replace("T", " ").replace(/\.\d+.*$/, ""));
+  if (Number.isNaN(date.getTime())) return raw;
+  const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const days = Math.round((dayStart(now) - dayStart(date)) / 86400000);
+  if (days <= 0) return "今天";
+  if (days === 1) return "昨天";
+  if (days < 7) return `${days}天前`;
+  if (date.getFullYear() === now.getFullYear()) return `${date.getMonth() + 1}月${date.getDate()}日`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 export function shiftYearMonth(value: string, delta: number) {
   const [year, month] = value.split("-").map(Number);
   const next = new Date(year, month - 1 + delta, 1);

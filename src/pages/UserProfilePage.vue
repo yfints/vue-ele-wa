@@ -75,8 +75,16 @@
 
           <div class="pfRow">
             <span class="pfLabel">微信号</span>
-            <div class="pfField">
-              <input v-model="form.wechatId" class="pfInput" maxlength="30" placeholder="请输入微信号" />
+            <div class="pfField pfFieldPlain flex ac">
+              <button v-if="!wechatId" type="button" class="pfLink hand" @click="openWechat">
+                绑定微信
+                <img class="pfLinkArrow" src="/clone-assets/practice/icon-next.png" alt="" />
+              </button>
+              <template v-else>
+                <img class="pfWechatIcon" src="/clone-assets/login/wechat.png" alt="" />
+                <span class="pfWechatId">{{ wechatId }}</span>
+                <button type="button" class="pfLink pfRebind hand" @click="openWechat">换绑</button>
+              </template>
             </div>
           </div>
 
@@ -126,6 +134,35 @@
 
     <ChangePasswordDialog v-model="passwordOpen" :phone="phone" @done="onPasswordDone" />
     <CancelAccountDialog v-model="cancelOpen" @done="onAccountCanceled" />
+
+    <!--
+      微信号绑定：后端只有 /user/profile 的 wechatId 字段（没有微信授权接口），
+      所以这里是「录入微信号 = 绑定」，换绑走同一个弹窗。
+    -->
+    <el-dialog
+      v-model="wechatOpen"
+      :title="wechatId ? '换绑微信号' : '绑定微信'"
+      width="420px"
+      append-to-body
+    >
+      <el-form label-width="72px" @submit.prevent>
+        <el-form-item label="微信号">
+          <el-input
+            v-model="wechatDraft"
+            maxlength="30"
+            placeholder="请输入微信号"
+            clearable
+            @keyup.enter="saveWechat"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="wechatOpen = false">取消</el-button>
+        <el-button type="primary" :loading="wechatSaving" @click="saveWechat">
+          {{ wechatId ? "确认换绑" : "确认绑定" }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -155,9 +192,15 @@ const avatarPreview = ref("");
 /** 头像地址失效时退回默认图，别显示成裂图 */
 const avatarFailed = ref(false);
 const form = reactive({ nickname: "", signature: "", wechatId: "" });
+/** 微信号绑定弹窗 */
+const wechatOpen = ref(false);
+const wechatSaving = ref(false);
+const wechatDraft = ref("");
 
 const userId = computed(() => String(user.value?.userId ?? ""));
 const phone = computed(() => String(user.value?.phone ?? ""));
+/** 已绑定的微信号（接口里的 wechatId） */
+const wechatId = computed(() => String(user.value?.wechatId || ""));
 const shownAvatar = computed(() => avatarPreview.value || avatarUrl.value);
 const avatarSrc = computed(() => (avatarFailed.value ? DEFAULT_AVATAR : shownAvatar.value));
 
@@ -222,6 +265,43 @@ async function submit() {
 function pickAvatar() {
   if (uploading.value || saving.value) return;
   fileInputRef.value?.click();
+}
+
+/** 打开绑定/换绑弹窗，已绑定时带出当前微信号 */
+function openWechat() {
+  wechatDraft.value = wechatId.value;
+  wechatOpen.value = true;
+}
+
+/**
+ * 绑定/换绑微信号。
+ * `/user/profile` 是三个字段全量提交，昵称/签名取「已保存」的值（不带上表单里没提交的改动），
+ * 保证这次只改微信号。
+ */
+async function saveWechat() {
+  if (wechatSaving.value) return;
+  const value = wechatDraft.value.trim();
+  if (!value) {
+    ElMessage.warning("请输入微信号");
+    return;
+  }
+  const isRebind = Boolean(wechatId.value);
+  wechatSaving.value = true;
+  try {
+    const current = user.value;
+    await updateMyProfile({
+      nickname: String(current?.nickname || current?.name || ""),
+      signature: current?.signature || null,
+      wechatId: value,
+    });
+    await fetchMe();
+    wechatOpen.value = false;
+    ElMessage.success(isRebind ? "微信号已更新" : "绑定成功");
+  } catch {
+    /* http 层已提示 */
+  } finally {
+    wechatSaving.value = false;
+  }
 }
 
 /** 选图只做本地预览，不传服务端；点「提交」时才上传并保存 */

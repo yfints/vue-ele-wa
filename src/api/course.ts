@@ -333,6 +333,167 @@ export function topStudyPlanLesson(body: { userLessonId?: string | number; cours
   return post("/study-plan/lessons/top", body);
 }
 
+/**
+ * 学习计划 · 统一列表（`GET /study-plan/list`）
+ * 句子轨（user_course）+ 单词轨（user_word）合并去重后的一行；服务端按 status 过滤、分页。
+ */
+export interface StudyPlanRow {
+  courseId: string;
+  /** 句子轨记录 ID（user_course.id），没有该轨为 null */
+  userLessonId: string | null;
+  /** 单词轨记录 ID（user_word.id），没有该轨为 null */
+  userWordId: string | null;
+  /** 1=只有句子轨 2=只有单词轨 3=两轨都有 */
+  track: number;
+  /** 1=进行中 2=已完成 */
+  status: number;
+  isTop: number;
+  /** 最近学习时间，从未学过为 null */
+  lastStudyTime: string | null;
+  /** true=单词集课（doneCount/totalCount 是单词数，文案用「词」） */
+  wordCourse: boolean;
+  /** 已完成数：课时型=已完成课时数，单词集课=已学单词数 */
+  doneCount: number;
+  /** 总数：课时型=上线课时数，单词集课=单词总数 */
+  totalCount: number;
+  /** 0-100，直接渲染，不要自己算 */
+  progress: number;
+  name: string;
+  cover: string;
+  categories: CourseCategoryRef[];
+  /** 会员判定：allowed=false 且 reason=NEED_MEMBER 表示会员课未开通 */
+  access: { allowed?: boolean; reason?: string | null } | null;
+}
+
+export function normalizeStudyPlanRow(row: unknown): StudyPlanRow | null {
+  const raw = asRecord(row);
+  if (!raw) return null;
+  const lesson = asRecord(raw.lesson);
+  // 课程已不存在时接口会给 lesson: null，这行直接跳过
+  if (!lesson) return null;
+  const courseId = lesson.id ?? raw.courseId;
+  if (courseId == null || courseId === "") return null;
+  const access = asRecord(lesson.access);
+  return {
+    courseId: String(courseId),
+    userLessonId: (raw.userLessonId ?? lesson.userLessonId ?? null) as string | null,
+    userWordId: (raw.userWordId ?? lesson.userWordId ?? null) as string | null,
+    track: Number(raw.track ?? 0) || 0,
+    status: Number(raw.status ?? 0) || 0,
+    isTop: Number(raw.isTop ?? 0) || 0,
+    lastStudyTime: (raw.lastStudyTime as string | null) ?? null,
+    wordCourse: raw.wordCourse === true,
+    doneCount: Number(raw.doneCount ?? 0) || 0,
+    totalCount: Number(raw.totalCount ?? 0) || 0,
+    progress: Math.max(0, Math.min(100, Number(raw.progress ?? 0) || 0)),
+    name: textOf(lesson.name),
+    cover: textOf(lesson.cover || lesson.image),
+    categories: Array.isArray(lesson.categories) ? (lesson.categories as CourseCategoryRef[]) : [],
+    access: access
+      ? { allowed: access.allowed === true, reason: (access.reason as string | null) ?? null }
+      : null,
+  };
+}
+
+export function unwrapStudyPlanList(data: unknown): { items: StudyPlanRow[]; total?: number } {
+  const obj = asRecord(data);
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(obj?.records)
+      ? obj?.records
+      : Array.isArray(obj?.data)
+        ? obj?.data
+        : [];
+  const items = list.map(normalizeStudyPlanRow).filter((item): item is StudyPlanRow => Boolean(item));
+  const total = obj?.total ?? obj?.count;
+  return { items, total: total == null ? undefined : Number(total) };
+}
+
+export function fetchStudyPlanList(params?: {
+  /** 1=进行中 2=已完成；不传=全部 */
+  status?: number;
+  page?: number;
+  limit?: number;
+}, config?: { silent?: boolean }) {
+  const page = Number(params?.page) || 1;
+  const limit = Number(params?.limit) || 50;
+  const query: Record<string, unknown> = { page, limit };
+  // 不传 status 就是「全部」，注意别传空串（非法值后端判 400）
+  if (params?.status === 1 || params?.status === 2) query.status = params.status;
+  return get("/study-plan/list", query, { skipAuthRedirect: true, ...config });
+}
+
+/** 学习计划 · 汇总卡（`GET /study-plan/summary`）：与列表独立，切页签不变 */
+export interface StudyPlanSummary {
+  /** 在学项目数（进度未满格，含一次都没学的） */
+  studyingCount: number;
+  /** 已完成项目数 */
+  doneCount: number;
+  /** 累计学习秒数（全部学习口径，与首页同源） */
+  totalSeconds: number;
+}
+
+export async function fetchStudyPlanSummary(config?: { silent?: boolean }): Promise<StudyPlanSummary> {
+  const raw = ((await get<Record<string, unknown>>("/study-plan/summary", undefined, {
+    skipAuthRedirect: true,
+    ...config,
+  })) || {}) as Record<string, unknown>;
+  return {
+    studyingCount: Number(raw.studyingCount ?? 0) || 0,
+    doneCount: Number(raw.doneCount ?? 0) || 0,
+    totalSeconds: Number(raw.totalSeconds ?? 0) || 0,
+  };
+}
+
+/**
+ * 旧句子轨接口（`/study-plan/lessons`）的记录转成统一列表行。
+ * 只在 `/study-plan/list` 还没上线（404）时兜底用，新接口部署后这段可以删。
+ */
+export function legacyStudyPlanRow(row: unknown): StudyPlanRow | null {
+  const raw = asRecord(row);
+  const item = normalizeStudyPlanLesson(row);
+  if (!raw || !item) return null;
+  const lesson = asRecord(raw.lesson) || {};
+  const access = asRecord(lesson.access);
+  return {
+    courseId: String(item.courseId),
+    userLessonId: (lesson.userLessonId ?? raw.userLessonId ?? null) as string | null,
+    userWordId: null,
+    track: 1,
+    status: item.progress >= 100 ? 2 : 1,
+    isTop: item.isTop,
+    lastStudyTime: item.lastStudyTime || null,
+    wordCourse: false,
+    doneCount: item.courseDoneCount,
+    totalCount: item.courseNum || item.courseCount || 0,
+    progress: item.progress,
+    name: item.name,
+    cover: item.cover,
+    categories: item.categories,
+    access: access
+      ? { allowed: access.allowed === true, reason: (access.reason as string | null) ?? null }
+      : null,
+  };
+}
+
+/** 旧句子轨接口的分页结果（一次把分页取完时用） */
+export function unwrapLegacyStudyPlanList(data: unknown): {
+  items: StudyPlanRow[];
+  total?: number;
+} {
+  const obj = asRecord(data);
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(obj?.records)
+      ? obj?.records
+      : Array.isArray(obj?.data)
+        ? obj?.data
+        : [];
+  const items = list.map(legacyStudyPlanRow).filter((item): item is StudyPlanRow => Boolean(item));
+  const total = obj?.total ?? obj?.count;
+  return { items, total: total == null ? undefined : Number(total) };
+}
+
 /** 学习计划里的一条课程（`/study-plan/lessons` 的 records[]） */
 export interface StudyPlanLessonItem {
   /** 学习计划记录 ID（user_course.id） */

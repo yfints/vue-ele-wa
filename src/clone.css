@@ -7342,6 +7342,34 @@ html.dark .practiceHead .userDrop {
     box-shadow: 0 0 0 3px rgba(0, 86, 181, 0.1);
 }
 
+/* 微信号行：不是输入框，但保持和输入框同样高度的行高（设计稿行距 54） */
+.pfFieldPlain {
+    /* 与输入框内文字左对齐（输入框 padding: 0 20px） */
+    padding-left: 20px;
+    min-height: 43px;
+}
+
+/*
+ * 微信号行：未绑定是「绑定微信 ›」（复用 .pfLink），已绑定是「微信图标 + 微信号 + 换绑」
+ * （换绑距微信号值 122，对齐设计稿）
+ */
+.pfWechatIcon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.pfWechatId {
+    margin-left: 6px;
+    color: #666;
+    font-size: 14px;
+}
+
+.pfRebind {
+    margin-left: 122px;
+}
+
 .pfAvatar {
     width: 68px;
     height: 68px;
@@ -7511,6 +7539,15 @@ html.dark .practiceHead .userDrop {
     .pfLinkRow {
         height: 48px;
         margin-top: 8px;
+    }
+
+    /* 手机上字段变窄，换绑别顶出去 */
+    .pfFieldPlain {
+        padding-left: 12px;
+    }
+
+    .pfRebind {
+        margin-left: 24px;
     }
 }
 

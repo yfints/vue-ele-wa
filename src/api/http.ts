@@ -15,6 +15,16 @@ export interface ApiResult<T = unknown> {
   data: T;
 }
 
+/**
+ * 请求配置扩展：
+ * - skipAuthRedirect：401 不跳登录页（未登录场景自己处理）
+ * - silent：业务报错不弹全局 toast（调用方要自己兜底/自己提示时用）
+ */
+export interface ApiRequestConfig extends AxiosRequestConfig {
+  skipAuthRedirect?: boolean;
+  silent?: boolean;
+}
+
 function apiMessage(payload: unknown, fallback = "请求失败") {
   if (payload && typeof payload === "object") {
     const data = payload as { message?: string; msg?: string };
@@ -134,6 +144,9 @@ http.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    const silent = Boolean((config as ApiRequestConfig | undefined)?.silent);
+    if (silent) return Promise.reject(error);
+
     if (code != null && code !== 200) {
       notifyApiError(payload, code);
     } else if (axios.isAxiosError(error) && !config?.skipAuthRedirect) {
@@ -143,7 +156,7 @@ http.interceptors.response.use(
   },
 );
 
-function unwrap<T>(payload: ApiResult<T> | T): T {
+function unwrap<T>(payload: ApiResult<T> | T, silent = false): T {
   if (payload && typeof payload === "object" && "code" in payload) {
     const result = payload as ApiResult<T>;
     if (result.code !== 200) {
@@ -152,7 +165,7 @@ function unwrap<T>(payload: ApiResult<T> | T): T {
         handleUnauthorized(apiMessage(result, "登录已失效，请重新登录"));
         throw new Error(apiMessage(result, "登录已失效，请重新登录"));
       }
-      notifyApiError(result, result.code);
+      if (!silent) notifyApiError(result, result.code);
       throw new Error(apiMessage(result));
     }
     unauthorizedNotified = false;
@@ -163,7 +176,7 @@ function unwrap<T>(payload: ApiResult<T> | T): T {
 
 async function request<T>(config: AxiosRequestConfig): Promise<T> {
   const response: AxiosResponse<ApiResult<T> | T> = await http.request(config);
-  return unwrap(response.data);
+  return unwrap(response.data, Boolean((config as ApiRequestConfig | undefined)?.silent));
 }
 
 export function get<T>(url: string, params?: unknown, config?: AxiosRequestConfig) {
