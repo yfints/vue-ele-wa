@@ -34,7 +34,14 @@ const router = createRouter({
       path: "/",
       component: AppLayout,
       children: [
-        { path: "", redirect: "/courseMall" },
+        // 访问域名根路径：没登录先给登录页，登录后再进课程广场
+        {
+          path: "",
+          redirect: () =>
+            getToken()
+              ? "/courseMall"
+              : { path: "/login/index", query: { redirect: "/courseMall" } },
+        },
         { path: "home", redirect: "/home/index" },
         { path: "home/index", component: HomePage, meta: { title: "首页" } },
         { path: "textbook", redirect: "/textbook/index", meta: { public: true } },
