@@ -10626,3 +10626,552 @@ html.dark .vpBenefitDesc {
     }
 
 }
+
+/* ===== 学习手帐（设计稿 image_id=83f442e0 / c01fd5fc）=====
+ * 口径（设计稿 1440 宽，侧边栏 180 + 内容左右各 20）：
+ *  内容区 #F7F7F7，内边距 20；
+ *  说明卡 1220×150 圆角 12；页签卡 40 高圆角 12（与说明卡间距 20）；
+ *  工具条 32 高（与页签卡间距 10）；列表卡白底圆角 12（与工具条间距 10），
+ *  单行 88 高、行间 2 高 #F6F6F6 分隔线。
+ */
+
+.journalPage {
+    background: #f7f7f7;
+}
+
+.jbHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: var(--bg-card);
+}
+
+.jbHeadLeft {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.jbMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.jbTitle {
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.jbBody {
+    padding: 20px;
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.jbBody::-webkit-scrollbar {
+    display: none;
+}
+
+/* ---------- 说明卡 ---------- */
+
+.jbHero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 150px;
+    padding-left: 144px;
+    border-radius: 12px;
+    overflow: hidden;
+    /*
+     * 插画按 1:1 靠右固定（窗口变宽不会放大、变窄只裁左侧的渐变），
+     * 左侧用设计稿同色铺底；hero.png 左缘做了透明渐变，所以任何宽度都不会有接缝。
+     */
+    background: #e4eefd url("/clone-assets/journal/hero.png") right center / auto 150px no-repeat;
+}
+
+/* 剪贴板图标单独一个元素（不再烤进背景图，否则背景一裁就和文字错位） */
+.jbHeroIcon {
+    position: absolute;
+    top: 50%;
+    left: 38px;
+    display: block;
+    width: 79px;
+    transform: translateY(-50%);
+}
+
+.jbHeroTitle {
+    color: #333;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.jbHeroDesc {
+    margin-top: 12px;
+    color: #333;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+/* ---------- 页签卡 ---------- */
+
+.jbTabsCard {
+    height: 40px;
+    margin-top: 20px;
+    border-radius: 12px;
+    background: var(--bg-card);
+}
+
+.jbTabs,
+.jbTabs .el-tabs__header {
+    height: 40px;
+    margin: 0;
+}
+
+.jbTabs .el-tabs__nav-wrap::after,
+.jbTabs .el-tabs__active-bar {
+    display: none;
+}
+
+.jbTabs .el-tabs__nav {
+    height: 40px;
+}
+
+/* 设计稿：文字 14px（灰 #666 / 选中 #333 加粗），下划线只有文字宽，3 高、距底 2 */
+.jbTabs .el-tabs__item {
+    position: relative;
+    height: 40px;
+    padding: 0 20px !important;
+    color: #666;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 40px;
+}
+
+.jbTabs .el-tabs__item.is-active {
+    color: #333;
+    font-weight: 600;
+}
+
+.jbTabs .el-tabs__item.is-active::after {
+    content: "";
+    position: absolute;
+    right: 20px;
+    bottom: 2px;
+    left: 20px;
+    height: 3px;
+    border-radius: 2px;
+    background: #0056b5;
+}
+
+/* ---------- 工具条 ---------- */
+
+.jbTools {
+    gap: 10px;
+    height: 32px;
+    margin-top: 10px;
+}
+
+.jbPill {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    width: 70px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #eeeeee;
+    border-radius: 16px;
+    background: var(--bg-card);
+    color: #999;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 30px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.jbPillAct {
+    border-color: #0056b5;
+    background: #0056b5;
+    color: #fff;
+    font-weight: 600;
+}
+
+.jbSearch {
+    flex: 1;
+    min-width: 0;
+    margin-left: 10px;
+}
+
+.jbSearch .el-input__wrapper {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 16px;
+    background: var(--bg-card);
+    box-shadow: 0 0 0 1px #eeeeee inset;
+}
+
+.jbSearch .el-input__inner {
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.jbSearch .el-input__prefix {
+    margin-right: 8px;
+    color: #999;
+    font-size: 18px;
+}
+
+.jbSort {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    width: 113px;
+    height: 32px;
+    padding: 0 11px;
+    border: 1px solid #eeeeee;
+    border-radius: 16px;
+    background: var(--bg-card);
+    color: #333;
+    font-family: inherit;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.jbSortLabel {
+    flex: 0 0 auto;
+}
+
+.jbSortDir {
+    margin-left: 4px;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.jbSortCaret {
+    margin-left: 10px;
+    color: #666;
+    font-size: 13px;
+}
+
+.journalPage .jbClear.el-button {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    width: 113px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #eeeeee;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.journalPage .jbClear.el-button,
+.journalPage .jbClear.el-button:hover,
+.journalPage .jbClear.el-button:focus {
+    color: #f53f3f;
+}
+
+.journalPage .jbClear.el-button:hover,
+.journalPage .jbClear.el-button:focus {
+    border-color: #ffd7d7;
+    background: #fff5f5;
+}
+
+.journalPage .jbClear .el-icon {
+    margin-right: 5px;
+    font-size: 18px;
+}
+
+/* ---------- 列表 ---------- */
+
+.jbListCard {
+    margin-top: 10px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    overflow: hidden;
+}
+
+.jbRow {
+    box-sizing: border-box;
+    height: 88px;
+    padding: 0 20px;
+    border-bottom: 2px solid #f6f6f6;
+}
+
+.jbRow:last-child {
+    border-bottom: none;
+}
+
+.jbBadge {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+}
+
+.jbBadgeSentence {
+    background: #dfebff;
+}
+
+.jbBadgeWord {
+    background: #e7ffdf;
+}
+
+.jbBadgeQuote {
+    display: block;
+    width: 20px;
+}
+
+.jbBadgeAa {
+    color: #00c26d;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.jbInfo {
+    flex: 1;
+    min-width: 0;
+    margin-left: 13px;
+}
+
+.jbName {
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.jbDesc {
+    margin-top: 10px;
+    color: #666;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* 右侧按钮 140×40、圆角 10：不熟悉列表给「已掌握」（绿），已掌握列表给「不熟悉」（蓝） */
+.journalPage .jbBtn.el-button {
+    flex: 0 0 auto;
+    width: 140px;
+    height: 40px;
+    margin-left: 16px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.journalPage .jbBtnMaster.el-button {
+    background: #00c26d;
+    color: #fff;
+}
+
+.journalPage .jbBtnMaster.el-button:hover,
+.journalPage .jbBtnMaster.el-button:focus {
+    background: #00a95f;
+    color: #fff;
+}
+
+.journalPage .jbBtnStrange.el-button {
+    background: #0056b5;
+    color: #fff;
+}
+
+.journalPage .jbBtnStrange.el-button:hover,
+.journalPage .jbBtnStrange.el-button:focus {
+    background: #00499c;
+    color: #fff;
+}
+
+.jbMore {
+    padding: 12px 0;
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* 空态 */
+.jbEmpty {
+    min-height: 320px;
+    padding: 40px 0;
+}
+
+.jbEmptyImg {
+    width: 136px;
+}
+
+.jbEmptyText {
+    margin-top: 40px;
+    color: #999;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+/* 骨架屏 */
+.jbSkeletonBadge {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+}
+
+.jbSkeletonTitle {
+    width: 360px;
+    height: 16px;
+}
+
+.jbSkeletonDesc {
+    width: 220px;
+    height: 12px;
+    margin-top: 14px;
+}
+
+.jbSkeletonBtn {
+    flex: 0 0 auto;
+    width: 140px;
+    height: 40px;
+    margin-left: 16px;
+    border-radius: 10px;
+}
+
+/* ---------- 深色模式 ---------- */
+
+html.dark .journalPage {
+    background: var(--bg-container);
+}
+
+html.dark .jbTitle,
+html.dark .jbName,
+html.dark .jbSort {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .jbDesc {
+    color: var(--el-text-color-secondary);
+}
+
+/* 说明卡的背景图是浅色插画，文案在深色模式下也保持深色 */
+html.dark .jbHeroTitle,
+html.dark .jbHeroDesc {
+    color: #333;
+}
+
+html.dark .jbTabs .el-tabs__item {
+    color: var(--el-text-color-secondary);
+}
+
+html.dark .jbTabs .el-tabs__item.is-active {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .jbPill {
+    border-color: var(--theme-border);
+}
+
+html.dark .jbPillAct {
+    border-color: #2b7fd9;
+    background: #2b7fd9;
+    color: #fff;
+}
+
+html.dark .jbSearch .el-input__wrapper,
+html.dark .jbSort {
+    border-color: var(--theme-border);
+    box-shadow: 0 0 0 1px var(--theme-border) inset;
+}
+
+html.dark .jbRow,
+html.dark .jbRow:last-child {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ---------- 手机端 ---------- */
+
+@media (max-width: 900px) {
+    .jbBody {
+        height: calc(100dvh - 60px);
+        padding: 12px;
+    }
+
+    .jbHead {
+        padding: 0 12px;
+    }
+
+    .jbHero {
+        height: auto;
+        min-height: 118px;
+        padding: 20px 16px;
+        background-position: 78% center;
+        /* 手机上文字压在插画上，左侧加一层浅蓝蒙版保证可读性 */
+        background-image: linear-gradient(
+                90deg,
+                rgba(232, 240, 254, 0.96) 0%,
+                rgba(232, 240, 254, 0.78) 55%,
+                rgba(232, 240, 254, 0) 100%
+            ),
+            url("/clone-assets/journal/hero.png");
+        background-size: cover;
+    }
+
+    /* 手机上文字从最左边开始，图标会和文字打架，直接隐藏 */
+    .jbHeroIcon {
+        display: none;
+    }
+
+    .jbHeroTitle {
+        font-size: 20px;
+        line-height: 26px;
+    }
+
+    .jbHeroDesc {
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 17px;
+    }
+
+    .jbTools {
+        height: auto;
+        flex-wrap: wrap;
+        row-gap: 10px;
+    }
+
+    .jbSearch {
+        flex: 1 1 100%;
+        order: 5;
+        margin-left: 0;
+    }
+
+    .jbSort,
+    .journalPage .jbClear.el-button {
+        flex: 1 1 auto;
+        width: auto;
+    }
+
+    .jbRow {
+        height: auto;
+        padding: 12px;
+        flex-wrap: wrap;
+        row-gap: 12px;
+    }
+
+    .jbInfo {
+        flex: 1 1 160px;
+    }
+
+    .jbBadge {
+        width: 40px;
+        height: 40px;
+    }
+
+    .journalPage .jbBtn.el-button {
+        width: 100%;
+        margin-left: 0;
+    }
+}

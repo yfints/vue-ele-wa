@@ -54,6 +54,7 @@ const primary = [
   {
     label: "学习手帐",
     icon: "/clone-assets/menu/journal.svg",
+    to: "/journal/index",
   },
   {
     label: "我的收藏",

@@ -4,6 +4,7 @@ import AppLayout from "@/layouts/AppLayout.vue";
 import CourseDetailPage from "@/pages/CourseDetailPage.vue";
 import CourseMallPage from "@/pages/CourseMallPage.vue";
 import HomePage from "@/pages/HomePage.vue";
+import JournalPage from "@/pages/JournalPage.vue";
 import MyCourseCollectPage from "@/pages/MyCourseCollectPage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
 import GameLoadPage from "@/pages/GameLoadPage.vue";
@@ -108,6 +109,12 @@ const router = createRouter({
           path: "vip/index",
           component: VipPage,
           meta: { public: true, title: "开通会员" },
+        },
+        { path: "journal", redirect: "/journal/index", meta: { public: true } },
+        {
+          path: "journal/index",
+          component: JournalPage,
+          meta: { public: true, title: "学习手帐" },
         },
         { path: ":pathMatch(.*)*", redirect: "/home/index" },
       ],
