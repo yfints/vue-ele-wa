@@ -15,6 +15,7 @@ import StudyPlanPage from "@/pages/StudyPlanPage.vue";
 import TextbookPage from "@/pages/TextbookPage.vue";
 import TextbookDetailPage from "@/pages/TextbookDetailPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
+import VipPage from "@/pages/VipPage.vue";
 import WordsPage from "@/pages/WordsPage.vue";
 import WordDetailPage from "@/pages/WordDetailPage.vue";
 
@@ -101,6 +102,12 @@ const router = createRouter({
           path: "studyPlan/index",
           component: StudyPlanPage,
           meta: { public: true, title: "学习计划" },
+        },
+        { path: "vip", redirect: "/vip/index", meta: { public: true } },
+        {
+          path: "vip/index",
+          component: VipPage,
+          meta: { public: true, title: "开通会员" },
         },
         { path: ":pathMatch(.*)*", redirect: "/home/index" },
       ],

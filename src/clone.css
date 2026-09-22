@@ -10206,3 +10206,423 @@ html.dark .spBar .el-progress-bar__outer {
         margin-left: 0;
     }
 }
+
+/* ===== 开通会员（设计稿 image_id=8a0d7f05）=====
+ * 口径（设计稿 1440 宽，侧边栏 180 + 内容左右各 20）：
+ *  内容区 #F7F7F7，内边距 20；
+ *  横幅 1220×175 圆角 12（文案 36/20、左 60）；
+ *  权益卡 y=269~531、套餐卡 y=542~1005，均白底圆角 16、内边距 20，两卡间距 10；
+ *  权益条目 380×84（3 列、竖间距 10 / 横间距 20）；
+ *  套餐卡 380×251（推荐那张 380×271，多一条 20 高的「推荐购买」缎带）。
+ */
+
+.vipPage {
+    background: #f7f7f7;
+}
+
+.vpHead {
+    flex: 0 0 auto;
+    height: 60px;
+    padding: 0 20px;
+    background: var(--bg-card);
+}
+
+.vpHeadLeft {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.vpMenu {
+    margin-right: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.vpTitle {
+    color: #333;
+    font-size: 16px;
+    line-height: 22px;
+}
+
+.vpBody {
+    padding: 20px;
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.vpBody::-webkit-scrollbar {
+    display: none;
+}
+
+/* ---------- 横幅 ---------- */
+
+.vpHero {
+    box-sizing: border-box;
+    height: 175px;
+    padding: 51px 0 0 60px;
+    border-radius: 12px;
+    background: #ffdead url("/clone-assets/vip/hero.png") right center / cover no-repeat;
+}
+
+.vpHeroTitle {
+    color: #664300;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 44px;
+}
+
+.vpHeroSub {
+    margin-top: 7px;
+    color: #664300;
+    font-size: 20px;
+    line-height: 28px;
+}
+
+/* ---------- 白卡 + 小标题 ---------- */
+
+.vpCard {
+    margin-top: 14px;
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--bg-card);
+}
+
+/* 权益卡与套餐卡之间空 10（设计稿 y=531~541） */
+.vpCard + .vpCard {
+    margin-top: 10px;
+}
+
+.vpCardTitle {
+    color: #333;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 26px;
+}
+
+/* 皇冠（18×13）用 mask 上色，方便深色模式跟文字一起变色 */
+.vpCrown {
+    width: 18px;
+    height: 13px;
+    margin-right: 11px;
+    background-color: currentColor;
+    -webkit-mask: url("/clone-assets/vip/crown.png") center / contain no-repeat;
+    mask: url("/clone-assets/vip/crown.png") center / contain no-repeat;
+}
+
+/* ---------- 会员权益 ---------- */
+
+.vpBenefits {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 20px;
+    margin-top: 19px;
+}
+
+.vpBenefit {
+    box-sizing: border-box;
+    height: 84px;
+    padding: 0 16px 0 21px;
+    border: 1px solid #fce3b5;
+    border-radius: 10px;
+    background: #fffbf3;
+}
+
+.vpBenefitIcon {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #ffe1b6;
+}
+
+.vpBenefitIcon img {
+    display: block;
+    height: auto;
+    position: relative;
+    top: -5px;
+    left: -4px;
+}
+
+.vpBenefitText {
+    min-width: 0;
+    margin-left: 7px;
+}
+
+.vpBenefitName {
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+.vpBenefitDesc {
+    margin-top: 6px;
+    color: #999;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+/* ---------- 套餐 ---------- */
+
+/* 推荐那张卡整体比另外两张高 20（顶部多一条缎带），三张底边对齐 */
+.vpPlans {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: 20px;
+}
+
+.vpPlan {
+    position: relative;
+    box-sizing: border-box;
+    height: 251px;
+    border-radius: 12px;
+    background: #fff;
+    /* 用 inset 阴影描边，避免 border 影响内部尺寸 */
+    box-shadow: inset 0 0 0 1px #eeeeee;
+}
+
+.vpPlanRec {
+    height: 271px;
+    background: #fffbf3;
+    box-shadow: inset 0 0 0 3px #ffd173;
+    overflow: hidden;
+}
+
+.vpRibbon {
+    height: 20px;
+    background: #ffd173;
+    color: #664300;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+}
+
+/* 省 ¥18 / 省 ¥150 角标：卡内右上角 */
+.vpSave {
+    position: absolute;
+    top: 30px;
+    right: 20px;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 8px;
+    background: #ff4d4d;
+    color: #fff;
+    font-size: 14px;
+    line-height: 30px;
+}
+
+.vpPlanBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 32px 20px 20px;
+}
+
+.vpPlanRec .vpPlanBody {
+    height: calc(100% - 20px);
+    padding-top: 31px;
+}
+
+.vpPlanName {
+    color: #333;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+}
+
+.vpPlanPrice {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin-top: 8px;
+    color: #333;
+}
+
+.vpYuan {
+    margin-right: 6px;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.vpNum {
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 48px;
+}
+
+.vpUnit {
+    margin-left: 8px;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.vpPlanSub {
+    height: 20px;
+    margin-top: 20px;
+    color: #666;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.vpBtn.el-button {
+    width: 100%;
+    height: 60px;
+    margin-top: auto;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: #333333;
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+}
+
+.vpBtn.el-button:hover,
+.vpBtn.el-button:focus {
+    background: #1f1f1f;
+    color: #fff;
+}
+
+/* ---------- 扫码支付 ---------- */
+
+.vpPay {
+    margin-top: 14px;
+}
+
+.vpQr {
+    display: block;
+    width: 80px;
+    height: 80px;
+}
+
+.vpPayTip {
+    margin-top: 16px;
+    gap: 7px;
+    color: #666;
+    font-size: 12px;
+    line-height: 17px;
+}
+
+.vpPayIcon {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+/* ---------- 侧边栏「开通会员」选中态：金色胶囊 + 白色图标 ---------- */
+
+.dashVip .card.cardAct {
+    background: linear-gradient(90deg, #f6c67e 0%, #eca138 100%) !important;
+    color: #fff;
+}
+
+.dashVip .card.cardAct .dashMenuIconPng {
+    filter: brightness(0) invert(1);
+}
+
+/* ---------- 深色模式 ---------- */
+
+html.dark .vipPage {
+    background: var(--bg-container);
+}
+
+html.dark .vpTitle,
+html.dark .vpCardTitle,
+html.dark .vpPlanName,
+html.dark .vpPlanPrice,
+html.dark .vpBenefitName {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .vpBenefit {
+    border-color: rgba(255, 209, 115, 0.28);
+    background: rgba(255, 209, 115, 0.08);
+}
+
+html.dark .vpPlan {
+    background: var(--bg-card);
+    box-shadow: inset 0 0 0 1px var(--theme-border);
+}
+
+html.dark .vpPlanRec {
+    background: rgba(255, 209, 115, 0.08);
+    box-shadow: inset 0 0 0 3px #b98a2e;
+}
+
+html.dark .vpPlanSub,
+html.dark .vpPayTip {
+    color: var(--el-text-color-secondary);
+}
+
+html.dark .vpBenefitDesc {
+    color: var(--el-text-color-secondary);
+}
+
+/* ---------- 手机端 ---------- */
+
+@media (max-width: 900px) {
+    .vpBody {
+        height: calc(100dvh - 60px);
+        padding: 12px;
+    }
+
+    .vpHead {
+        padding: 0 12px;
+    }
+
+    .vpHero {
+        height: auto;
+        padding: 24px 16px 24px;
+        background-position: 78% center;
+        /* 手机上文字压在插画上，左侧加一层暖色蒙版保证可读性 */
+        background-image: linear-gradient(
+                90deg,
+                rgba(255, 231, 199, 0.94) 0%,
+                rgba(255, 231, 199, 0.72) 52%,
+                rgba(255, 231, 199, 0) 100%
+            ),
+            url("/clone-assets/vip/hero.png");
+        background-size: cover;
+    }
+
+    .vpHeroTitle {
+        font-size: 26px;
+        line-height: 34px;
+    }
+
+    .vpHeroSub {
+        font-size: 15px;
+        line-height: 22px;
+    }
+
+    .vpCard {
+        padding: 14px;
+    }
+
+    .vpBenefits {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .vpBenefit {
+        height: 76px;
+        padding-left: 14px;
+    }
+
+    .vpBenefitName {
+        font-size: 15px;
+    }
+
+    .vpPlans {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: stretch;
+        gap: 12px;
+    }
+
+}

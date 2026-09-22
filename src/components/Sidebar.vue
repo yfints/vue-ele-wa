@@ -64,6 +64,7 @@ const primary = [
     label: "开通会员",
     icon: "/clone-assets/menu/vip.png",
     tone: "dashVip",
+    to: "/vip/index",
   },
 ];
 </script>
